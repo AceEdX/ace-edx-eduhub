@@ -47,11 +47,11 @@ function LearnPage() {
     (async () => {
       const { data } = await supabase
         .from("lesson_progress")
-        .select("lesson_id, completed")
+        .select("lesson_id")
         .eq("user_id", user.id)
         .eq("course_id", course.data!.id);
       if (!cancelled && data) {
-        setCompleted(new Set(data.filter((d) => d.completed).map((d) => d.lesson_id)));
+        setCompleted(new Set(data.map((d) => d.lesson_id)));
       }
     })();
     return () => {
@@ -73,24 +73,30 @@ function LearnPage() {
     else next.add(active.id);
     setCompleted(next);
 
-    await supabase.from("lesson_progress").upsert(
-      {
-        user_id: user.id,
-        course_id: course.data.id,
-        lesson_id: active.id,
-        completed: !isDone,
-        completed_at: isDone ? null : new Date().toISOString(),
-      },
-      { onConflict: "user_id,lesson_id" },
-    );
+    if (isDone) {
+      await supabase
+        .from("lesson_progress")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("lesson_id", active.id);
+    } else {
+      await supabase.from("lesson_progress").upsert(
+        {
+          user_id: user.id,
+          course_id: course.data.id,
+          lesson_id: active.id,
+          completed_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,lesson_id" },
+      );
+    }
 
     const pct = Math.round((next.size / flat.length) * 100);
     await supabase
       .from("enrollments")
       .update({
-        progress_percent: pct,
+        progress: pct,
         completed_at: pct === 100 ? new Date().toISOString() : null,
-        last_accessed_at: new Date().toISOString(),
       })
       .eq("user_id", user.id)
       .eq("course_id", course.data.id);
@@ -178,7 +184,7 @@ function LearnPage() {
           <p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
             {active.module_title}
           </p>
-          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{active.summary}</p>
+          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{active.content}</p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Button variant={completed.has(active.id) ? "success" : "brand"} onClick={toggleComplete}>

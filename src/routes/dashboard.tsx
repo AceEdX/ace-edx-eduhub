@@ -52,11 +52,11 @@ function DashboardPage() {
         .from("enrollments")
         .select("*, courses(*)")
         .eq("user_id", user!.id)
-        .order("last_accessed_at", { ascending: false });
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as unknown as Array<{
         id: string;
-        progress_percent: number;
+        progress: number;
         courses: Course;
       }>;
     },
@@ -151,16 +151,16 @@ function DashboardPage() {
                     <div>
                       <p className="font-semibold">{e.courses?.title}</p>
                       <p className="text-xs text-muted-foreground">
-                        {e.progress_percent}% complete
+                        {e.progress}% complete
                       </p>
                     </div>
                     <Button variant="brand" size="sm" asChild>
                       <Link to="/learn/$slug" params={{ slug: e.courses.slug }}>
-                        {e.progress_percent > 0 ? "Resume" : "Start"}
+                        {e.progress > 0 ? "Resume" : "Start"}
                       </Link>
                     </Button>
                   </div>
-                  <Progress value={e.progress_percent} className="mt-4" />
+                  <Progress value={e.progress} className="mt-4" />
                 </li>
               ))}
             </ul>
