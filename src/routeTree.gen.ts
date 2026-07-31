@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CertificatesRouteImport } from './routes/certificates'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as MyLearningRouteImport } from './routes/my-learning'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as CommunityIndexRouteImport } from './routes/community.index'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
@@ -53,6 +54,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const MyLearningRoute = MyLearningRouteImport.update({
   id: '/my-learning',
   path: '/my-learning',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommunityIndexRoute = CommunityIndexRouteImport.update({
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/certificates': typeof CertificatesRoute
   '/dashboard': typeof DashboardRoute
   '/my-learning': typeof MyLearningRoute
+  '/profile': typeof ProfileRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/verify/$certificateId': typeof VerifyCertificateIdRoute
@@ -125,6 +132,7 @@ export interface FileRoutesByTo {
   '/certificates': typeof CertificatesRoute
   '/dashboard': typeof DashboardRoute
   '/my-learning': typeof MyLearningRoute
+  '/profile': typeof ProfileRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/verify/$certificateId': typeof VerifyCertificateIdRoute
@@ -143,6 +151,7 @@ export interface FileRoutesById {
   '/certificates': typeof CertificatesRoute
   '/dashboard': typeof DashboardRoute
   '/my-learning': typeof MyLearningRoute
+  '/profile': typeof ProfileRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/verify/$certificateId': typeof VerifyCertificateIdRoute
@@ -162,6 +171,7 @@ export interface FileRouteTypes {
     | '/certificates'
     | '/dashboard'
     | '/my-learning'
+    | '/profile'
     | '/courses/$slug'
     | '/learn/$slug'
     | '/verify/$certificateId'
@@ -179,6 +189,7 @@ export interface FileRouteTypes {
     | '/certificates'
     | '/dashboard'
     | '/my-learning'
+    | '/profile'
     | '/courses/$slug'
     | '/learn/$slug'
     | '/verify/$certificateId'
@@ -196,6 +207,7 @@ export interface FileRouteTypes {
     | '/certificates'
     | '/dashboard'
     | '/my-learning'
+    | '/profile'
     | '/courses/$slug'
     | '/learn/$slug'
     | '/verify/$certificateId'
@@ -214,6 +226,7 @@ export interface RootRouteChildren {
   CertificatesRoute: typeof CertificatesRoute
   DashboardRoute: typeof DashboardRoute
   MyLearningRoute: typeof MyLearningRoute
+  ProfileRoute: typeof ProfileRoute
   CoursesSlugRoute: typeof CoursesSlugRoute
   LearnSlugRoute: typeof LearnSlugRoute
   VerifyCertificateIdRoute: typeof VerifyCertificateIdRoute
@@ -267,6 +280,13 @@ declare module '@tanstack/react-router' {
       path: '/my-learning'
       fullPath: '/my-learning'
       preLoaderRoute: typeof MyLearningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/community/': {
@@ -342,6 +362,7 @@ const rootRouteChildren: RootRouteChildren = {
   CertificatesRoute: CertificatesRoute,
   DashboardRoute: DashboardRoute,
   MyLearningRoute: MyLearningRoute,
+  ProfileRoute: ProfileRoute,
   CoursesSlugRoute: CoursesSlugRoute,
   LearnSlugRoute: LearnSlugRoute,
   VerifyCertificateIdRoute: VerifyCertificateIdRoute,
