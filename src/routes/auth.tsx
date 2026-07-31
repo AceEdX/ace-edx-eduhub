@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import { z } from "zod";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 const emailSchema = z.string().trim().email("Enter a valid email address").max(255);
-const passwordSchema = z.string().min(8, "Use at least 8 characters").max(72);
+const passwordSchema = z.string().min(1, "Enter a password").max(72);
 
 type Form = {
   fullName: string;
