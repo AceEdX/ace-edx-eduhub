@@ -81,6 +81,8 @@ function AuthPage() {
   const [signinEmail, setSigninEmail] = useState("");
   const [signinPassword, setSigninPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showSigninPassword, setShowSigninPassword] = useState(false);
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
 
   useEffect(() => {
     if (!loading && user) navigate({ to: "/dashboard", replace: true });
