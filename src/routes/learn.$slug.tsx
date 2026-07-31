@@ -2,13 +2,14 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CheckCircle2, ChevronLeft, ChevronRight, Circle, PlayCircle } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ChevronRight, Circle } from "lucide-react";
 import { PageShell, EmptyState } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { courseQuery, lessonsQuery } from "@/lib/api";
 import { groupModules } from "@/lib/modules";
+import { LessonMedia } from "@/components/LessonMedia";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -173,18 +174,19 @@ function LearnPage() {
             ← {course.data.title}
           </Link>
 
-          <div className="mt-4 flex aspect-video items-center justify-center rounded-2xl border border-border bg-primary text-primary-foreground">
-            <div className="text-center">
-              <PlayCircle className="mx-auto h-14 w-14 opacity-80" />
-              <p className="mt-3 text-sm opacity-80">{active.duration_min} min lesson</p>
-            </div>
-          </div>
+          <LessonMedia lesson={active} />
 
           <h1 className="mt-6 font-display text-2xl font-semibold">{active.title}</h1>
           <p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
             {active.module_title}
           </p>
-          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{active.content}</p>
+          {active.content && (
+            <div className="prose-lesson mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground">
+              {active.content.split("\n").filter(Boolean).map((para, i) => (
+                <p key={i}>{para}</p>
+              ))}
+            </div>
+          )}
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Button variant={completed.has(active.id) ? "success" : "brand"} onClick={toggleComplete}>
