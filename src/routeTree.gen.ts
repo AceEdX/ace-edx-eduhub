@@ -11,10 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CertificatesRouteImport } from './routes/certificates'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CommunityIndexRouteImport } from './routes/community.index'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
 import { Route as ExpertsIndexRouteImport } from './routes/experts.index'
+import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
 import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
 import { Route as VerifyCertificateIdRouteImport } from './routes/verify.$certificateId'
 import { Route as WebinarsIndexRouteImport } from './routes/webinars.index'
@@ -28,6 +31,16 @@ const IndexRoute = IndexRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificatesRoute = CertificatesRouteImport.update({
+  id: '/certificates',
+  path: '/certificates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommunityIndexRoute = CommunityIndexRouteImport.update({
@@ -48,6 +61,11 @@ const CoursesSlugRoute = CoursesSlugRouteImport.update({
 const ExpertsIndexRoute = ExpertsIndexRouteImport.update({
   id: '/experts/',
   path: '/experts/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnSlugRoute = LearnSlugRouteImport.update({
+  id: '/learn/$slug',
+  path: '/learn/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResourcesIndexRoute = ResourcesIndexRouteImport.update({
@@ -74,7 +92,10 @@ const WebinarsSlugRoute = WebinarsSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/certificates': typeof CertificatesRoute
+  '/dashboard': typeof DashboardRoute
   '/courses/$slug': typeof CoursesSlugRoute
+  '/learn/$slug': typeof LearnSlugRoute
   '/verify/$certificateId': typeof VerifyCertificateIdRoute
   '/webinars/$slug': typeof WebinarsSlugRoute
   '/community/': typeof CommunityIndexRoute
@@ -86,7 +107,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/certificates': typeof CertificatesRoute
+  '/dashboard': typeof DashboardRoute
   '/courses/$slug': typeof CoursesSlugRoute
+  '/learn/$slug': typeof LearnSlugRoute
   '/verify/$certificateId': typeof VerifyCertificateIdRoute
   '/webinars/$slug': typeof WebinarsSlugRoute
   '/community': typeof CommunityIndexRoute
@@ -99,7 +123,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/certificates': typeof CertificatesRoute
+  '/dashboard': typeof DashboardRoute
   '/courses/$slug': typeof CoursesSlugRoute
+  '/learn/$slug': typeof LearnSlugRoute
   '/verify/$certificateId': typeof VerifyCertificateIdRoute
   '/webinars/$slug': typeof WebinarsSlugRoute
   '/community/': typeof CommunityIndexRoute
@@ -113,7 +140,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/certificates'
+    | '/dashboard'
     | '/courses/$slug'
+    | '/learn/$slug'
     | '/verify/$certificateId'
     | '/webinars/$slug'
     | '/community/'
@@ -125,7 +155,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/certificates'
+    | '/dashboard'
     | '/courses/$slug'
+    | '/learn/$slug'
     | '/verify/$certificateId'
     | '/webinars/$slug'
     | '/community'
@@ -137,7 +170,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/auth'
+    | '/certificates'
+    | '/dashboard'
     | '/courses/$slug'
+    | '/learn/$slug'
     | '/verify/$certificateId'
     | '/webinars/$slug'
     | '/community/'
@@ -150,7 +186,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  CertificatesRoute: typeof CertificatesRoute
+  DashboardRoute: typeof DashboardRoute
   CoursesSlugRoute: typeof CoursesSlugRoute
+  LearnSlugRoute: typeof LearnSlugRoute
   VerifyCertificateIdRoute: typeof VerifyCertificateIdRoute
   WebinarsSlugRoute: typeof WebinarsSlugRoute
   CommunityIndexRoute: typeof CommunityIndexRoute
@@ -174,6 +213,20 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certificates': {
+      id: '/certificates'
+      path: '/certificates'
+      fullPath: '/certificates'
+      preLoaderRoute: typeof CertificatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/community/': {
@@ -202,6 +255,13 @@ declare module '@tanstack/react-router' {
       path: '/experts'
       fullPath: '/experts/'
       preLoaderRoute: typeof ExpertsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn/$slug': {
+      id: '/learn/$slug'
+      path: '/learn/$slug'
+      fullPath: '/learn/$slug'
+      preLoaderRoute: typeof LearnSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resources/': {
@@ -238,7 +298,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  CertificatesRoute: CertificatesRoute,
+  DashboardRoute: DashboardRoute,
   CoursesSlugRoute: CoursesSlugRoute,
+  LearnSlugRoute: LearnSlugRoute,
   VerifyCertificateIdRoute: VerifyCertificateIdRoute,
   WebinarsSlugRoute: WebinarsSlugRoute,
   CommunityIndexRoute: CommunityIndexRoute,
