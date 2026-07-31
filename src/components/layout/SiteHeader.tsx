@@ -14,10 +14,12 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { NAV_LINKS } from "@/lib/brand";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
 
 export function SiteHeader() {
   const { user } = useAuth();
+  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [term, setTerm] = useState("");
@@ -96,6 +98,14 @@ export function SiteHeader() {
                   <DropdownMenuItem asChild>
                     <Link to="/profile">My Profile</Link>
                   </DropdownMenuItem>
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin">Admin console</Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onSelect={signOut}>
                     <LogOut className="mr-2 h-4 w-4" /> Log out
