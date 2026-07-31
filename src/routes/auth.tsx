@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import { z } from "zod";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 const emailSchema = z.string().trim().email("Enter a valid email address").max(255);
-const passwordSchema = z.string().min(8, "Use at least 8 characters").max(72);
+const passwordSchema = z.string().min(1, "Enter a password").max(72);
 
 type Form = {
   fullName: string;
@@ -81,6 +81,8 @@ function AuthPage() {
   const [signinEmail, setSigninEmail] = useState("");
   const [signinPassword, setSigninPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showSigninPassword, setShowSigninPassword] = useState(false);
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
 
   useEffect(() => {
     if (!loading && user) navigate({ to: "/dashboard", replace: true });
@@ -230,14 +232,25 @@ function AuthPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={signinPassword}
-                  onChange={(e) => setSigninPassword(e.target.value)}
-                  autoComplete="current-password"
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showSigninPassword ? "text" : "password"}
+                    required
+                    value={signinPassword}
+                    onChange={(e) => setSigninPassword(e.target.value)}
+                    autoComplete="current-password"
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowSigninPassword((v) => !v)}
+                    aria-label={showSigninPassword ? "Hide password" : "Show password"}
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
+                  >
+                    {showSigninPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
               <Button type="submit" variant="brand" className="w-full" disabled={busy}>
                 {busy && <Loader2 className="h-4 w-4 animate-spin" />} Sign in
@@ -285,14 +298,25 @@ function AuthPage() {
                 {step === 2 && (
                   <div className="space-y-2">
                     <Label htmlFor="signupPassword">Create a password</Label>
-                    <Input
-                      id="signupPassword"
-                      type="password"
-                      value={form.password}
-                      onChange={(e) => set("password", e.target.value)}
-                      autoComplete="new-password"
-                    />
-                    <p className="text-xs text-muted-foreground">At least 8 characters.</p>
+                    <div className="relative">
+                      <Input
+                        id="signupPassword"
+                        type={showSignupPassword ? "text" : "password"}
+                        value={form.password}
+                        onChange={(e) => set("password", e.target.value)}
+                        autoComplete="new-password"
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowSignupPassword((v) => !v)}
+                        aria-label={showSignupPassword ? "Hide password" : "Show password"}
+                        className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
+                      >
+                        {showSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Any password you like.</p>
                   </div>
                 )}
                 {step === 3 && (
