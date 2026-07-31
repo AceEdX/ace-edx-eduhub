@@ -298,14 +298,25 @@ function AuthPage() {
                 {step === 2 && (
                   <div className="space-y-2">
                     <Label htmlFor="signupPassword">Create a password</Label>
-                    <Input
-                      id="signupPassword"
-                      type="password"
-                      value={form.password}
-                      onChange={(e) => set("password", e.target.value)}
-                      autoComplete="new-password"
-                    />
-                    <p className="text-xs text-muted-foreground">At least 8 characters.</p>
+                    <div className="relative">
+                      <Input
+                        id="signupPassword"
+                        type={showSignupPassword ? "text" : "password"}
+                        value={form.password}
+                        onChange={(e) => set("password", e.target.value)}
+                        autoComplete="new-password"
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowSignupPassword((v) => !v)}
+                        aria-label={showSignupPassword ? "Hide password" : "Show password"}
+                        className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
+                      >
+                        {showSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Any password you like.</p>
                   </div>
                 )}
                 {step === 3 && (
