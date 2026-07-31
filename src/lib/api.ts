@@ -32,6 +32,7 @@ export type Course = {
   learners: number;
   outcomes: string[];
   audience: string[];
+  format: string;
   expert_id: string | null;
   experts?: Expert | null;
 };
@@ -46,6 +47,8 @@ export type Lesson = {
   kind: string;
   duration_min: number;
   content: string | null;
+  video_url: string | null;
+  document_url: string | null;
 };
 
 export type Webinar = {

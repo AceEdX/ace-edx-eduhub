@@ -200,6 +200,7 @@ export type Database = {
           description: string | null
           duration_hours: number
           expert_id: string | null
+          format: string
           id: string
           image_url: string | null
           is_free: boolean
@@ -223,6 +224,7 @@ export type Database = {
           description?: string | null
           duration_hours?: number
           expert_id?: string | null
+          format?: string
           id?: string
           image_url?: string | null
           is_free?: boolean
@@ -246,6 +248,7 @@ export type Database = {
           description?: string | null
           duration_hours?: number
           expert_id?: string | null
+          format?: string
           id?: string
           image_url?: string | null
           is_free?: boolean
@@ -428,6 +431,7 @@ export type Database = {
           content: string | null
           course_id: string
           created_at: string
+          document_url: string | null
           duration_min: number
           id: string
           kind: string
@@ -435,11 +439,13 @@ export type Database = {
           module_order: number
           module_title: string
           title: string
+          video_url: string | null
         }
         Insert: {
           content?: string | null
           course_id: string
           created_at?: string
+          document_url?: string | null
           duration_min?: number
           id?: string
           kind?: string
@@ -447,11 +453,13 @@ export type Database = {
           module_order?: number
           module_title: string
           title: string
+          video_url?: string | null
         }
         Update: {
           content?: string | null
           course_id?: string
           created_at?: string
+          document_url?: string | null
           duration_min?: number
           id?: string
           kind?: string
@@ -459,6 +467,7 @@ export type Database = {
           module_order?: number
           module_title?: string
           title?: string
+          video_url?: string | null
         }
         Relationships: [
           {
@@ -510,7 +519,9 @@ export type Database = {
           item_type: string
           provider: string
           provider_order_id: string | null
+          provider_payment_id: string | null
           status: string
+          updated_at: string
           user_id: string
         }
         Insert: {
@@ -522,7 +533,9 @@ export type Database = {
           item_type: string
           provider?: string
           provider_order_id?: string | null
+          provider_payment_id?: string | null
           status?: string
+          updated_at?: string
           user_id: string
         }
         Update: {
@@ -534,7 +547,9 @@ export type Database = {
           item_type?: string
           provider?: string
           provider_order_id?: string | null
+          provider_payment_id?: string | null
           status?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []

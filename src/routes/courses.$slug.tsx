@@ -17,6 +17,7 @@ import { groupModules } from "@/lib/modules";
 import { formatPrice } from "@/lib/brand";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { payAndUnlock } from "@/lib/razorpay";
 
 export const Route = createFileRoute("/courses/$slug")({
   head: ({ params }) => ({
@@ -70,23 +71,17 @@ function CourseDetail() {
     const data = course.data;
     if (!data) return;
 
-    if (!data.is_free) {
-      const { error } = await supabase.from("orders").insert({
-        user_id: user.id,
-        item_type: "course",
-        item_id: data.id,
-        item_title: data.title,
-        amount_inr: data.price_inr,
-        status: "pending",
-        provider: "razorpay",
+    if (!data.is_free && data.price_inr > 0) {
+      await payAndUnlock({
+        itemType: "course",
+        itemId: data.id,
+        email: user.email ?? "",
+        onSuccess: async () => {
+          await queryClient.invalidateQueries({ queryKey: ["enrollments"] });
+          navigate({ to: "/learn/$slug", params: { slug } });
+        },
       });
-      if (error) {
-        toast.error(error.message);
-        return;
-      }
-      toast.info(
-        "Razorpay checkout is not connected yet — your order is saved and access has been granted for preview.",
-      );
+      return;
     }
 
     const { error } = await supabase

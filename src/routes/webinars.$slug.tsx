@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { formatPrice } from "@/lib/brand";
+import { payAndUnlock } from "@/lib/razorpay";
 import type { Webinar } from "@/lib/api";
 
 export const Route = createFileRoute("/webinars/$slug")({
@@ -79,6 +80,24 @@ function WebinarDetail() {
 
   const countdown = useCountdown(webinar.data?.starts_at);
 
+  async function confirmRegistration(w: Webinar) {
+    const { error } = await supabase
+      .from("webinar_registrations")
+      .upsert({ user_id: user!.id, webinar_id: w.id }, { onConflict: "user_id,webinar_id" });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    await supabase.from("notifications").insert({
+      user_id: user!.id,
+      title: "Webinar registration confirmed",
+      body: `You are registered for ${w.title}. We'll remind you 24 hours and 1 hour before.`,
+      link: `/webinars/${w.slug}`,
+    });
+    await registration.refetch();
+    toast.success("You're registered — confirmation sent to your notifications");
+  }
+
   async function register() {
     if (!user) {
       navigate({ to: "/auth", search: { mode: "signup" } });
@@ -86,33 +105,18 @@ function WebinarDetail() {
     }
     const w = webinar.data;
     if (!w) return;
-    if (!w.is_free) {
-      await supabase.from("orders").insert({
-        user_id: user.id,
-        item_type: "webinar",
-        item_id: w.id,
-        item_title: w.title,
-        amount_inr: w.price_inr,
-        status: "pending",
-        provider: "razorpay",
+
+    if (!w.is_free && w.price_inr > 0) {
+      await payAndUnlock({
+        itemType: "webinar",
+        itemId: w.id,
+        email: user.email ?? "",
+        onSuccess: () => confirmRegistration(w),
       });
-      toast.info("Razorpay checkout is not connected yet — your seat is held for preview.");
-    }
-    const { error } = await supabase
-      .from("webinar_registrations")
-      .upsert({ user_id: user.id, webinar_id: w.id }, { onConflict: "user_id,webinar_id" });
-    if (error) {
-      toast.error(error.message);
       return;
     }
-    await supabase.from("notifications").insert({
-      user_id: user.id,
-      title: "Webinar registration confirmed",
-      body: `You are registered for ${w.title}. We'll remind you 24 hours and 1 hour before.`,
-      link: `/webinars/${w.slug}`,
-    });
-    await registration.refetch();
-    toast.success("You're registered — confirmation sent to your notifications");
+
+    await confirmRegistration(w);
   }
 
   async function markAttended() {
