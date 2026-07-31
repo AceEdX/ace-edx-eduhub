@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { formatPrice } from "@/lib/brand";
+import { payAndUnlock } from "@/lib/razorpay";
 import type { Webinar } from "@/lib/api";
 
 export const Route = createFileRoute("/webinars/$slug")({
