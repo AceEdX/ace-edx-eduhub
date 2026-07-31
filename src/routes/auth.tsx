@@ -232,14 +232,25 @@ function AuthPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={signinPassword}
-                  onChange={(e) => setSigninPassword(e.target.value)}
-                  autoComplete="current-password"
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showSigninPassword ? "text" : "password"}
+                    required
+                    value={signinPassword}
+                    onChange={(e) => setSigninPassword(e.target.value)}
+                    autoComplete="current-password"
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowSigninPassword((v) => !v)}
+                    aria-label={showSigninPassword ? "Hide password" : "Show password"}
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
+                  >
+                    {showSigninPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
               <Button type="submit" variant="brand" className="w-full" disabled={busy}>
                 {busy && <Loader2 className="h-4 w-4 animate-spin" />} Sign in
