@@ -10,33 +10,193 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CertificatesRouteImport } from './routes/certificates'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CommunityIndexRouteImport } from './routes/community.index'
+import { Route as CoursesIndexRouteImport } from './routes/courses.index'
+import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
+import { Route as ExpertsIndexRouteImport } from './routes/experts.index'
+import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
+import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
+import { Route as VerifyCertificateIdRouteImport } from './routes/verify.$certificateId'
+import { Route as WebinarsIndexRouteImport } from './routes/webinars.index'
+import { Route as WebinarsSlugRouteImport } from './routes/webinars.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificatesRoute = CertificatesRouteImport.update({
+  id: '/certificates',
+  path: '/certificates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityIndexRoute = CommunityIndexRouteImport.update({
+  id: '/community/',
+  path: '/community/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoursesIndexRoute = CoursesIndexRouteImport.update({
+  id: '/courses/',
+  path: '/courses/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoursesSlugRoute = CoursesSlugRouteImport.update({
+  id: '/courses/$slug',
+  path: '/courses/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExpertsIndexRoute = ExpertsIndexRouteImport.update({
+  id: '/experts/',
+  path: '/experts/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnSlugRoute = LearnSlugRouteImport.update({
+  id: '/learn/$slug',
+  path: '/learn/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesIndexRoute = ResourcesIndexRouteImport.update({
+  id: '/resources/',
+  path: '/resources/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyCertificateIdRoute = VerifyCertificateIdRouteImport.update({
+  id: '/verify/$certificateId',
+  path: '/verify/$certificateId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WebinarsIndexRoute = WebinarsIndexRouteImport.update({
+  id: '/webinars/',
+  path: '/webinars/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WebinarsSlugRoute = WebinarsSlugRouteImport.update({
+  id: '/webinars/$slug',
+  path: '/webinars/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/certificates': typeof CertificatesRoute
+  '/dashboard': typeof DashboardRoute
+  '/courses/$slug': typeof CoursesSlugRoute
+  '/learn/$slug': typeof LearnSlugRoute
+  '/verify/$certificateId': typeof VerifyCertificateIdRoute
+  '/webinars/$slug': typeof WebinarsSlugRoute
+  '/community/': typeof CommunityIndexRoute
+  '/courses/': typeof CoursesIndexRoute
+  '/experts/': typeof ExpertsIndexRoute
+  '/resources/': typeof ResourcesIndexRoute
+  '/webinars/': typeof WebinarsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/certificates': typeof CertificatesRoute
+  '/dashboard': typeof DashboardRoute
+  '/courses/$slug': typeof CoursesSlugRoute
+  '/learn/$slug': typeof LearnSlugRoute
+  '/verify/$certificateId': typeof VerifyCertificateIdRoute
+  '/webinars/$slug': typeof WebinarsSlugRoute
+  '/community': typeof CommunityIndexRoute
+  '/courses': typeof CoursesIndexRoute
+  '/experts': typeof ExpertsIndexRoute
+  '/resources': typeof ResourcesIndexRoute
+  '/webinars': typeof WebinarsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/certificates': typeof CertificatesRoute
+  '/dashboard': typeof DashboardRoute
+  '/courses/$slug': typeof CoursesSlugRoute
+  '/learn/$slug': typeof LearnSlugRoute
+  '/verify/$certificateId': typeof VerifyCertificateIdRoute
+  '/webinars/$slug': typeof WebinarsSlugRoute
+  '/community/': typeof CommunityIndexRoute
+  '/courses/': typeof CoursesIndexRoute
+  '/experts/': typeof ExpertsIndexRoute
+  '/resources/': typeof ResourcesIndexRoute
+  '/webinars/': typeof WebinarsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/certificates'
+    | '/dashboard'
+    | '/courses/$slug'
+    | '/learn/$slug'
+    | '/verify/$certificateId'
+    | '/webinars/$slug'
+    | '/community/'
+    | '/courses/'
+    | '/experts/'
+    | '/resources/'
+    | '/webinars/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/certificates'
+    | '/dashboard'
+    | '/courses/$slug'
+    | '/learn/$slug'
+    | '/verify/$certificateId'
+    | '/webinars/$slug'
+    | '/community'
+    | '/courses'
+    | '/experts'
+    | '/resources'
+    | '/webinars'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/certificates'
+    | '/dashboard'
+    | '/courses/$slug'
+    | '/learn/$slug'
+    | '/verify/$certificateId'
+    | '/webinars/$slug'
+    | '/community/'
+    | '/courses/'
+    | '/experts/'
+    | '/resources/'
+    | '/webinars/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
+  CertificatesRoute: typeof CertificatesRoute
+  DashboardRoute: typeof DashboardRoute
+  CoursesSlugRoute: typeof CoursesSlugRoute
+  LearnSlugRoute: typeof LearnSlugRoute
+  VerifyCertificateIdRoute: typeof VerifyCertificateIdRoute
+  WebinarsSlugRoute: typeof WebinarsSlugRoute
+  CommunityIndexRoute: typeof CommunityIndexRoute
+  CoursesIndexRoute: typeof CoursesIndexRoute
+  ExpertsIndexRoute: typeof ExpertsIndexRoute
+  ResourcesIndexRoute: typeof ResourcesIndexRoute
+  WebinarsIndexRoute: typeof WebinarsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +208,108 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certificates': {
+      id: '/certificates'
+      path: '/certificates'
+      fullPath: '/certificates'
+      preLoaderRoute: typeof CertificatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community/': {
+      id: '/community/'
+      path: '/community'
+      fullPath: '/community/'
+      preLoaderRoute: typeof CommunityIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/courses/': {
+      id: '/courses/'
+      path: '/courses'
+      fullPath: '/courses/'
+      preLoaderRoute: typeof CoursesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/courses/$slug': {
+      id: '/courses/$slug'
+      path: '/courses/$slug'
+      fullPath: '/courses/$slug'
+      preLoaderRoute: typeof CoursesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experts/': {
+      id: '/experts/'
+      path: '/experts'
+      fullPath: '/experts/'
+      preLoaderRoute: typeof ExpertsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn/$slug': {
+      id: '/learn/$slug'
+      path: '/learn/$slug'
+      fullPath: '/learn/$slug'
+      preLoaderRoute: typeof LearnSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources/': {
+      id: '/resources/'
+      path: '/resources'
+      fullPath: '/resources/'
+      preLoaderRoute: typeof ResourcesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify/$certificateId': {
+      id: '/verify/$certificateId'
+      path: '/verify/$certificateId'
+      fullPath: '/verify/$certificateId'
+      preLoaderRoute: typeof VerifyCertificateIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/webinars/': {
+      id: '/webinars/'
+      path: '/webinars'
+      fullPath: '/webinars/'
+      preLoaderRoute: typeof WebinarsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/webinars/$slug': {
+      id: '/webinars/$slug'
+      path: '/webinars/$slug'
+      fullPath: '/webinars/$slug'
+      preLoaderRoute: typeof WebinarsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
+  CertificatesRoute: CertificatesRoute,
+  DashboardRoute: DashboardRoute,
+  CoursesSlugRoute: CoursesSlugRoute,
+  LearnSlugRoute: LearnSlugRoute,
+  VerifyCertificateIdRoute: VerifyCertificateIdRoute,
+  WebinarsSlugRoute: WebinarsSlugRoute,
+  CommunityIndexRoute: CommunityIndexRoute,
+  CoursesIndexRoute: CoursesIndexRoute,
+  ExpertsIndexRoute: ExpertsIndexRoute,
+  ResourcesIndexRoute: ResourcesIndexRoute,
+  WebinarsIndexRoute: WebinarsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

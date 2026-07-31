@@ -1,0 +1,916 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.15"
+  }
+  public: {
+    Tables: {
+      certificates: {
+        Row: {
+          certificate_id: string
+          course_id: string | null
+          duration_text: string | null
+          id: string
+          issued_at: string
+          issuer: string
+          kind: string
+          recipient_name: string
+          revoked: boolean
+          speaker: string | null
+          title: string
+          user_id: string
+          webinar_id: string | null
+        }
+        Insert: {
+          certificate_id?: string
+          course_id?: string | null
+          duration_text?: string | null
+          id?: string
+          issued_at?: string
+          issuer?: string
+          kind?: string
+          recipient_name: string
+          revoked?: boolean
+          speaker?: string | null
+          title: string
+          user_id: string
+          webinar_id?: string | null
+        }
+        Update: {
+          certificate_id?: string
+          course_id?: string | null
+          duration_text?: string | null
+          id?: string
+          issued_at?: string
+          issuer?: string
+          kind?: string
+          recipient_name?: string
+          revoked?: boolean
+          speaker?: string | null
+          title?: string
+          user_id?: string
+          webinar_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificates_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificates_webinar_id_fkey"
+            columns: ["webinar_id"]
+            isOneToOne: false
+            referencedRelation: "webinars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_comments: {
+        Row: {
+          author_name: string
+          body: string
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string | null
+        }
+        Insert: {
+          author_name?: string
+          body: string
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id?: string | null
+        }
+        Update: {
+          author_name?: string
+          body?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_groups: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          members_count: number
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          members_count?: number
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          members_count?: number
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      community_posts: {
+        Row: {
+          author_name: string
+          author_role: string | null
+          body: string
+          created_at: string
+          group_id: string | null
+          id: string
+          kind: string
+          reactions: number
+          title: string | null
+          topic: string | null
+          user_id: string | null
+          views: number
+        }
+        Insert: {
+          author_name?: string
+          author_role?: string | null
+          body: string
+          created_at?: string
+          group_id?: string | null
+          id?: string
+          kind?: string
+          reactions?: number
+          title?: string | null
+          topic?: string | null
+          user_id?: string | null
+          views?: number
+        }
+        Update: {
+          author_name?: string
+          author_role?: string | null
+          body?: string
+          created_at?: string
+          group_id?: string | null
+          id?: string
+          kind?: string
+          reactions?: number
+          title?: string | null
+          topic?: string | null
+          user_id?: string | null
+          views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_posts_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "community_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courses: {
+        Row: {
+          audience: string[]
+          certificate: boolean
+          created_at: string
+          description: string | null
+          duration_hours: number
+          expert_id: string | null
+          id: string
+          image_url: string | null
+          is_free: boolean
+          language: string
+          learners: number
+          level: string
+          outcomes: string[]
+          price_inr: number
+          published: boolean
+          rating: number
+          slug: string
+          summary: string | null
+          title: string
+          topic: string
+          updated_at: string
+        }
+        Insert: {
+          audience?: string[]
+          certificate?: boolean
+          created_at?: string
+          description?: string | null
+          duration_hours?: number
+          expert_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_free?: boolean
+          language?: string
+          learners?: number
+          level?: string
+          outcomes?: string[]
+          price_inr?: number
+          published?: boolean
+          rating?: number
+          slug: string
+          summary?: string | null
+          title: string
+          topic?: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string[]
+          certificate?: boolean
+          created_at?: string
+          description?: string | null
+          duration_hours?: number
+          expert_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_free?: boolean
+          language?: string
+          learners?: number
+          level?: string
+          outcomes?: string[]
+          price_inr?: number
+          published?: boolean
+          rating?: number
+          slug?: string
+          summary?: string | null
+          title?: string
+          topic?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courses_expert_id_fkey"
+            columns: ["expert_id"]
+            isOneToOne: false
+            referencedRelation: "experts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      enrollments: {
+        Row: {
+          completed_at: string | null
+          course_id: string
+          created_at: string
+          id: string
+          progress: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          course_id: string
+          created_at?: string
+          id?: string
+          progress?: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          course_id?: string
+          created_at?: string
+          id?: string
+          progress?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enrollments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      experts: {
+        Row: {
+          bio: string | null
+          country: string | null
+          courses_count: number
+          created_at: string
+          expertise: string[]
+          id: string
+          name: string
+          organisation: string | null
+          photo_url: string | null
+          rating: number
+          slug: string
+          title: string | null
+          webinars_count: number
+        }
+        Insert: {
+          bio?: string | null
+          country?: string | null
+          courses_count?: number
+          created_at?: string
+          expertise?: string[]
+          id?: string
+          name: string
+          organisation?: string | null
+          photo_url?: string | null
+          rating?: number
+          slug: string
+          title?: string | null
+          webinars_count?: number
+        }
+        Update: {
+          bio?: string | null
+          country?: string | null
+          courses_count?: number
+          created_at?: string
+          expertise?: string[]
+          id?: string
+          name?: string
+          organisation?: string | null
+          photo_url?: string | null
+          rating?: number
+          slug?: string
+          title?: string | null
+          webinars_count?: number
+        }
+        Relationships: []
+      }
+      group_members: {
+        Row: {
+          created_at: string
+          group_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "community_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lesson_progress: {
+        Row: {
+          completed_at: string
+          course_id: string
+          id: string
+          lesson_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          course_id: string
+          id?: string
+          lesson_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          course_id?: string
+          id?: string
+          lesson_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_progress_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lessons: {
+        Row: {
+          content: string | null
+          course_id: string
+          created_at: string
+          duration_min: number
+          id: string
+          kind: string
+          lesson_order: number
+          module_order: number
+          module_title: string
+          title: string
+        }
+        Insert: {
+          content?: string | null
+          course_id: string
+          created_at?: string
+          duration_min?: number
+          id?: string
+          kind?: string
+          lesson_order?: number
+          module_order?: number
+          module_title: string
+          title: string
+        }
+        Update: {
+          content?: string | null
+          course_id?: string
+          created_at?: string
+          duration_min?: number
+          id?: string
+          kind?: string
+          lesson_order?: number
+          module_order?: number
+          module_title?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          read: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          amount_inr: number
+          created_at: string
+          id: string
+          item_id: string | null
+          item_title: string
+          item_type: string
+          provider: string
+          provider_order_id: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount_inr?: number
+          created_at?: string
+          id?: string
+          item_id?: string | null
+          item_title: string
+          item_type: string
+          provider?: string
+          provider_order_id?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount_inr?: number
+          created_at?: string
+          id?: string
+          item_id?: string | null
+          item_title?: string
+          item_type?: string
+          provider?: string
+          provider_order_id?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          full_name: string
+          id: string
+          interests: string[]
+          learning_hours: number
+          onboarding_complete: boolean
+          professional_role: string | null
+          school_name: string | null
+          streak_days: number
+          updated_at: string
+          visibility: string
+          years_in_education: number | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          full_name?: string
+          id: string
+          interests?: string[]
+          learning_hours?: number
+          onboarding_complete?: boolean
+          professional_role?: string | null
+          school_name?: string | null
+          streak_days?: number
+          updated_at?: string
+          visibility?: string
+          years_in_education?: number | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          interests?: string[]
+          learning_hours?: number
+          onboarding_complete?: boolean
+          professional_role?: string | null
+          school_name?: string | null
+          streak_days?: number
+          updated_at?: string
+          visibility?: string
+          years_in_education?: number | null
+        }
+        Relationships: []
+      }
+      resources: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          downloads: number
+          file_url: string | null
+          id: string
+          is_free: boolean
+          is_toolkit: boolean
+          resource_type: string
+          slug: string
+          title: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          downloads?: number
+          file_url?: string | null
+          id?: string
+          is_free?: boolean
+          is_toolkit?: boolean
+          resource_type?: string
+          slug: string
+          title: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          downloads?: number
+          file_url?: string | null
+          id?: string
+          is_free?: boolean
+          is_toolkit?: boolean
+          resource_type?: string
+          slug?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      webinar_registrations: {
+        Row: {
+          attendance_minutes: number
+          attended: boolean
+          created_at: string
+          id: string
+          joined_at: string | null
+          user_id: string
+          webinar_id: string
+        }
+        Insert: {
+          attendance_minutes?: number
+          attended?: boolean
+          created_at?: string
+          id?: string
+          joined_at?: string | null
+          user_id: string
+          webinar_id: string
+        }
+        Update: {
+          attendance_minutes?: number
+          attended?: boolean
+          created_at?: string
+          id?: string
+          joined_at?: string | null
+          user_id?: string
+          webinar_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webinar_registrations_webinar_id_fkey"
+            columns: ["webinar_id"]
+            isOneToOne: false
+            referencedRelation: "webinars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webinars: {
+        Row: {
+          certificate: boolean
+          created_at: string
+          description: string | null
+          duration_min: number
+          expert_id: string | null
+          id: string
+          image_url: string | null
+          is_free: boolean
+          meeting_url: string | null
+          price_inr: number
+          published: boolean
+          recording_url: string | null
+          registered_count: number
+          slug: string
+          starts_at: string
+          status: string
+          title: string
+          topic: string
+        }
+        Insert: {
+          certificate?: boolean
+          created_at?: string
+          description?: string | null
+          duration_min?: number
+          expert_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_free?: boolean
+          meeting_url?: string | null
+          price_inr?: number
+          published?: boolean
+          recording_url?: string | null
+          registered_count?: number
+          slug: string
+          starts_at: string
+          status?: string
+          title: string
+          topic?: string
+        }
+        Update: {
+          certificate?: boolean
+          created_at?: string
+          description?: string | null
+          duration_min?: number
+          expert_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_free?: boolean
+          meeting_url?: string | null
+          price_inr?: number
+          published?: boolean
+          recording_url?: string | null
+          registered_count?: number
+          slug?: string
+          starts_at?: string
+          status?: string
+          title?: string
+          topic?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webinars_expert_id_fkey"
+            columns: ["expert_id"]
+            isOneToOne: false
+            referencedRelation: "experts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+    }
+    Enums: {
+      app_role: "admin" | "expert" | "member" | "institution_admin"
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      app_role: ["admin", "expert", "member", "institution_admin"],
+    },
+  },
+} as const
