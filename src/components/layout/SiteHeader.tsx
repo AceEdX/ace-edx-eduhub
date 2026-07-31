@@ -1,0 +1,167 @@
+import { useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Bell, LayoutDashboard, LogOut, Menu, Search, X } from "lucide-react";
+import { Logo } from "@/components/Logo";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { NAV_LINKS } from "@/lib/brand";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+
+export function SiteHeader() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [term, setTerm] = useState("");
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    navigate({ to: "/", replace: true });
+  }
+
+  const initials = (user?.email ?? "A").slice(0, 2).toUpperCase();
+
+  return (
+    <header className="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-xl">
+      <div className="container-page flex h-16 items-center gap-4">
+        <Logo />
+
+        <nav className="ml-4 hidden items-center gap-1 lg:flex" aria-label="Main">
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              className="rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              activeProps={{ className: "bg-secondary text-foreground" }}
+              activeOptions={{ exact: link.to === "/" }}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="ml-auto hidden items-center gap-2 md:flex">
+          <form
+            className="relative"
+            onSubmit={(e) => {
+              e.preventDefault();
+              navigate({ to: "/courses", search: { q: term } });
+            }}
+          >
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={term}
+              onChange={(e) => setTerm(e.target.value)}
+              placeholder="Search courses, webinars, experts"
+              aria-label="Search the platform"
+              className="h-9 w-64 rounded-full pl-9"
+            />
+          </form>
+
+          {user ? (
+            <>
+              <Button variant="ghost" size="icon" asChild aria-label="Notifications">
+                <Link to="/dashboard">
+                  <Bell className="h-4 w-4" />
+                </Link>
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                    <Avatar className="h-9 w-9">
+                      <AvatarFallback className="bg-primary text-xs text-primary-foreground">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard">My Dashboard</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/my-learning">My Learning</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/certificates">My Certificates</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile">My Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onSelect={signOut}>
+                    <LogOut className="mr-2 h-4 w-4" /> Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" asChild>
+                <Link to="/auth">Sign in</Link>
+              </Button>
+              <Button variant="brand" asChild>
+                <Link to="/auth" search={{ mode: "signup" }}>
+                  Join free
+                </Link>
+              </Button>
+            </>
+          )}
+        </div>
+
+        <button
+          className="ml-auto rounded-md p-2 lg:hidden"
+          aria-label={open ? "Close menu" : "Open menu"}
+          onClick={() => setOpen((v) => !v)}
+        >
+          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+      </div>
+
+      {open && (
+        <div className="border-t border-border bg-background lg:hidden">
+          <nav className="container-page flex flex-col py-3" aria-label="Mobile">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={() => setOpen(false)}
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-secondary"
+              >
+                {link.label}
+              </Link>
+            ))}
+            <div className="mt-2 flex gap-2 px-3 pb-2">
+              {user ? (
+                <Button variant="brand" className="flex-1" asChild onClick={() => setOpen(false)}>
+                  <Link to="/dashboard">
+                    <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
+                  </Link>
+                </Button>
+              ) : (
+                <>
+                  <Button variant="outline" className="flex-1" asChild onClick={() => setOpen(false)}>
+                    <Link to="/auth">Sign in</Link>
+                  </Button>
+                  <Button variant="brand" className="flex-1" asChild onClick={() => setOpen(false)}>
+                    <Link to="/auth" search={{ mode: "signup" }}>
+                      Join free
+                    </Link>
+                  </Button>
+                </>
+              )}
+            </div>
+          </nav>
+        </div>
+      )}
+    </header>
+  );
+}
