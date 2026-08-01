@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { PageHeading, PageShell, EmptyState } from "@/components/layout/PageShell";
-import { PostCard } from "@/components/cards";
+import { PostThread } from "@/components/PostThread";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -131,7 +131,7 @@ function CommunityPage() {
           ) : (
             <div className="space-y-4">
               {(posts.data ?? []).map((p) => (
-                <PostCard key={p.id} post={p} />
+                <PostThread key={p.id} post={p} />
               ))}
             </div>
           )}

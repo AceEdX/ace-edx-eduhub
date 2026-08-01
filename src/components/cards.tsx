@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Award, Clock, Star, Users, Video, Download, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { downloadResource } from "@/lib/resources";
 import { formatPrice } from "@/lib/brand";
 import type { Course, Expert, Post, Resource, Webinar } from "@/lib/api";
 
@@ -170,8 +171,14 @@ export function ResourceCard({ resource }: { resource: Resource }) {
         <span className="text-xs text-muted-foreground">
           {resource.downloads.toLocaleString()} downloads
         </span>
-        <Button size="sm" variant="outline">
-          <Download className="h-4 w-4" /> Download
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() =>
+            void downloadResource({ fileUrl: resource.file_url, title: resource.title })
+          }
+        >
+          <Download className="h-4 w-4" /> Download PDF
         </Button>
       </div>
     </article>
