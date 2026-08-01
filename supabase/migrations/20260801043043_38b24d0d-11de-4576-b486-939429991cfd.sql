@@ -1,0 +1,4 @@
+CREATE POLICY "resources files readable" ON storage.objects FOR SELECT TO anon, authenticated USING (bucket_id = 'resources');
+CREATE POLICY "admins upload resources files" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'resources' AND public.has_role(auth.uid(), 'admin'));
+CREATE POLICY "admins update resources files" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'resources' AND public.has_role(auth.uid(), 'admin')) WITH CHECK (bucket_id = 'resources' AND public.has_role(auth.uid(), 'admin'));
+CREATE POLICY "admins delete resources files" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'resources' AND public.has_role(auth.uid(), 'admin'));
