@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import type { Certificate } from "@/lib/api";
+import { CertificateDownloadButton } from "@/components/CertificateArtwork";
 
 export const Route = createFileRoute("/certificates")({
   head: () => ({
@@ -102,6 +103,7 @@ function CertificatesPage() {
                       Verify
                     </Link>
                   </Button>
+                  <CertificateDownloadButton certificate={c} variant="outline" size="sm" />
                   <Button size="sm" variant="outline" onClick={() => copyLink(c.certificate_id)}>
                     <Copy className="h-4 w-4" /> Copy link
                   </Button>
