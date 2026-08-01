@@ -93,6 +93,7 @@ export type Resource = {
   is_toolkit: boolean;
   is_free: boolean;
   downloads: number;
+  file_url: string | null;
 };
 
 export type Certificate = {
