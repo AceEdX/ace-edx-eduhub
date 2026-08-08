@@ -245,6 +245,12 @@ function WebinarDetail() {
   const w = webinar.data;
   const date = new Date(w.starts_at);
   const isRegistered = Boolean(registration.data);
+  const isRecorded = w.status === "recorded" || Boolean(w.recording_url);
+  const requiredSec = Math.round(w.duration_min * 60 * 0.8);
+  const watchPct = Math.min(100, Math.round((watchedSec / requiredSec) * 100));
+  const certificateEarned = Boolean(registration.data?.attended);
+  const endsAt = new Date(w.starts_at).getTime() + w.duration_min * 60000;
+  const liveFinished = Date.now() > endsAt;
   const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
     w.title,
   )}&dates=${date.toISOString().replace(/[-:]|\.\d{3}/g, "")}/${new Date(
