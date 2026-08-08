@@ -66,6 +66,22 @@ function LearnPage() {
   const activeIndex = active ? flat.findIndex((l) => l.id === active.id) : -1;
   const percent = flat.length ? Math.round((completed.size / flat.length) * 100) : 0;
 
+  // Engagement gate: a lesson can only be marked complete after it has actually
+  // been watched / read on this page for a meaningful share of its length.
+  const [dwellSec, setDwellSec] = useState(0);
+  useEffect(() => {
+    setDwellSec(0);
+  }, [active?.id]);
+  useEffect(() => {
+    const id = setInterval(() => setDwellSec((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const requiredSec = active ? Math.min(Math.round(active.duration_min * 60 * 0.6), 180) : 0;
+  const isDone = active ? completed.has(active.id) : false;
+  const engaged = isDone || dwellSec >= requiredSec;
+  const remainingSec = Math.max(0, requiredSec - dwellSec);
+
+
   async function toggleComplete() {
     if (!user || !active || !course.data) return;
     const isDone = completed.has(active.id);
