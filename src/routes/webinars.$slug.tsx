@@ -119,15 +119,40 @@ function WebinarDetail() {
     await confirmRegistration(w);
   }
 
-  async function markAttended() {
+  const [watching, setWatching] = useState(false);
+  const [watchedSec, setWatchedSec] = useState(0);
+  const [issuing, setIssuing] = useState(false);
+
+  useEffect(() => {
+    const mins = registration.data?.attendance_minutes ?? 0;
+    if (mins > 0) setWatchedSec((s) => Math.max(s, mins * 60));
+  }, [registration.data]);
+
+  useEffect(() => {
+    if (!watching) return;
+    const id = setInterval(() => setWatchedSec((s) => s + 5), 5000);
+    return () => clearInterval(id);
+  }, [watching]);
+
+  async function saveAttendance(minutes: number, attended: boolean) {
     const w = webinar.data;
     if (!user || !w) return;
-    const minutes = Math.round(w.duration_min * 0.8);
     await supabase
       .from("webinar_registrations")
-      .update({ attended: true, attendance_minutes: minutes, joined_at: new Date().toISOString() })
+      .update({
+        attended,
+        attendance_minutes: minutes,
+        joined_at: registration.data?.joined_at ?? new Date().toISOString(),
+      })
       .eq("user_id", user.id)
       .eq("webinar_id", w.id);
+  }
+
+  async function issueCertificate(minutes: number) {
+    const w = webinar.data;
+    if (!user || !w || issuing) return;
+    setIssuing(true);
+    await saveAttendance(minutes, true);
 
     const { data: profile } = await supabase
       .from("profiles")
@@ -142,7 +167,7 @@ function WebinarDetail() {
       .eq("webinar_id", w.id)
       .maybeSingle();
 
-    if (!existing) {
+    if (!existing && w.certificate) {
       await supabase.from("certificates").insert({
         user_id: user.id,
         recipient_name: profile?.full_name || user.email || "AceEdX Member",
@@ -152,11 +177,41 @@ function WebinarDetail() {
         duration_text: `${w.duration_min} minutes`,
         webinar_id: w.id,
       });
+      toast.success("Session complete — your participation certificate has been issued");
     }
     await registration.refetch();
-    toast.success("Attendance recorded — your participation certificate is ready");
+  }
+
+  // Persist watch time periodically and unlock the certificate at 80% watched.
+  useEffect(() => {
+    const w = webinar.data;
+    if (!w || !user || !watching || watchedSec === 0) return;
+    const minutes = Math.floor(watchedSec / 60);
+    const requiredSec = Math.round(w.duration_min * 60 * 0.8);
+    if (watchedSec >= requiredSec) {
+      if (!registration.data?.attended) void issueCertificate(minutes);
+      setWatching(false);
+      return;
+    }
+    if (watchedSec % 30 === 0) void saveAttendance(minutes, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchedSec, watching]);
+
+  async function startLiveSession() {
+    const w = webinar.data;
+    if (!w) return;
+    if (w.meeting_url) window.open(w.meeting_url, "_blank", "noopener,noreferrer");
+    await saveAttendance(registration.data?.attendance_minutes ?? 0, false);
+    await registration.refetch();
+  }
+
+  async function confirmLiveAttendance() {
+    const w = webinar.data;
+    if (!w) return;
+    await issueCertificate(Math.round(w.duration_min * 0.8));
     navigate({ to: "/certificates" });
   }
+
 
   if (webinar.isLoading) {
     return (
