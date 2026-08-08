@@ -1,32 +1,40 @@
-# Finish the remaining AceEdX items
+# Policy pages, footer, and certificate gating
 
-Six items are still open. Plan below closes all of them.
+Two pieces of work: the legal/policy surface with proper www.aceedx.com branding, and making certificates something you actually have to earn.
 
-## 1. Resource library PDFs — expand to 5+ pages
-The 20 documents are live and downloadable but run 2–3 pages. Expand every document with additional sections (implementation timeline, roles and responsibilities, monitoring indicators, compliance checklist, annexures/templates) so each renders at least 5 pages, then regenerate and re-upload to the same `library/<slug>.pdf` paths so existing links keep working.
+## 1. Policy pages
 
-## 2. Certificate seal — orange star
-Replace the round green "Verified Credential" seal with a filled orange star badge, in both the PDF and the on-screen certificate. Update the footer verification text to `www.aceedx.com`.
+Five new public pages, each with its own SEO metadata and a shared readable layout:
 
-## 3. Admin-only console
-Add a route-level guard on `/admin` so non-admins are redirected away with a clear message instead of seeing the console. The header link is already admin-gated.
+- `/refund-policy` — refunds for paid courses and webinars, cancellation window, how a refund is processed, non-refundable cases (certificate issued, course substantially completed).
+- `/terms` — account rules, acceptable use, content ownership, certificate validity, payment terms, governing law (India).
+- `/privacy-policy` — what data is collected (profile, learning progress, payments), how it's used, storage, third parties (payments, email), user rights, DPDP Act 2023 alignment.
+- `/cookie-policy` — essential vs analytics cookies, session storage, how to control them.
+- `/disclaimer` — educational content is guidance, not legal/regulatory advice; policy references (NEP 2020, NCF, RTE) are summaries of public documents.
 
-## 4. Admin resource management
-New "Resources" tab in the admin console: upload a PDF (file picker → storage upload → new row with title, description, category, type, toolkit flag, free/paid), edit those fields inline, and delete a resource (removes the row and the stored file).
+Every page carries the AceEdX contact block with **www.aceedx.com** and the support email, plus a "last updated" date.
 
-## 5. Policy pages + domain
-New `/policies` page with anchored sections: Refund & Cancellation, Terms of Service, Privacy Policy, Cookie Policy, Disclaimer, and Contact. Link them from the footer, and show `www.aceedx.com` in the footer branding.
+## 2. Footer + branding
 
-## 6. Certificate gating on actual completion
-- Free recorded webinars: pressing "Join webinar" opens the recording inline immediately. The certificate button unlocks only after the recording has been watched (playback time tracked to ~90%).
-- Live webinars: unchanged — attendance confirmation after the session.
-- Courses: certificate issues only when every lesson is marked complete; document lessons require scrolling to the end of the reading before they can be marked done.
+- Add a third footer column, "Company", linking to About-style items and all five policy pages.
+- Show **www.aceedx.com** in the footer bottom bar next to the copyright, linked to the live site.
+- Add the website address to the central brand config so the certificate PDF, verification page, and footer all read from one value.
 
-## 7. Google sign-in
-Add a "Continue with Google" button on both sign-in and sign-up screens using the managed Google provider, plus a download button on the public verification page.
+## 3. Certificate gating
+
+Certificates stop being issued on a button press.
+
+**Recorded webinars (free or paid):** pressing "Join webinar" opens the recording inline on the page instead of instantly marking attendance. Watch progress is tracked while the recording plays; the participation certificate is issued only once at least 80% of the runtime has been watched. Until then the page shows a progress bar and "Certificate unlocks at 80% watched".
+
+**Live webinars:** joining opens the meeting link and records a join timestamp. The certificate is issued when the user returns and confirms attendance, but only after the session's scheduled end time has passed — not before.
+
+**Courses:** the certificate already requires all lessons marked complete; this is tightened so document lessons must be opened and scrolled to the end before they can be marked complete, and the "Mark as complete" button stays disabled until the lesson's media has actually been engaged with (video played to near the end, or document scrolled through).
+
+Wherever a certificate is not yet unlocked, the UI states exactly what remains.
 
 ## Technical notes
-- PDFs regenerated with reportlab and re-uploaded via storage upload to the private `resources` bucket; downloads keep using short-lived signed URLs.
-- Star seal drawn as a vector polygon in `certificate-pdf.ts`; CSS clip-path star in `CertificateArtwork.tsx`.
-- Admin guard uses the existing `useAdmin` hook and the server-side `has_role` check that already backs the RLS policies.
-- Webinar watch tracking stores progress in `webinar_registrations.attendance_minutes` / `attended`, so it survives reloads.
+
+- New route files under `src/routes/` (`refund-policy.tsx`, `terms.tsx`, `privacy-policy.tsx`, `cookie-policy.tsx`, `disclaimer.tsx`) sharing a `PolicyPage` presentation component; each defines its own `head()` with canonical and og tags.
+- `src/lib/brand.ts` gains `site: "www.aceedx.com"` / `siteUrl`, consumed by `SiteFooter`, `certificate-pdf.ts`, and the verify page.
+- Webinar watch tracking uses the existing `webinar_registrations.attendance_minutes` column, updated periodically from the player's `timeupdate`; certificate insert moves behind the 80% threshold check. No schema change needed.
+- Lesson engagement gating is client-side state in the course player plus the existing `lesson_progress` writes; no schema change.
