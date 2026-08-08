@@ -392,6 +392,30 @@ function WebinarDetail() {
         </div>
       </section>
 
+      {isRegistered && isRecorded && watching && w.recording_url && (
+        <div id="watch" className="container-page pt-10">
+          <h2 className="font-display text-xl font-semibold">Recording</h2>
+          <LessonMedia
+            lesson={{
+              title: w.title,
+              kind: "video",
+              duration_min: w.duration_min,
+              video_url: w.recording_url,
+            }}
+          />
+          <div className="mt-4 max-w-xl">
+            <Progress value={watchPct} />
+            <p className="mt-2 text-xs text-muted-foreground">
+              {certificateEarned
+                ? "Certificate issued — find it in your credentials wallet."
+                : `Keep the recording playing on this page. ${watchPct}% of the required watch time completed — your certificate is issued automatically at 80%.`}
+            </p>
+          </div>
+        </div>
+      )}
+
+
+
       <div className="container-page py-14">
         <div className="card-surface max-w-2xl p-6">
           <h2 className="font-display text-lg font-semibold">Your speaker</h2>
