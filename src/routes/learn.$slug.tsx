@@ -205,9 +205,13 @@ function LearnPage() {
           )}
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Button variant={completed.has(active.id) ? "success" : "brand"} onClick={toggleComplete}>
+            <Button
+              variant={isDone ? "success" : "brand"}
+              disabled={!engaged}
+              onClick={toggleComplete}
+            >
               <CheckCircle2 className="h-4 w-4" />
-              {completed.has(active.id) ? "Completed" : "Mark as complete"}
+              {isDone ? "Completed" : "Mark as complete"}
             </Button>
             <Button variant="outline" disabled={activeIndex <= 0} onClick={() => move(-1)}>
               <ChevronLeft className="h-4 w-4" /> Previous
@@ -220,6 +224,14 @@ function LearnPage() {
               Next <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
+          {!engaged && (
+            <p className="mt-3 text-xs text-muted-foreground">
+              Keep {active.kind === "video" ? "watching" : "reading"} — you can mark this lesson
+              complete in {Math.ceil(remainingSec / 60)} min. Your certificate is issued only after
+              every lesson is genuinely completed.
+            </p>
+          )}
+
         </div>
 
         <aside className="card-surface h-fit p-5">
