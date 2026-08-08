@@ -307,18 +307,75 @@ function WebinarDetail() {
                 <p className="inline-flex items-center gap-2 text-sm font-semibold text-success">
                   <CheckCircle2 className="h-4 w-4" /> You are registered
                 </p>
-                <Button variant="brand" className="mt-4 w-full" onClick={markAttended}>
-                  <Video className="h-4 w-4" /> Join webinar
-                </Button>
+          <aside className="card-surface h-fit p-6 text-foreground">
+            {isRegistered ? (
+              <>
+                <p className="inline-flex items-center gap-2 text-sm font-semibold text-success">
+                  <CheckCircle2 className="h-4 w-4" /> You are registered
+                </p>
+
+                {isRecorded ? (
+                  <>
+                    <Button
+                      variant="brand"
+                      className="mt-4 w-full"
+                      disabled={!w.recording_url}
+                      onClick={() => {
+                        setWatching(true);
+                        document
+                          .getElementById("watch")
+                          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }}
+                    >
+                      <Video className="h-4 w-4" />
+                      {w.recording_url ? "Watch the recording" : "Recording coming soon"}
+                    </Button>
+                    <Progress value={watchPct} className="mt-4" />
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {certificateEarned
+                        ? "Watched — your participation certificate has been issued."
+                        : `${watchPct}% watched · certificate unlocks at 80% of the session.`}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant="brand"
+                      className="mt-4 w-full"
+                      disabled={!w.meeting_url}
+                      onClick={startLiveSession}
+                    >
+                      <Video className="h-4 w-4" />
+                      {w.meeting_url ? "Join live session" : "Joining link coming soon"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="mt-2 w-full"
+                      disabled={!liveFinished || certificateEarned}
+                      onClick={confirmLiveAttendance}
+                    >
+                      Confirm attendance & get certificate
+                    </Button>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {certificateEarned
+                        ? "Attendance confirmed — certificate issued."
+                        : liveFinished
+                          ? "Confirm you attended to receive your certificate."
+                          : "You can claim your certificate once the session has finished."}
+                    </p>
+                  </>
+                )}
+
                 <Button variant="outline" className="mt-2 w-full" asChild>
                   <a href={calendarUrl} target="_blank" rel="noopener noreferrer">
                     <CalendarPlus className="h-4 w-4" /> Add to Google Calendar
                   </a>
                 </Button>
-                <p className="mt-4 text-xs text-muted-foreground">
-                  Attend at least 75% of the session and your participation certificate is issued
-                  automatically.
-                </p>
+                {certificateEarned && (
+                  <Button variant="success" className="mt-2 w-full" asChild>
+                    <Link to="/certificates">View your certificate</Link>
+                  </Button>
+                )}
               </>
             ) : (
               <>
