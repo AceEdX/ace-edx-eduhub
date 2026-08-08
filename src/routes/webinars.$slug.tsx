@@ -7,6 +7,8 @@ import { PageShell, EmptyState } from "@/components/layout/PageShell";
 import { Pill } from "@/components/cards";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
+import { LessonMedia } from "@/components/LessonMedia";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { formatPrice } from "@/lib/brand";
