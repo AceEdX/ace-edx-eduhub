@@ -39,7 +39,9 @@ export function downloadCertificatePdf(certificate: Certificate, verifyUrl: stri
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9.5);
   doc.setTextColor(201, 214, 228);
-  doc.text("Professional learning for school leaders", W - 18, 17, { align: "right" });
+  doc.text("www.aceedx.com  ·  Professional learning for school leaders", W - 18, 17, {
+    align: "right",
+  });
 
   const isWebinar = certificate.kind === "webinar";
 

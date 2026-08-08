@@ -66,6 +66,22 @@ function LearnPage() {
   const activeIndex = active ? flat.findIndex((l) => l.id === active.id) : -1;
   const percent = flat.length ? Math.round((completed.size / flat.length) * 100) : 0;
 
+  // Engagement gate: a lesson can only be marked complete after it has actually
+  // been watched / read on this page for a meaningful share of its length.
+  const [dwellSec, setDwellSec] = useState(0);
+  useEffect(() => {
+    setDwellSec(0);
+  }, [active?.id]);
+  useEffect(() => {
+    const id = setInterval(() => setDwellSec((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const requiredSec = active ? Math.min(Math.round(active.duration_min * 60 * 0.6), 180) : 0;
+  const isDone = active ? completed.has(active.id) : false;
+  const engaged = isDone || dwellSec >= requiredSec;
+  const remainingSec = Math.max(0, requiredSec - dwellSec);
+
+
   async function toggleComplete() {
     if (!user || !active || !course.data) return;
     const isDone = completed.has(active.id);
@@ -189,9 +205,13 @@ function LearnPage() {
           )}
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Button variant={completed.has(active.id) ? "success" : "brand"} onClick={toggleComplete}>
+            <Button
+              variant={isDone ? "success" : "brand"}
+              disabled={!engaged}
+              onClick={toggleComplete}
+            >
               <CheckCircle2 className="h-4 w-4" />
-              {completed.has(active.id) ? "Completed" : "Mark as complete"}
+              {isDone ? "Completed" : "Mark as complete"}
             </Button>
             <Button variant="outline" disabled={activeIndex <= 0} onClick={() => move(-1)}>
               <ChevronLeft className="h-4 w-4" /> Previous
@@ -204,6 +224,14 @@ function LearnPage() {
               Next <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
+          {!engaged && (
+            <p className="mt-3 text-xs text-muted-foreground">
+              Keep {active.kind === "video" ? "watching" : "reading"} — you can mark this lesson
+              complete in {Math.ceil(remainingSec / 60)} min. Your certificate is issued only after
+              every lesson is genuinely completed.
+            </p>
+          )}
+
         </div>
 
         <aside className="card-surface h-fit p-5">

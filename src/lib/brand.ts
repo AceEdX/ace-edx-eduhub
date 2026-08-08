@@ -7,7 +7,17 @@ export const brand = {
   certificatePrefix: "ACE",
   supportEmail: "hello@aceedx.com",
   currency: "INR",
+  site: "www.aceedx.com",
+  siteUrl: "https://www.aceedx.com",
 } as const;
+
+export const POLICY_LINKS = [
+  { to: "/refund-policy", label: "Refund policy" },
+  { to: "/terms", label: "Terms of use" },
+  { to: "/privacy-policy", label: "Privacy policy" },
+  { to: "/cookie-policy", label: "Cookie policy" },
+  { to: "/disclaimer", label: "Disclaimer" },
+] as const;
 
 export const NAV_LINKS = [
   { to: "/", label: "Home" },

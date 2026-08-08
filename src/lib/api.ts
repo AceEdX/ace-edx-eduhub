@@ -65,6 +65,9 @@ export type Webinar = {
   certificate: boolean;
   registered_count: number;
   expert_id: string | null;
+  meeting_url?: string | null;
+  recording_url?: string | null;
+  image_url?: string | null;
   experts?: Expert | null;
 };
 
@@ -216,12 +219,11 @@ export const resourcesQuery = {
 export const certificateQuery = (certificateId: string) => ({
   queryKey: ["certificate", certificateId],
   queryFn: async (): Promise<Certificate | null> => {
-    const { data, error } = await supabase
-      .from("certificates")
-      .select("*")
-      .eq("certificate_id", certificateId)
-      .maybeSingle();
+    const { data, error } = await supabase.rpc("verify_certificate", {
+      _certificate_id: certificateId,
+    });
     if (error) throw error;
-    return (data ?? null) as unknown as Certificate | null;
+    const row = Array.isArray(data) ? data[0] : data;
+    return (row ?? null) as unknown as Certificate | null;
   },
 });
