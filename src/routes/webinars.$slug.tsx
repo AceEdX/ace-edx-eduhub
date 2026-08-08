@@ -307,12 +307,6 @@ function WebinarDetail() {
                 <p className="inline-flex items-center gap-2 text-sm font-semibold text-success">
                   <CheckCircle2 className="h-4 w-4" /> You are registered
                 </p>
-          <aside className="card-surface h-fit p-6 text-foreground">
-            {isRegistered ? (
-              <>
-                <p className="inline-flex items-center gap-2 text-sm font-semibold text-success">
-                  <CheckCircle2 className="h-4 w-4" /> You are registered
-                </p>
 
                 {isRecorded ? (
                   <>
