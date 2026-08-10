@@ -3,7 +3,7 @@ import type { Certificate } from "@/lib/api";
 
 const NAVY = [15, 42, 74] as const;
 const ORANGE = [249, 115, 22] as const;
-const GREEN = [22, 163, 74] as const;
+
 const GREY = [91, 107, 124] as const;
 
 /**

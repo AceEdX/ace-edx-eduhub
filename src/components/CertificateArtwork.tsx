@@ -1,4 +1,4 @@
-import { BadgeCheck, Download, ShieldCheck } from "lucide-react";
+import { BadgeCheck, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { downloadCertificatePdf } from "@/lib/certificate-pdf";
 import type { Certificate } from "@/lib/api";
