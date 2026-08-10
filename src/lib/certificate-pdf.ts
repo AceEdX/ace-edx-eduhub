@@ -3,7 +3,7 @@ import type { Certificate } from "@/lib/api";
 
 const NAVY = [15, 42, 74] as const;
 const ORANGE = [249, 115, 22] as const;
-const GREEN = [22, 163, 74] as const;
+
 const GREY = [91, 107, 124] as const;
 
 /**
@@ -130,21 +130,46 @@ export function downloadCertificatePdf(certificate: Certificate, verifyUrl: stri
   doc.text("Date of issue", 69, baseY + 5, { align: "center" });
   doc.text("Issuing authority", W - 69, baseY + 5, { align: "center" });
 
-  // Verification seal
-  doc.setFillColor(236, 253, 243);
-  doc.setDrawColor(...GREEN);
-  doc.setLineWidth(0.6);
-  doc.circle(W / 2, baseY - 4, 15, "FD");
-  doc.setTextColor(...GREEN);
+  // Verification seal — orange star
+  const cx = W / 2;
+  const cy = baseY - 4;
+  const drawStar = (outer: number, inner: number) => {
+    const pts: [number, number][] = [];
+    for (let i = 0; i < 10; i++) {
+      const r = i % 2 === 0 ? outer : inner;
+      const a = -Math.PI / 2 + (i * Math.PI) / 5;
+      pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+    }
+    const deltas = pts.slice(1).map((p, i) => [p[0] - pts[i][0], p[1] - pts[i][1]] as [number, number]);
+    deltas.push([pts[0][0] - pts[9][0], pts[0][1] - pts[9][1]]);
+    return { start: pts[0], deltas };
+  };
+
+  const outerStar = drawStar(19, 8.4);
+  doc.setFillColor(...ORANGE);
+  doc.setDrawColor(...ORANGE);
+  doc.setLineWidth(0.4);
+  doc.lines(outerStar.deltas, outerStar.start[0], outerStar.start[1], [1, 1], "FD", true);
+
+  const innerStar = drawStar(15.5, 6.8);
+  doc.setFillColor(255, 247, 237);
+  doc.setDrawColor(255, 255, 255);
+  doc.setLineWidth(0.3);
+  doc.lines(innerStar.deltas, innerStar.start[0], innerStar.start[1], [1, 1], "FD", true);
+
+  doc.setTextColor(...ORANGE);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(8);
-  doc.text("VERIFIED", W / 2, baseY - 7, { align: "center" });
-  doc.setFontSize(6.6);
+  doc.setFontSize(7.6);
+  doc.text("VERIFIED", cx, cy - 2.2, { align: "center" });
+  doc.setFontSize(5.8);
   doc.setFont("helvetica", "normal");
-  doc.text("CREDENTIAL", W / 2, baseY - 3, { align: "center" });
+  doc.setTextColor(...GREY);
+  doc.text("CREDENTIAL", cx, cy + 1.4, { align: "center" });
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(6.4);
-  doc.text("AceEdX", W / 2, baseY + 2.5, { align: "center" });
+  doc.setFontSize(6.2);
+  doc.setTextColor(...NAVY);
+  doc.text("AceEdX", cx, cy + 5.2, { align: "center" });
+
 
   // Footer bar
   doc.setTextColor(255, 255, 255);
