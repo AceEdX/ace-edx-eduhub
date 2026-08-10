@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, MessageCircle, Sparkles } from "lucide-react";
 import heroImage from "@/assets/hero-leaders.jpg";
 import { PageShell } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/button";
