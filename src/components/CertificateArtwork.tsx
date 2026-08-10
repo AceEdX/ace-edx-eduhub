@@ -66,12 +66,29 @@ export function CertificateArtwork({ certificate }: { certificate: Certificate }
             </div>
 
             <div className="order-1 flex justify-center sm:order-2">
-              <div className="flex h-24 w-24 flex-col items-center justify-center rounded-full border-2 border-success bg-success-soft text-success">
-                <ShieldCheck className="h-5 w-5" />
-                <span className="mt-1 text-[9px] font-bold uppercase tracking-widest">Verified</span>
-                <span className="text-[9px] font-semibold">AceEdX</span>
+              <div className="relative h-28 w-28">
+                <svg viewBox="0 0 100 100" className="h-full w-full drop-shadow-sm">
+                  <polygon
+                    points="50,3 61.8,35.5 96.4,35.5 68.3,56.5 79.1,90 50,69.5 20.9,90 31.7,56.5 3.6,35.5 38.2,35.5"
+                    className="fill-accent"
+                  />
+                  <polygon
+                    points="50,14 59.6,40.5 87.8,40.5 65,57.6 73.8,84.8 50,68.1 26.2,84.8 35,57.6 12.2,40.5 40.4,40.5"
+                    className="fill-accent-soft"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pt-1 text-center">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-accent">
+                    Verified
+                  </span>
+                  <span className="text-[7px] uppercase tracking-wider text-muted-foreground">
+                    Credential
+                  </span>
+                  <span className="text-[9px] font-bold text-primary">AceEdX</span>
+                </div>
               </div>
             </div>
+
 
             <div className="order-3">
               <div className="mx-auto h-px w-36 bg-border" />
