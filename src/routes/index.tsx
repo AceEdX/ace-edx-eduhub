@@ -347,6 +347,19 @@ function HomePage() {
           </Button>
         </div>
       </section>
+
+      {/* WHATSAPP COMMUNITY */}
+      <a
+        href="https://chat.whatsapp.com/GPMRUY7v0RL0MKJm74LfIZ?s=sw&p=a&mlu=0&ilr=4"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Join the AceEdX WhatsApp group"
+        className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2 rounded-full bg-success px-4 py-3 font-semibold text-success-foreground shadow-[var(--shadow-lift)] transition-transform hover:scale-105"
+      >
+        <MessageCircle className="h-5 w-5" />
+        <span className="hidden text-sm sm:inline">Join WhatsApp group</span>
+      </a>
+
     </PageShell>
   );
 }
