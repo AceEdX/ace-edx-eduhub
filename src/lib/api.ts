@@ -1,3 +1,4 @@
+import { verifyCertificate } from "@/lib/certificates.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export type Expert = {
@@ -219,11 +220,8 @@ export const resourcesQuery = {
 export const certificateQuery = (certificateId: string) => ({
   queryKey: ["certificate", certificateId],
   queryFn: async (): Promise<Certificate | null> => {
-    const { data, error } = await supabase.rpc("verify_certificate", {
-      _certificate_id: certificateId,
-    });
-    if (error) throw error;
-    const row = Array.isArray(data) ? data[0] : data;
+    const row = await verifyCertificate({ data: { certificateId } });
     return (row ?? null) as unknown as Certificate | null;
   },
 });
+
