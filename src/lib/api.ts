@@ -1,3 +1,4 @@
+import { verifyCertificate } from "@/lib/certificates.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export type Expert = {
