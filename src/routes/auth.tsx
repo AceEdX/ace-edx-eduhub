@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { z } from "zod";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -12,19 +12,23 @@ import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { INTEREST_AREAS, PROFESSIONAL_ROLES, brand } from "@/lib/brand";
+import { SCHOOL_BOARDS } from "@/lib/principals";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: z.object({ mode: z.enum(["signin", "signup"]).optional() }),
   head: () => ({
     meta: [
-      { title: "Sign in or join — AceEdX" },
+      { title: "Join the Principal Network — AceEdX PrincipalX" },
       {
         name: "description",
         content:
-          "Create your AceEdX account to access courses, webinars, certificates and the school leaders community.",
+          "Create your verified principal account to access the community, webinars, masterclasses, courses and certificates on AceEdX PrincipalX.",
       },
-      { property: "og:title", content: "Sign in or join — AceEdX" },
-      { property: "og:description", content: "Join the professional community for school leaders." },
+      { property: "og:title", content: "Join the Principal Network — AceEdX PrincipalX" },
+      {
+        property: "og:description",
+        content: "A professional network built exclusively for school principals and education leaders.",
+      },
     ],
   }),
   component: AuthPage,
@@ -38,8 +42,15 @@ type Form = {
   email: string;
   password: string;
   professionalRole: string;
+  designation: string;
   schoolName: string;
+  affiliationNumber: string;
+  board: string;
+  schoolWebsite: string;
+  mobile: string;
+  linkedinUrl: string;
   city: string;
+  state: string;
   country: string;
   years: string;
   interests: string[];
@@ -51,8 +62,15 @@ const emptyForm: Form = {
   email: "",
   password: "",
   professionalRole: "",
+  designation: "",
   schoolName: "",
+  affiliationNumber: "",
+  board: "",
+  schoolWebsite: "",
+  mobile: "",
+  linkedinUrl: "",
   city: "",
+  state: "",
   country: "",
   years: "",
   interests: [],
@@ -65,6 +83,8 @@ const STEPS = [
   "Password",
   "Professional role",
   "Your school",
+  "School verification",
+  "Contact details",
   "Location",
   "Experience",
   "Areas of interest",
@@ -104,7 +124,13 @@ function AuthPage() {
     }
     if (step === 3 && !form.professionalRole) return "Choose your professional role";
     if (step === 4 && form.schoolName.trim().length < 2) return "Enter your school or organisation";
-    if (step === 5 && form.country.trim().length < 2) return "Enter your country";
+    if (step === 5) {
+      if (form.affiliationNumber.trim().length < 3)
+        return "Your school affiliation number is required for verification";
+      if (!form.board) return "Select your school board";
+    }
+    if (step === 6 && form.mobile.trim().length < 6) return "Enter a mobile number we can reach you on";
+    if (step === 7 && form.country.trim().length < 2) return "Enter your country";
     return null;
   }
 
@@ -136,19 +162,44 @@ function AuthPage() {
           .update({
             full_name: form.fullName.trim(),
             professional_role: form.professionalRole,
+            designation: form.designation.trim() || form.professionalRole,
             school_name: form.schoolName.trim(),
+            board: form.board,
+            school_website: form.schoolWebsite.trim() || null,
+            linkedin_url: form.linkedinUrl.trim() || null,
             city: form.city.trim(),
+            state: form.state.trim() || null,
             country: form.country.trim(),
             years_in_education: form.years ? Number(form.years) : null,
             interests: form.interests,
             bio: form.bio.trim(),
+            verification_status: "pending",
             onboarding_complete: true,
           })
           .eq("id", data.user.id);
+
+        await supabase.from("school_verifications").upsert(
+          {
+            user_id: data.user.id,
+            full_name: form.fullName.trim(),
+            mobile: form.mobile.trim(),
+            school_name: form.schoolName.trim(),
+            affiliation_number: form.affiliationNumber.trim(),
+            board: form.board,
+            designation: form.designation.trim() || form.professionalRole,
+            city: form.city.trim(),
+            state: form.state.trim(),
+            country: form.country.trim(),
+            school_website: form.schoolWebsite.trim() || null,
+            linkedin_url: form.linkedinUrl.trim() || null,
+            status: "pending",
+          },
+          { onConflict: "user_id" },
+        );
       }
       if (data.session) {
-        toast.success("Welcome to AceEdX");
-        navigate({ to: "/dashboard" });
+        toast.success("Account created — your school verification is under review");
+        navigate({ to: "/verification" });
       } else {
         toast.success("Check your email to confirm your account");
         setMode("signin");
@@ -188,9 +239,9 @@ function AuthPage() {
           </h1>
           <p className="mt-4 max-w-sm text-sm text-primary-foreground/75">{brand.subheadline}</p>
           <ul className="mt-8 space-y-3 text-sm text-primary-foreground/80">
-            <li>500+ courses and live webinars</li>
+            <li>Verified principals only — every member is reviewed</li>
+            <li>Webinars, masterclasses and courses from Resource Principals</li>
             <li>Verifiable certificates you can share</li>
-            <li>A peer community of 10,000+ school leaders</li>
           </ul>
         </div>
         <p className="text-xs text-primary-foreground/60">{brand.tagline}</p>
@@ -211,7 +262,7 @@ function AuthPage() {
                   mode === m ? "bg-card shadow-sm" : "text-muted-foreground"
                 }`}
               >
-                {m === "signin" ? "Sign in" : "Create account"}
+                {m === "signin" ? "Sign in" : "Join the network"}
               </button>
             ))}
           </div>
@@ -258,7 +309,7 @@ function AuthPage() {
               <p className="text-center text-xs text-muted-foreground">
                 New here?{" "}
                 <button type="button" className="font-semibold text-accent" onClick={() => setMode("signup")}>
-                  Create your free account
+                  Join the Principal Network
                 </button>
               </p>
             </form>
@@ -320,21 +371,33 @@ function AuthPage() {
                   </div>
                 )}
                 {step === 3 && (
-                  <div className="grid grid-cols-2 gap-2">
-                    {PROFESSIONAL_ROLES.map((role) => (
-                      <button
-                        key={role}
-                        type="button"
-                        onClick={() => set("professionalRole", role)}
-                        className={`rounded-xl border px-3 py-3 text-sm font-medium transition-colors ${
-                          form.professionalRole === role
-                            ? "border-accent bg-accent-soft text-accent"
-                            : "border-border bg-card hover:border-accent/50"
-                        }`}
-                      >
-                        {role}
-                      </button>
-                    ))}
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-2">
+                      {PROFESSIONAL_ROLES.map((role) => (
+                        <button
+                          key={role}
+                          type="button"
+                          onClick={() => set("professionalRole", role)}
+                          className={`rounded-xl border px-3 py-3 text-sm font-medium transition-colors ${
+                            form.professionalRole === role
+                              ? "border-accent bg-accent-soft text-accent"
+                              : "border-border bg-card hover:border-accent/50"
+                          }`}
+                        >
+                          {role}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="designation">Official designation (optional)</Label>
+                      <Input
+                        id="designation"
+                        value={form.designation}
+                        onChange={(e) => set("designation", e.target.value)}
+                        placeholder="Principal & Head of Senior School"
+                        maxLength={120}
+                      />
+                    </div>
                   </div>
                 )}
                 {step === 4 && (
@@ -349,12 +412,88 @@ function AuthPage() {
                   </div>
                 )}
                 {step === 5 && (
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-2 rounded-xl bg-accent-soft p-3 text-xs text-accent">
+                      <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
+                      <p>
+                        We verify every principal. Your affiliation number is stored privately, reviewed
+                        by our team and never shown on your public profile.
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="affiliation">School affiliation number</Label>
+                      <Input
+                        id="affiliation"
+                        value={form.affiliationNumber}
+                        onChange={(e) => set("affiliationNumber", e.target.value)}
+                        placeholder="e.g. 1234567"
+                        maxLength={40}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="board">School board</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {SCHOOL_BOARDS.map((b) => (
+                          <button
+                            key={b}
+                            type="button"
+                            onClick={() => set("board", b)}
+                            className={`rounded-full border px-3.5 py-2 text-sm transition-colors ${
+                              form.board === b
+                                ? "border-accent bg-accent-soft text-accent"
+                                : "border-border bg-card hover:border-accent/50"
+                            }`}
+                          >
+                            {b}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="website">School website (optional)</Label>
+                      <Input
+                        id="website"
+                        value={form.schoolWebsite}
+                        onChange={(e) => set("schoolWebsite", e.target.value)}
+                        placeholder="https://"
+                      />
+                    </div>
+                  </div>
+                )}
+                {step === 6 && (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="mobile">Mobile number</Label>
+                      <Input
+                        id="mobile"
+                        value={form.mobile}
+                        onChange={(e) => set("mobile", e.target.value)}
+                        placeholder="+91 98765 43210"
+                        maxLength={24}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="linkedin">LinkedIn profile (optional)</Label>
+                      <Input
+                        id="linkedin"
+                        value={form.linkedinUrl}
+                        onChange={(e) => set("linkedinUrl", e.target.value)}
+                        placeholder="https://linkedin.com/in/…"
+                      />
+                    </div>
+                  </div>
+                )}
+                {step === 7 && (
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="city">City</Label>
                       <Input id="city" value={form.city} onChange={(e) => set("city", e.target.value)} />
                     </div>
                     <div className="space-y-2">
+                      <Label htmlFor="state">State / region</Label>
+                      <Input id="state" value={form.state} onChange={(e) => set("state", e.target.value)} />
+                    </div>
+                    <div className="space-y-2 sm:col-span-2">
                       <Label htmlFor="country">Country</Label>
                       <Input
                         id="country"
@@ -364,7 +503,7 @@ function AuthPage() {
                     </div>
                   </div>
                 )}
-                {step === 6 && (
+                {step === 8 && (
                   <div className="space-y-2">
                     <Label htmlFor="years">Years in education</Label>
                     <Input
@@ -377,7 +516,7 @@ function AuthPage() {
                     />
                   </div>
                 )}
-                {step === 7 && (
+                {step === 9 && (
                   <div className="flex flex-wrap gap-2">
                     {INTEREST_AREAS.map((interest) => {
                       const active = form.interests.includes(interest);
@@ -405,7 +544,7 @@ function AuthPage() {
                     })}
                   </div>
                 )}
-                {step === 8 && (
+                {step === 10 && (
                   <div className="space-y-2">
                     <Label htmlFor="bio">Short professional biography</Label>
                     <Textarea
@@ -428,7 +567,7 @@ function AuthPage() {
                 )}
                 <Button variant="brand" className="flex-1" onClick={next} disabled={busy}>
                   {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {step === STEPS.length - 1 ? "Create my account" : "Continue"}
+                  {step === STEPS.length - 1 ? "Submit for verification" : "Continue"}
                   {step < STEPS.length - 1 && <ArrowRight className="h-4 w-4" />}
                 </Button>
               </div>
