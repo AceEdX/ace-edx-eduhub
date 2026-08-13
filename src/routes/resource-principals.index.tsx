@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { resourcePrincipalsQuery } from "@/lib/principals";
 
-export const Route = createFileRoute("/resource-principals")({
+export const Route = createFileRoute("/resource-principals/")({
   head: () => ({
     meta: [
       { title: "Resource Principals — expert school leaders on AceEdX" },

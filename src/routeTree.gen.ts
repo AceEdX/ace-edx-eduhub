@@ -21,11 +21,13 @@ import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as VerificationRouteImport } from './routes/verification'
 import { Route as CommunityIndexRouteImport } from './routes/community.index'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
 import { Route as ExpertsIndexRouteImport } from './routes/experts.index'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
+import { Route as ResourcePrincipalsIndexRouteImport } from './routes/resource-principals.index'
 import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
 import { Route as VerifyCertificateIdRouteImport } from './routes/verify.$certificateId'
 import { Route as WebinarsIndexRouteImport } from './routes/webinars.index'
@@ -91,6 +93,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VerificationRoute = VerificationRouteImport.update({
+  id: '/verification',
+  path: '/verification',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CommunityIndexRoute = CommunityIndexRouteImport.update({
   id: '/community/',
   path: '/community/',
@@ -114,6 +121,11 @@ const ExpertsIndexRoute = ExpertsIndexRouteImport.update({
 const LearnSlugRoute = LearnSlugRouteImport.update({
   id: '/learn/$slug',
   path: '/learn/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcePrincipalsIndexRoute = ResourcePrincipalsIndexRouteImport.update({
+  id: '/resource-principals/',
+  path: '/resource-principals/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResourcesIndexRoute = ResourcesIndexRouteImport.update({
@@ -150,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/terms': typeof TermsRoute
+  '/verification': typeof VerificationRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/verify/$certificateId': typeof VerifyCertificateIdRoute
@@ -157,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/community/': typeof CommunityIndexRoute
   '/courses/': typeof CoursesIndexRoute
   '/experts/': typeof ExpertsIndexRoute
+  '/resource-principals/': typeof ResourcePrincipalsIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/webinars/': typeof WebinarsIndexRoute
 }
@@ -173,6 +187,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/terms': typeof TermsRoute
+  '/verification': typeof VerificationRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/verify/$certificateId': typeof VerifyCertificateIdRoute
@@ -180,6 +195,7 @@ export interface FileRoutesByTo {
   '/community': typeof CommunityIndexRoute
   '/courses': typeof CoursesIndexRoute
   '/experts': typeof ExpertsIndexRoute
+  '/resource-principals': typeof ResourcePrincipalsIndexRoute
   '/resources': typeof ResourcesIndexRoute
   '/webinars': typeof WebinarsIndexRoute
 }
@@ -197,6 +213,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/terms': typeof TermsRoute
+  '/verification': typeof VerificationRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/verify/$certificateId': typeof VerifyCertificateIdRoute
@@ -204,6 +221,7 @@ export interface FileRoutesById {
   '/community/': typeof CommunityIndexRoute
   '/courses/': typeof CoursesIndexRoute
   '/experts/': typeof ExpertsIndexRoute
+  '/resource-principals/': typeof ResourcePrincipalsIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/webinars/': typeof WebinarsIndexRoute
 }
@@ -222,6 +240,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/refund-policy'
     | '/terms'
+    | '/verification'
     | '/courses/$slug'
     | '/learn/$slug'
     | '/verify/$certificateId'
@@ -229,6 +248,7 @@ export interface FileRouteTypes {
     | '/community/'
     | '/courses/'
     | '/experts/'
+    | '/resource-principals/'
     | '/resources/'
     | '/webinars/'
   fileRoutesByTo: FileRoutesByTo
@@ -245,6 +265,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/refund-policy'
     | '/terms'
+    | '/verification'
     | '/courses/$slug'
     | '/learn/$slug'
     | '/verify/$certificateId'
@@ -252,6 +273,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/courses'
     | '/experts'
+    | '/resource-principals'
     | '/resources'
     | '/webinars'
   id:
@@ -268,6 +290,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/refund-policy'
     | '/terms'
+    | '/verification'
     | '/courses/$slug'
     | '/learn/$slug'
     | '/verify/$certificateId'
@@ -275,6 +298,7 @@ export interface FileRouteTypes {
     | '/community/'
     | '/courses/'
     | '/experts/'
+    | '/resource-principals/'
     | '/resources/'
     | '/webinars/'
   fileRoutesById: FileRoutesById
@@ -292,6 +316,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   TermsRoute: typeof TermsRoute
+  VerificationRoute: typeof VerificationRoute
   CoursesSlugRoute: typeof CoursesSlugRoute
   LearnSlugRoute: typeof LearnSlugRoute
   VerifyCertificateIdRoute: typeof VerifyCertificateIdRoute
@@ -299,6 +324,7 @@ export interface RootRouteChildren {
   CommunityIndexRoute: typeof CommunityIndexRoute
   CoursesIndexRoute: typeof CoursesIndexRoute
   ExpertsIndexRoute: typeof ExpertsIndexRoute
+  ResourcePrincipalsIndexRoute: typeof ResourcePrincipalsIndexRoute
   ResourcesIndexRoute: typeof ResourcesIndexRoute
   WebinarsIndexRoute: typeof WebinarsIndexRoute
 }
@@ -389,6 +415,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/verification': {
+      id: '/verification'
+      path: '/verification'
+      fullPath: '/verification'
+      preLoaderRoute: typeof VerificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/community/': {
       id: '/community/'
       path: '/community'
@@ -422,6 +455,13 @@ declare module '@tanstack/react-router' {
       path: '/learn/$slug'
       fullPath: '/learn/$slug'
       preLoaderRoute: typeof LearnSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resource-principals/': {
+      id: '/resource-principals/'
+      path: '/resource-principals'
+      fullPath: '/resource-principals/'
+      preLoaderRoute: typeof ResourcePrincipalsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resources/': {
@@ -468,6 +508,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   TermsRoute: TermsRoute,
+  VerificationRoute: VerificationRoute,
   CoursesSlugRoute: CoursesSlugRoute,
   LearnSlugRoute: LearnSlugRoute,
   VerifyCertificateIdRoute: VerifyCertificateIdRoute,
@@ -475,6 +516,7 @@ const rootRouteChildren: RootRouteChildren = {
   CommunityIndexRoute: CommunityIndexRoute,
   CoursesIndexRoute: CoursesIndexRoute,
   ExpertsIndexRoute: ExpertsIndexRoute,
+  ResourcePrincipalsIndexRoute: ResourcePrincipalsIndexRoute,
   ResourcesIndexRoute: ResourcesIndexRoute,
   WebinarsIndexRoute: WebinarsIndexRoute,
 }
