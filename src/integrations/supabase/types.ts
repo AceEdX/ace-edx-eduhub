@@ -554,60 +554,225 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           bio: string | null
+          board: string | null
           city: string | null
           country: string | null
           created_at: string
+          designation: string | null
           full_name: string
           id: string
           interests: string[]
           learning_hours: number
+          linkedin_url: string | null
           onboarding_complete: boolean
           professional_role: string | null
           school_name: string | null
+          school_website: string | null
+          state: string | null
           streak_days: number
           updated_at: string
+          verification_status: string
           visibility: string
           years_in_education: number | null
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          board?: string | null
           city?: string | null
           country?: string | null
           created_at?: string
+          designation?: string | null
           full_name?: string
           id: string
           interests?: string[]
           learning_hours?: number
+          linkedin_url?: string | null
           onboarding_complete?: boolean
           professional_role?: string | null
           school_name?: string | null
+          school_website?: string | null
+          state?: string | null
           streak_days?: number
           updated_at?: string
+          verification_status?: string
           visibility?: string
           years_in_education?: number | null
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          board?: string | null
           city?: string | null
           country?: string | null
           created_at?: string
+          designation?: string | null
           full_name?: string
           id?: string
           interests?: string[]
           learning_hours?: number
+          linkedin_url?: string | null
           onboarding_complete?: boolean
           professional_role?: string | null
           school_name?: string | null
+          school_website?: string | null
+          state?: string | null
           streak_days?: number
           updated_at?: string
+          verification_status?: string
           visibility?: string
           years_in_education?: number | null
+        }
+        Relationships: []
+      }
+      resource_principal_applications: {
+        Row: {
+          admin_notes: string | null
+          bio: string
+          created_at: string
+          credentials: string | null
+          expertise: string[]
+          headline: string | null
+          id: string
+          linkedin_url: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sample_work_url: string | null
+          speaking_topics: string[]
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          bio: string
+          created_at?: string
+          credentials?: string | null
+          expertise?: string[]
+          headline?: string | null
+          id?: string
+          linkedin_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sample_work_url?: string | null
+          speaking_topics?: string[]
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          bio?: string
+          created_at?: string
+          credentials?: string | null
+          expertise?: string[]
+          headline?: string | null
+          id?: string
+          linkedin_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sample_work_url?: string | null
+          speaking_topics?: string[]
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      resource_principals: {
+        Row: {
+          bio: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          credentials: string | null
+          display_name: string
+          expertise: string[]
+          featured: boolean
+          headline: string | null
+          id: string
+          linkedin_url: string | null
+          photo_url: string | null
+          revenue_share_pct: number
+          school_name: string | null
+          slug: string
+          speaking_topics: string[]
+          status: string
+          updated_at: string
+          user_id: string
+          website_url: string | null
+        }
+        Insert: {
+          bio?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          credentials?: string | null
+          display_name: string
+          expertise?: string[]
+          featured?: boolean
+          headline?: string | null
+          id?: string
+          linkedin_url?: string | null
+          photo_url?: string | null
+          revenue_share_pct?: number
+          school_name?: string | null
+          slug: string
+          speaking_topics?: string[]
+          status?: string
+          updated_at?: string
+          user_id: string
+          website_url?: string | null
+        }
+        Update: {
+          bio?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          credentials?: string | null
+          display_name?: string
+          expertise?: string[]
+          featured?: boolean
+          headline?: string | null
+          id?: string
+          linkedin_url?: string | null
+          photo_url?: string | null
+          revenue_share_pct?: number
+          school_name?: string | null
+          slug?: string
+          speaking_topics?: string[]
+          status?: string
+          updated_at?: string
+          user_id?: string
+          website_url?: string | null
         }
         Relationships: []
       }
@@ -650,6 +815,72 @@ export type Database = {
           resource_type?: string
           slug?: string
           title?: string
+        }
+        Relationships: []
+      }
+      school_verifications: {
+        Row: {
+          admin_notes: string | null
+          affiliation_number: string
+          board: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          designation: string | null
+          full_name: string
+          id: string
+          linkedin_url: string | null
+          mobile: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          school_name: string
+          school_website: string | null
+          state: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          affiliation_number: string
+          board?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          designation?: string | null
+          full_name: string
+          id?: string
+          linkedin_url?: string | null
+          mobile?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          school_name: string
+          school_website?: string | null
+          state?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          affiliation_number?: string
+          board?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          designation?: string | null
+          full_name?: string
+          id?: string
+          linkedin_url?: string | null
+          mobile?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          school_name?: string
+          school_website?: string | null
+          state?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -788,6 +1019,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      course_outline: {
+        Args: { _course_id: string }
+        Returns: {
+          duration_min: number
+          id: string
+          kind: string
+          lesson_order: number
+          module_order: number
+          module_title: string
+          title: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as BecomeAResourcePrincipalRouteImport } from './routes/become-a-resource-principal'
 import { Route as CertificatesRouteImport } from './routes/certificates'
 import { Route as CookiePolicyRouteImport } from './routes/cookie-policy'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -21,11 +22,14 @@ import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as VerificationRouteImport } from './routes/verification'
 import { Route as CommunityIndexRouteImport } from './routes/community.index'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
 import { Route as ExpertsIndexRouteImport } from './routes/experts.index'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
+import { Route as ResourcePrincipalsIndexRouteImport } from './routes/resource-principals.index'
+import { Route as ResourcePrincipalsSlugRouteImport } from './routes/resource-principals.$slug'
 import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
 import { Route as VerifyCertificateIdRouteImport } from './routes/verify.$certificateId'
 import { Route as WebinarsIndexRouteImport } from './routes/webinars.index'
@@ -46,6 +50,12 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BecomeAResourcePrincipalRoute =
+  BecomeAResourcePrincipalRouteImport.update({
+    id: '/become-a-resource-principal',
+    path: '/become-a-resource-principal',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const CertificatesRoute = CertificatesRouteImport.update({
   id: '/certificates',
   path: '/certificates',
@@ -91,6 +101,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VerificationRoute = VerificationRouteImport.update({
+  id: '/verification',
+  path: '/verification',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CommunityIndexRoute = CommunityIndexRouteImport.update({
   id: '/community/',
   path: '/community/',
@@ -114,6 +129,16 @@ const ExpertsIndexRoute = ExpertsIndexRouteImport.update({
 const LearnSlugRoute = LearnSlugRouteImport.update({
   id: '/learn/$slug',
   path: '/learn/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcePrincipalsIndexRoute = ResourcePrincipalsIndexRouteImport.update({
+  id: '/resource-principals/',
+  path: '/resource-principals/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcePrincipalsSlugRoute = ResourcePrincipalsSlugRouteImport.update({
+  id: '/resource-principals/$slug',
+  path: '/resource-principals/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResourcesIndexRoute = ResourcesIndexRouteImport.update({
@@ -141,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/become-a-resource-principal': typeof BecomeAResourcePrincipalRoute
   '/certificates': typeof CertificatesRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/dashboard': typeof DashboardRoute
@@ -150,13 +176,16 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/terms': typeof TermsRoute
+  '/verification': typeof VerificationRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/resource-principals/$slug': typeof ResourcePrincipalsSlugRoute
   '/verify/$certificateId': typeof VerifyCertificateIdRoute
   '/webinars/$slug': typeof WebinarsSlugRoute
   '/community/': typeof CommunityIndexRoute
   '/courses/': typeof CoursesIndexRoute
   '/experts/': typeof ExpertsIndexRoute
+  '/resource-principals/': typeof ResourcePrincipalsIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/webinars/': typeof WebinarsIndexRoute
 }
@@ -164,6 +193,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/become-a-resource-principal': typeof BecomeAResourcePrincipalRoute
   '/certificates': typeof CertificatesRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/dashboard': typeof DashboardRoute
@@ -173,13 +203,16 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/terms': typeof TermsRoute
+  '/verification': typeof VerificationRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/resource-principals/$slug': typeof ResourcePrincipalsSlugRoute
   '/verify/$certificateId': typeof VerifyCertificateIdRoute
   '/webinars/$slug': typeof WebinarsSlugRoute
   '/community': typeof CommunityIndexRoute
   '/courses': typeof CoursesIndexRoute
   '/experts': typeof ExpertsIndexRoute
+  '/resource-principals': typeof ResourcePrincipalsIndexRoute
   '/resources': typeof ResourcesIndexRoute
   '/webinars': typeof WebinarsIndexRoute
 }
@@ -188,6 +221,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/become-a-resource-principal': typeof BecomeAResourcePrincipalRoute
   '/certificates': typeof CertificatesRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/dashboard': typeof DashboardRoute
@@ -197,13 +231,16 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/terms': typeof TermsRoute
+  '/verification': typeof VerificationRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/resource-principals/$slug': typeof ResourcePrincipalsSlugRoute
   '/verify/$certificateId': typeof VerifyCertificateIdRoute
   '/webinars/$slug': typeof WebinarsSlugRoute
   '/community/': typeof CommunityIndexRoute
   '/courses/': typeof CoursesIndexRoute
   '/experts/': typeof ExpertsIndexRoute
+  '/resource-principals/': typeof ResourcePrincipalsIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/webinars/': typeof WebinarsIndexRoute
 }
@@ -213,6 +250,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/become-a-resource-principal'
     | '/certificates'
     | '/cookie-policy'
     | '/dashboard'
@@ -222,13 +260,16 @@ export interface FileRouteTypes {
     | '/profile'
     | '/refund-policy'
     | '/terms'
+    | '/verification'
     | '/courses/$slug'
     | '/learn/$slug'
+    | '/resource-principals/$slug'
     | '/verify/$certificateId'
     | '/webinars/$slug'
     | '/community/'
     | '/courses/'
     | '/experts/'
+    | '/resource-principals/'
     | '/resources/'
     | '/webinars/'
   fileRoutesByTo: FileRoutesByTo
@@ -236,6 +277,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/become-a-resource-principal'
     | '/certificates'
     | '/cookie-policy'
     | '/dashboard'
@@ -245,13 +287,16 @@ export interface FileRouteTypes {
     | '/profile'
     | '/refund-policy'
     | '/terms'
+    | '/verification'
     | '/courses/$slug'
     | '/learn/$slug'
+    | '/resource-principals/$slug'
     | '/verify/$certificateId'
     | '/webinars/$slug'
     | '/community'
     | '/courses'
     | '/experts'
+    | '/resource-principals'
     | '/resources'
     | '/webinars'
   id:
@@ -259,6 +304,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/become-a-resource-principal'
     | '/certificates'
     | '/cookie-policy'
     | '/dashboard'
@@ -268,13 +314,16 @@ export interface FileRouteTypes {
     | '/profile'
     | '/refund-policy'
     | '/terms'
+    | '/verification'
     | '/courses/$slug'
     | '/learn/$slug'
+    | '/resource-principals/$slug'
     | '/verify/$certificateId'
     | '/webinars/$slug'
     | '/community/'
     | '/courses/'
     | '/experts/'
+    | '/resource-principals/'
     | '/resources/'
     | '/webinars/'
   fileRoutesById: FileRoutesById
@@ -283,6 +332,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
+  BecomeAResourcePrincipalRoute: typeof BecomeAResourcePrincipalRoute
   CertificatesRoute: typeof CertificatesRoute
   CookiePolicyRoute: typeof CookiePolicyRoute
   DashboardRoute: typeof DashboardRoute
@@ -292,13 +342,16 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   TermsRoute: typeof TermsRoute
+  VerificationRoute: typeof VerificationRoute
   CoursesSlugRoute: typeof CoursesSlugRoute
   LearnSlugRoute: typeof LearnSlugRoute
+  ResourcePrincipalsSlugRoute: typeof ResourcePrincipalsSlugRoute
   VerifyCertificateIdRoute: typeof VerifyCertificateIdRoute
   WebinarsSlugRoute: typeof WebinarsSlugRoute
   CommunityIndexRoute: typeof CommunityIndexRoute
   CoursesIndexRoute: typeof CoursesIndexRoute
   ExpertsIndexRoute: typeof ExpertsIndexRoute
+  ResourcePrincipalsIndexRoute: typeof ResourcePrincipalsIndexRoute
   ResourcesIndexRoute: typeof ResourcesIndexRoute
   WebinarsIndexRoute: typeof WebinarsIndexRoute
 }
@@ -324,6 +377,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/become-a-resource-principal': {
+      id: '/become-a-resource-principal'
+      path: '/become-a-resource-principal'
+      fullPath: '/become-a-resource-principal'
+      preLoaderRoute: typeof BecomeAResourcePrincipalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/certificates': {
@@ -389,6 +449,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/verification': {
+      id: '/verification'
+      path: '/verification'
+      fullPath: '/verification'
+      preLoaderRoute: typeof VerificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/community/': {
       id: '/community/'
       path: '/community'
@@ -422,6 +489,20 @@ declare module '@tanstack/react-router' {
       path: '/learn/$slug'
       fullPath: '/learn/$slug'
       preLoaderRoute: typeof LearnSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resource-principals/': {
+      id: '/resource-principals/'
+      path: '/resource-principals'
+      fullPath: '/resource-principals/'
+      preLoaderRoute: typeof ResourcePrincipalsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resource-principals/$slug': {
+      id: '/resource-principals/$slug'
+      path: '/resource-principals/$slug'
+      fullPath: '/resource-principals/$slug'
+      preLoaderRoute: typeof ResourcePrincipalsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resources/': {
@@ -459,6 +540,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
+  BecomeAResourcePrincipalRoute: BecomeAResourcePrincipalRoute,
   CertificatesRoute: CertificatesRoute,
   CookiePolicyRoute: CookiePolicyRoute,
   DashboardRoute: DashboardRoute,
@@ -468,13 +550,16 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   TermsRoute: TermsRoute,
+  VerificationRoute: VerificationRoute,
   CoursesSlugRoute: CoursesSlugRoute,
   LearnSlugRoute: LearnSlugRoute,
+  ResourcePrincipalsSlugRoute: ResourcePrincipalsSlugRoute,
   VerifyCertificateIdRoute: VerifyCertificateIdRoute,
   WebinarsSlugRoute: WebinarsSlugRoute,
   CommunityIndexRoute: CommunityIndexRoute,
   CoursesIndexRoute: CoursesIndexRoute,
   ExpertsIndexRoute: ExpertsIndexRoute,
+  ResourcePrincipalsIndexRoute: ResourcePrincipalsIndexRoute,
   ResourcesIndexRoute: ResourcesIndexRoute,
   WebinarsIndexRoute: WebinarsIndexRoute,
 }
