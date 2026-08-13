@@ -24,7 +24,7 @@ export const NAV_LINKS = [
   { to: "/courses", label: "Courses" },
   { to: "/webinars", label: "Webinars" },
   { to: "/community", label: "Community" },
-  { to: "/experts", label: "Experts" },
+  { to: "/resource-principals", label: "Resource Principals" },
   { to: "/resources", label: "Resources" },
 ] as const;
 
