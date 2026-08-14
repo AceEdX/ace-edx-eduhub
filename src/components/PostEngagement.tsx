@@ -36,7 +36,10 @@ export function PostEngagement({ postId, reactions }: { postId: string; reaction
   const likes = state.data?.likes ?? reactions;
 
   async function toggleLike() {
-    if (!user) return toast.error("Sign in to react to posts");
+    if (!user) {
+      toast.error("Sign in to react to posts");
+      return;
+    }
     if (state.data?.liked) {
       await supabase.from("post_reactions").delete().eq("post_id", postId).eq("user_id", user.id);
     } else {
@@ -47,7 +50,10 @@ export function PostEngagement({ postId, reactions }: { postId: string; reaction
   }
 
   async function toggleSave() {
-    if (!user) return toast.error("Sign in to save posts");
+    if (!user) {
+      toast.error("Sign in to save posts");
+      return;
+    }
     if (state.data?.saved) {
       await supabase.from("post_saves").delete().eq("post_id", postId).eq("user_id", user.id);
       toast.success("Removed from saved");
@@ -60,7 +66,10 @@ export function PostEngagement({ postId, reactions }: { postId: string; reaction
   }
 
   async function report() {
-    if (!user) return toast.error("Sign in to report content");
+    if (!user) {
+      toast.error("Sign in to report content");
+      return;
+    }
     setReporting(true);
     const { error } = await supabase.from("content_reports").insert({
       post_id: postId,
