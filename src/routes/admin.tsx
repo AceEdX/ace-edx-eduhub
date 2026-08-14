@@ -20,6 +20,13 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdmin } from "@/hooks/useAdmin";
+import {
+  VerificationQueueAdmin,
+  ResourcePrincipalsAdmin,
+} from "@/components/admin/PrincipalsAdmin";
+import { ModerationAdmin } from "@/components/admin/CommunityAdmin";
+import { ResourcesAdmin, SettingsAdmin } from "@/components/admin/LibraryAdmin";
+
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -127,7 +134,12 @@ function AdminPage() {
             <TabsTrigger value="courses">Courses</TabsTrigger>
             <TabsTrigger value="webinars">Webinars</TabsTrigger>
             <TabsTrigger value="content">Course content</TabsTrigger>
+            <TabsTrigger value="verifications">Verifications</TabsTrigger>
+            <TabsTrigger value="principals">Resource Principals</TabsTrigger>
+            <TabsTrigger value="moderation">Community</TabsTrigger>
+            <TabsTrigger value="library">Library</TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="courses">
             <CoursesAdmin />
@@ -138,9 +150,25 @@ function AdminPage() {
           <TabsContent value="content">
             <ContentAdmin />
           </TabsContent>
+          <TabsContent value="verifications">
+            <VerificationQueueAdmin />
+          </TabsContent>
+          <TabsContent value="principals">
+            <ResourcePrincipalsAdmin />
+          </TabsContent>
+          <TabsContent value="moderation">
+            <ModerationAdmin />
+          </TabsContent>
+          <TabsContent value="library">
+            <ResourcesAdmin />
+          </TabsContent>
           <TabsContent value="orders">
             <OrdersAdmin />
           </TabsContent>
+          <TabsContent value="settings">
+            <SettingsAdmin />
+          </TabsContent>
+
         </Tabs>
       </div>
     </PageShell>

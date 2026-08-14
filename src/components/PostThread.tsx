@@ -6,6 +6,7 @@ import { MessageSquare, Send, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Pill } from "@/components/cards";
+import { PostEngagement } from "@/components/PostEngagement";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import type { Post } from "@/lib/api";
@@ -118,6 +119,7 @@ export function PostThread({ post }: { post: Post }) {
               <MessageSquare className="h-3.5 w-3.5" />
               {count === 0 ? "Answer this" : `${count} ${count === 1 ? "reply" : "replies"}`}
             </button>
+            <PostEngagement postId={post.id} reactions={post.reactions} />
           </div>
 
           {open && (
