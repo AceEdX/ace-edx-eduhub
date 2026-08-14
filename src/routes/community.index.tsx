@@ -31,6 +31,8 @@ export const Route = createFileRoute("/community/")({
   component: CommunityPage,
 });
 
+const POST_KINDS = ["discussion", "question", "resource", "achievement", "announcement"] as const;
+
 function CommunityPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -38,7 +40,55 @@ function CommunityPage() {
   const groups = useQuery(groupsQuery);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [kind, setKind] = useState<string>("discussion");
+  const [groupId, setGroupId] = useState<string>("");
+  const [feed, setFeed] = useState<"latest" | "saved">("latest");
   const [busy, setBusy] = useState(false);
+
+  const saved = useQuery({
+    queryKey: ["saved-posts", user?.id ?? "anon"],
+    enabled: Boolean(user),
+    queryFn: async (): Promise<string[]> => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from("post_saves")
+        .select("post_id")
+        .eq("user_id", user.id);
+      if (error) throw error;
+      return (data ?? []).map((r) => r.post_id);
+    },
+  });
+
+  const myGroups = useQuery({
+    queryKey: ["my-groups", user?.id ?? "anon"],
+    enabled: Boolean(user),
+    queryFn: async (): Promise<string[]> => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from("group_members")
+        .select("group_id")
+        .eq("user_id", user.id);
+      if (error) throw error;
+      return (data ?? []).map((r) => r.group_id);
+    },
+  });
+
+  const visiblePosts = (posts.data ?? []).filter((p) =>
+    feed === "saved" ? (saved.data ?? []).includes(p.id) : true,
+  );
+
+  async function toggleGroup(id: string, joined: boolean) {
+    if (!user) {
+      toast.error("Sign in to join a peer group");
+      return;
+    }
+    if (joined) {
+      await supabase.from("group_members").delete().eq("group_id", id).eq("user_id", user.id);
+    } else {
+      await supabase.from("group_members").insert({ group_id: id, user_id: user.id });
+    }
+    void queryClient.invalidateQueries({ queryKey: ["my-groups"] });
+  }
 
   async function publish() {
     if (!user) return;
@@ -58,7 +108,8 @@ function CommunityPage() {
       author_role: [profile?.professional_role, profile?.school_name].filter(Boolean).join(", "),
       title: title.trim() || null,
       body: body.trim(),
-      kind: "discussion",
+      kind,
+      group_id: groupId || null,
     });
     setBusy(false);
     if (error) {
@@ -83,6 +134,20 @@ function CommunityPage() {
           {user ? (
             <div className="card-surface space-y-3 p-5">
               <h2 className="font-display text-base font-semibold">Start a discussion</h2>
+              <div className="flex flex-wrap gap-2">
+                {POST_KINDS.map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => setKind(k)}
+                    className={`rounded-full border px-3 py-1 text-xs font-semibold capitalize transition-colors ${
+                      kind === k ? "border-primary bg-primary-soft text-primary" : "border-border"
+                    }`}
+                  >
+                    {k}
+                  </button>
+                ))}
+              </div>
               <Input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -98,7 +163,20 @@ function CommunityPage() {
                 placeholder="What is on your mind this week? Ask a question or share what worked."
                 aria-label="Discussion body"
               />
-              <div className="flex justify-end">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <select
+                  value={groupId}
+                  onChange={(e) => setGroupId(e.target.value)}
+                  aria-label="Post to a peer group"
+                  className="h-9 rounded-lg border border-border bg-background px-3 text-sm"
+                >
+                  <option value="">Whole community</option>
+                  {(groups.data ?? []).map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.name}
+                    </option>
+                  ))}
+                </select>
                 <Button variant="brand" onClick={publish} disabled={busy}>
                   Post to community
                 </Button>
@@ -117,20 +195,39 @@ function CommunityPage() {
             </div>
           )}
 
+          <div className="flex gap-2">
+            {(["latest", "saved"] as const).map((f) => (
+              <button
+                key={f}
+                type="button"
+                onClick={() => setFeed(f)}
+                className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold capitalize transition-colors ${
+                  feed === f ? "border-primary bg-primary-soft text-primary" : "border-border"
+                }`}
+              >
+                {f === "latest" ? "Latest" : "Saved posts"}
+              </button>
+            ))}
+          </div>
+
           {posts.isLoading ? (
             <div className="space-y-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="h-40 rounded-2xl" />
               ))}
             </div>
-          ) : (posts.data ?? []).length === 0 ? (
+          ) : visiblePosts.length === 0 ? (
             <EmptyState
-              title="No discussions yet"
-              description="Be the first to ask the community a question."
+              title={feed === "saved" ? "Nothing saved yet" : "No discussions yet"}
+              description={
+                feed === "saved"
+                  ? "Tap Save on any post to keep it here."
+                  : "Be the first to ask the community a question."
+              }
             />
           ) : (
             <div className="space-y-4">
-              {(posts.data ?? []).map((p) => (
+              {visiblePosts.map((p) => (
                 <PostThread key={p.id} post={p} />
               ))}
             </div>
@@ -141,16 +238,24 @@ function CommunityPage() {
           <div className="card-surface p-5">
             <h2 className="font-display text-base font-semibold">Peer groups</h2>
             <ul className="mt-3 space-y-2.5">
-              {(groups.data ?? []).map((g) => (
-                <li key={g.id} className="flex items-center justify-between text-sm">
-                  <span>{g.name}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {g.members_count.toLocaleString()}
-                  </span>
-                </li>
-              ))}
+              {(groups.data ?? []).map((g) => {
+                const joined = (myGroups.data ?? []).includes(g.id);
+                return (
+                  <li key={g.id} className="flex items-center justify-between gap-3 text-sm">
+                    <span className="min-w-0 truncate">{g.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => toggleGroup(g.id, joined)}
+                      className="shrink-0 text-xs font-semibold text-primary hover:underline"
+                    >
+                      {joined ? "Leave" : "Join"}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </div>
+
           <div className="card-surface p-5">
             <h2 className="font-display text-base font-semibold">Principal Pulse</h2>
             <p className="mt-2 text-sm text-muted-foreground">
