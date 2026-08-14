@@ -20,6 +20,13 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdmin } from "@/hooks/useAdmin";
+import {
+  VerificationQueueAdmin,
+  ResourcePrincipalsAdmin,
+} from "@/components/admin/PrincipalsAdmin";
+import { ModerationAdmin } from "@/components/admin/CommunityAdmin";
+import { ResourcesAdmin, SettingsAdmin } from "@/components/admin/LibraryAdmin";
+
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
