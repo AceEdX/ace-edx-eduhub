@@ -392,7 +392,11 @@ function DirectoryRow({
   const [share, setShare] = useState(rp.revenue_share_pct);
   const [busy, setBusy] = useState(false);
 
-  async function patch(values: Record<string, unknown>) {
+  async function patch(values: {
+    status?: string;
+    featured?: boolean;
+    revenue_share_pct?: number;
+  }) {
     setBusy(true);
     const { error } = await supabase.from("resource_principals").update(values).eq("id", rp.id);
     setBusy(false);
