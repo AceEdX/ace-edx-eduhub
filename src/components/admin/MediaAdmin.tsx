@@ -67,7 +67,7 @@ export function MediaLibraryAdmin() {
     qc.invalidateQueries({ queryKey: ["media-library"] });
   }
 
-  async function update(id: string, values: Record<string, unknown>) {
+  async function update(id: string, values: { published?: boolean }) {
     const { error } = await supabase.from("media_assets").update(values).eq("id", id);
     if (error) {
       toast.error(error.message);
