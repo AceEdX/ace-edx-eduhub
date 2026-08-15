@@ -28,6 +28,7 @@ export const NAV_LINKS = [
   { to: "/community", label: "Community" },
   { to: "/resource-principals", label: "Resource Principals" },
   { to: "/resources", label: "Resources" },
+  { to: "/pricing", label: "Pricing" },
 ] as const;
 
 export const PROFESSIONAL_ROLES = [
