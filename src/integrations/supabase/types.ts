@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_generations: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          meta: Json
+          output: string
+          prompt: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          meta?: Json
+          output: string
+          prompt: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          meta?: Json
+          output?: string
+          prompt?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       certificates: {
         Row: {
           certificate_id: string
@@ -246,6 +276,93 @@ export type Database = {
           },
         ]
       }
+      coupon_redemptions: {
+        Row: {
+          coupon_id: string
+          created_at: string
+          discount_inr: number
+          id: string
+          order_id: string | null
+          user_id: string
+        }
+        Insert: {
+          coupon_id: string
+          created_at?: string
+          discount_inr?: number
+          id?: string
+          order_id?: string | null
+          user_id: string
+        }
+        Update: {
+          coupon_id?: string
+          created_at?: string
+          discount_inr?: number
+          id?: string
+          order_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_redemptions_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coupon_redemptions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupons: {
+        Row: {
+          active: boolean
+          applies_to: string
+          code: string
+          created_at: string
+          description: string | null
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          max_redemptions: number | null
+          redemptions: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          applies_to?: string
+          code: string
+          created_at?: string
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          max_redemptions?: number | null
+          redemptions?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          applies_to?: string
+          code?: string
+          created_at?: string
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          max_redemptions?: number | null
+          redemptions?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       courses: {
         Row: {
           audience: string[]
@@ -441,6 +558,139 @@ export type Database = {
           },
         ]
       }
+      learning_path_enrollments: {
+        Row: {
+          created_at: string
+          id: string
+          path_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          path_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          path_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_path_enrollments_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "learning_paths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learning_path_items: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          id: string
+          item_type: string
+          label: string | null
+          path_id: string
+          resource_id: string | null
+          step_order: number
+          webinar_id: string | null
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          item_type?: string
+          label?: string | null
+          path_id: string
+          resource_id?: string | null
+          step_order?: number
+          webinar_id?: string | null
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          item_type?: string
+          label?: string | null
+          path_id?: string
+          resource_id?: string | null
+          step_order?: number
+          webinar_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_path_items_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learning_path_items_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "learning_paths"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learning_path_items_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "resources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learning_path_items_webinar_id_fkey"
+            columns: ["webinar_id"]
+            isOneToOne: false
+            referencedRelation: "webinars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learning_paths: {
+        Row: {
+          audience: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          level: string
+          published: boolean
+          slug: string
+          summary: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audience?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          level?: string
+          published?: boolean
+          slug: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          level?: string
+          published?: boolean
+          slug?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lesson_progress: {
         Row: {
           completed_at: string
@@ -533,6 +783,54 @@ export type Database = {
           },
         ]
       }
+      media_assets: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_sec: number
+          id: string
+          media_type: string
+          published: boolean
+          tags: string[]
+          thumbnail_url: string | null
+          title: string
+          transcript: string | null
+          updated_at: string
+          url: string
+          views: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_sec?: number
+          id?: string
+          media_type?: string
+          published?: boolean
+          tags?: string[]
+          thumbnail_url?: string | null
+          title: string
+          transcript?: string | null
+          updated_at?: string
+          url: string
+          views?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_sec?: number
+          id?: string
+          media_type?: string
+          published?: boolean
+          tags?: string[]
+          thumbnail_url?: string | null
+          title?: string
+          transcript?: string | null
+          updated_at?: string
+          url?: string
+          views?: number
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null
@@ -566,7 +864,9 @@ export type Database = {
       orders: {
         Row: {
           amount_inr: number
+          coupon_code: string | null
           created_at: string
+          discount_inr: number
           id: string
           item_id: string | null
           item_title: string
@@ -580,7 +880,9 @@ export type Database = {
         }
         Insert: {
           amount_inr?: number
+          coupon_code?: string | null
           created_at?: string
+          discount_inr?: number
           id?: string
           item_id?: string | null
           item_title: string
@@ -594,7 +896,9 @@ export type Database = {
         }
         Update: {
           amount_inr?: number
+          coupon_code?: string | null
           created_at?: string
+          discount_inr?: number
           id?: string
           item_id?: string | null
           item_title?: string
@@ -930,6 +1234,60 @@ export type Database = {
         }
         Relationships: []
       }
+      revenue_shares: {
+        Row: {
+          created_at: string
+          gross_inr: number
+          id: string
+          item_title: string
+          order_id: string | null
+          payout_inr: number
+          principal_id: string
+          share_pct: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          gross_inr?: number
+          id?: string
+          item_title: string
+          order_id?: string | null
+          payout_inr?: number
+          principal_id: string
+          share_pct?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          gross_inr?: number
+          id?: string
+          item_title?: string
+          order_id?: string | null
+          payout_inr?: number
+          principal_id?: string
+          share_pct?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "revenue_shares_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revenue_shares_principal_id_fkey"
+            columns: ["principal_id"]
+            isOneToOne: false
+            referencedRelation: "resource_principals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       school_verifications: {
         Row: {
           admin_notes: string | null
@@ -995,6 +1353,256 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      social_publications: {
+        Row: {
+          caption: string
+          channel: string
+          created_at: string
+          created_by: string | null
+          id: string
+          link_url: string | null
+          media_id: string | null
+          published_url: string | null
+          scheduled_for: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          caption: string
+          channel: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          link_url?: string | null
+          media_id?: string | null
+          published_url?: string | null
+          scheduled_for?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          caption?: string
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          link_url?: string | null
+          media_id?: string | null
+          published_url?: string | null
+          scheduled_for?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_publications_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      speaker_requests: {
+        Row: {
+          audience_size: number | null
+          budget_inr: number | null
+          city: string | null
+          created_at: string
+          event_date: string | null
+          event_format: string
+          event_name: string
+          id: string
+          message: string | null
+          principal_id: string | null
+          requester_id: string
+          status: string
+          topic: string
+          updated_at: string
+        }
+        Insert: {
+          audience_size?: number | null
+          budget_inr?: number | null
+          city?: string | null
+          created_at?: string
+          event_date?: string | null
+          event_format?: string
+          event_name: string
+          id?: string
+          message?: string | null
+          principal_id?: string | null
+          requester_id: string
+          status?: string
+          topic: string
+          updated_at?: string
+        }
+        Update: {
+          audience_size?: number | null
+          budget_inr?: number | null
+          city?: string | null
+          created_at?: string
+          event_date?: string | null
+          event_format?: string
+          event_name?: string
+          id?: string
+          message?: string | null
+          principal_id?: string | null
+          requester_id?: string
+          status?: string
+          topic?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "speaker_requests_principal_id_fkey"
+            columns: ["principal_id"]
+            isOneToOne: false
+            referencedRelation: "resource_principals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sponsorships: {
+        Row: {
+          admin_notes: string | null
+          budget_inr: number | null
+          company_name: string
+          contact_email: string
+          contact_name: string
+          created_at: string
+          id: string
+          message: string | null
+          package_type: string
+          phone: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          budget_inr?: number | null
+          company_name: string
+          contact_email: string
+          contact_name: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          package_type?: string
+          phone?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          budget_inr?: number | null
+          company_name?: string
+          contact_email?: string
+          contact_name?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          package_type?: string
+          phone?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      subscription_plans: {
+        Row: {
+          active: boolean
+          created_at: string
+          features: string[]
+          id: string
+          interval_months: number
+          name: string
+          price_inr: number
+          slug: string
+          sort_order: number
+          tagline: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          features?: string[]
+          id?: string
+          interval_months?: number
+          name: string
+          price_inr?: number
+          slug: string
+          sort_order?: number
+          tagline?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          features?: string[]
+          id?: string
+          interval_months?: number
+          name?: string
+          price_inr?: number
+          slug?: string
+          sort_order?: number
+          tagline?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string
+          id: string
+          order_id: string | null
+          plan_id: string
+          started_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string
+          id?: string
+          order_id?: string | null
+          plan_id: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string
+          id?: string
+          order_id?: string | null
+          plan_id?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
