@@ -26,6 +26,10 @@ import {
 } from "@/components/admin/PrincipalsAdmin";
 import { ModerationAdmin } from "@/components/admin/CommunityAdmin";
 import { ResourcesAdmin, SettingsAdmin } from "@/components/admin/LibraryAdmin";
+import { AiStudioAdmin } from "@/components/admin/AiStudioAdmin";
+import { MediaAdmin } from "@/components/admin/MediaAdmin";
+import { MonetizationAdmin } from "@/components/admin/MonetizationAdmin";
+import { GrowthAdmin } from "@/components/admin/GrowthAdmin";
 
 
 export const Route = createFileRoute("/admin")({
@@ -138,6 +142,10 @@ function AdminPage() {
             <TabsTrigger value="principals">Resource Principals</TabsTrigger>
             <TabsTrigger value="moderation">Community</TabsTrigger>
             <TabsTrigger value="library">Library</TabsTrigger>
+            <TabsTrigger value="ai">AI Studio</TabsTrigger>
+            <TabsTrigger value="media">Media</TabsTrigger>
+            <TabsTrigger value="monetization">Monetization</TabsTrigger>
+            <TabsTrigger value="growth">Growth</TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
@@ -161,6 +169,18 @@ function AdminPage() {
           </TabsContent>
           <TabsContent value="library">
             <ResourcesAdmin />
+          </TabsContent>
+          <TabsContent value="ai">
+            <AiStudioAdmin />
+          </TabsContent>
+          <TabsContent value="media">
+            <MediaAdmin />
+          </TabsContent>
+          <TabsContent value="monetization">
+            <MonetizationAdmin />
+          </TabsContent>
+          <TabsContent value="growth">
+            <GrowthAdmin />
           </TabsContent>
           <TabsContent value="orders">
             <OrdersAdmin />
