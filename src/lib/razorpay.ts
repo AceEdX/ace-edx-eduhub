@@ -20,8 +20,9 @@ function loadRazorpayScript(): Promise<boolean> {
 }
 
 export async function payAndUnlock(opts: {
-  itemType: "course" | "webinar";
+  itemType: "course" | "webinar" | "subscription";
   itemId: string;
+  couponCode?: string;
   name?: string;
   email?: string;
   onSuccess: () => Promise<void> | void;
@@ -34,7 +35,11 @@ export async function payAndUnlock(opts: {
     }
 
     const order = await createPaymentOrder({
-      data: { itemType: opts.itemType, itemId: opts.itemId },
+      data: {
+        itemType: opts.itemType,
+        itemId: opts.itemId,
+        ...(opts.couponCode ? { couponCode: opts.couponCode } : {}),
+      },
     });
 
     const rzp = new window.Razorpay!({
