@@ -19,6 +19,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as LearningHubRouteImport } from './routes/learning-hub'
 import { Route as MyLearningRouteImport } from './routes/my-learning'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
@@ -85,6 +86,11 @@ const LearningHubRoute = LearningHubRouteImport.update({
 const MyLearningRoute = MyLearningRouteImport.update({
   id: '/my-learning',
   path: '/my-learning',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/disclaimer': typeof DisclaimerRoute
   '/learning-hub': typeof LearningHubRoute
   '/my-learning': typeof MyLearningRoute
+  '/pricing': typeof PricingRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
@@ -207,6 +214,7 @@ export interface FileRoutesByTo {
   '/disclaimer': typeof DisclaimerRoute
   '/learning-hub': typeof LearningHubRoute
   '/my-learning': typeof MyLearningRoute
+  '/pricing': typeof PricingRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
@@ -236,6 +244,7 @@ export interface FileRoutesById {
   '/disclaimer': typeof DisclaimerRoute
   '/learning-hub': typeof LearningHubRoute
   '/my-learning': typeof MyLearningRoute
+  '/pricing': typeof PricingRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/disclaimer'
     | '/learning-hub'
     | '/my-learning'
+    | '/pricing'
     | '/privacy-policy'
     | '/profile'
     | '/refund-policy'
@@ -294,6 +304,7 @@ export interface FileRouteTypes {
     | '/disclaimer'
     | '/learning-hub'
     | '/my-learning'
+    | '/pricing'
     | '/privacy-policy'
     | '/profile'
     | '/refund-policy'
@@ -322,6 +333,7 @@ export interface FileRouteTypes {
     | '/disclaimer'
     | '/learning-hub'
     | '/my-learning'
+    | '/pricing'
     | '/privacy-policy'
     | '/profile'
     | '/refund-policy'
@@ -351,6 +363,7 @@ export interface RootRouteChildren {
   DisclaimerRoute: typeof DisclaimerRoute
   LearningHubRoute: typeof LearningHubRoute
   MyLearningRoute: typeof MyLearningRoute
+  PricingRoute: typeof PricingRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   ProfileRoute: typeof ProfileRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
@@ -439,6 +452,13 @@ declare module '@tanstack/react-router' {
       path: '/my-learning'
       fullPath: '/my-learning'
       preLoaderRoute: typeof MyLearningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy-policy': {
@@ -567,6 +587,7 @@ const rootRouteChildren: RootRouteChildren = {
   DisclaimerRoute: DisclaimerRoute,
   LearningHubRoute: LearningHubRoute,
   MyLearningRoute: MyLearningRoute,
+  PricingRoute: PricingRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   ProfileRoute: ProfileRoute,
   RefundPolicyRoute: RefundPolicyRoute,

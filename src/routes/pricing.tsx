@@ -141,7 +141,9 @@ function PricingPage() {
                           itemId: plan.id,
                           couponCode: coupon.trim() || undefined,
                           email: user.email ?? "",
-                          onSuccess: () => toast.success("Membership active — welcome aboard!"),
+                          onSuccess: () => {
+                            toast.success("Membership active — welcome aboard!");
+                          },
                         })
                       }
                     >
