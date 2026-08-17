@@ -22,14 +22,17 @@ export const POLICY_LINKS = [
 export const NAV_LINKS = [
   { to: "/", label: "Home" },
   { to: "/learning-hub", label: "Learning Hub" },
+  { to: "/learning-paths", label: "Paths" },
   { to: "/courses", label: "Courses" },
   { to: "/webinars", label: "Webinars" },
-
+  { to: "/media", label: "Media" },
   { to: "/community", label: "Community" },
   { to: "/resource-principals", label: "Resource Principals" },
   { to: "/resources", label: "Resources" },
+  { to: "/assistant", label: "AI Assistant" },
   { to: "/pricing", label: "Pricing" },
 ] as const;
+
 
 export const PROFESSIONAL_ROLES = [
   "Principal",
