@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { courseQuery, lessonsQuery } from "@/lib/api";
 import { groupModules } from "@/lib/modules";
 import { LessonMedia } from "@/components/LessonMedia";
+import { CourseAssistant } from "@/components/CourseAssistant";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
