@@ -8,6 +8,8 @@ const columns = [
     links: [
       { to: "/courses", label: "Courses" },
       { to: "/webinars", label: "Webinars" },
+      { to: "/learning-paths", label: "Learning paths" },
+      { to: "/media", label: "Media library" },
       { to: "/resources", label: "Resource library" },
     ],
   },
@@ -16,6 +18,8 @@ const columns = [
     links: [
       { to: "/community", label: "Community" },
       { to: "/experts", label: "Experts" },
+      { to: "/request-a-speaker", label: "Request a speaker" },
+      { to: "/sponsorships", label: "Sponsorships" },
       { to: "/dashboard", label: "My dashboard" },
     ],
   },

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BecomeAResourcePrincipalRouteImport } from './routes/become-a-resource-principal'
 import { Route as CertificatesRouteImport } from './routes/certificates'
@@ -23,6 +24,8 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
+import { Route as RequestASpeakerRouteImport } from './routes/request-a-speaker'
+import { Route as SponsorshipsRouteImport } from './routes/sponsorships'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as VerificationRouteImport } from './routes/verification'
 import { Route as CommunityIndexRouteImport } from './routes/community.index'
@@ -30,6 +33,8 @@ import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
 import { Route as ExpertsIndexRouteImport } from './routes/experts.index'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
+import { Route as LearningPathsIndexRouteImport } from './routes/learning-paths.index'
+import { Route as MediaIndexRouteImport } from './routes/media.index'
 import { Route as ResourcePrincipalsIndexRouteImport } from './routes/resource-principals.index'
 import { Route as ResourcePrincipalsSlugRouteImport } from './routes/resource-principals.$slug'
 import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
@@ -45,6 +50,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssistantRoute = AssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -108,6 +118,16 @@ const RefundPolicyRoute = RefundPolicyRouteImport.update({
   path: '/refund-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RequestASpeakerRoute = RequestASpeakerRouteImport.update({
+  id: '/request-a-speaker',
+  path: '/request-a-speaker',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SponsorshipsRoute = SponsorshipsRouteImport.update({
+  id: '/sponsorships',
+  path: '/sponsorships',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -141,6 +161,16 @@ const ExpertsIndexRoute = ExpertsIndexRouteImport.update({
 const LearnSlugRoute = LearnSlugRouteImport.update({
   id: '/learn/$slug',
   path: '/learn/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearningPathsIndexRoute = LearningPathsIndexRouteImport.update({
+  id: '/learning-paths/',
+  path: '/learning-paths/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MediaIndexRoute = MediaIndexRouteImport.update({
+  id: '/media/',
+  path: '/media/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResourcePrincipalsIndexRoute = ResourcePrincipalsIndexRouteImport.update({
@@ -177,6 +207,7 @@ const WebinarsSlugRoute = WebinarsSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/become-a-resource-principal': typeof BecomeAResourcePrincipalRoute
   '/certificates': typeof CertificatesRoute
@@ -189,6 +220,8 @@ export interface FileRoutesByFullPath {
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/request-a-speaker': typeof RequestASpeakerRoute
+  '/sponsorships': typeof SponsorshipsRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
   '/courses/$slug': typeof CoursesSlugRoute
@@ -199,6 +232,8 @@ export interface FileRoutesByFullPath {
   '/community/': typeof CommunityIndexRoute
   '/courses/': typeof CoursesIndexRoute
   '/experts/': typeof ExpertsIndexRoute
+  '/learning-paths/': typeof LearningPathsIndexRoute
+  '/media/': typeof MediaIndexRoute
   '/resource-principals/': typeof ResourcePrincipalsIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/webinars/': typeof WebinarsIndexRoute
@@ -206,6 +241,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/become-a-resource-principal': typeof BecomeAResourcePrincipalRoute
   '/certificates': typeof CertificatesRoute
@@ -218,6 +254,8 @@ export interface FileRoutesByTo {
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/request-a-speaker': typeof RequestASpeakerRoute
+  '/sponsorships': typeof SponsorshipsRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
   '/courses/$slug': typeof CoursesSlugRoute
@@ -228,6 +266,8 @@ export interface FileRoutesByTo {
   '/community': typeof CommunityIndexRoute
   '/courses': typeof CoursesIndexRoute
   '/experts': typeof ExpertsIndexRoute
+  '/learning-paths': typeof LearningPathsIndexRoute
+  '/media': typeof MediaIndexRoute
   '/resource-principals': typeof ResourcePrincipalsIndexRoute
   '/resources': typeof ResourcesIndexRoute
   '/webinars': typeof WebinarsIndexRoute
@@ -236,6 +276,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/become-a-resource-principal': typeof BecomeAResourcePrincipalRoute
   '/certificates': typeof CertificatesRoute
@@ -248,6 +289,8 @@ export interface FileRoutesById {
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/request-a-speaker': typeof RequestASpeakerRoute
+  '/sponsorships': typeof SponsorshipsRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
   '/courses/$slug': typeof CoursesSlugRoute
@@ -258,6 +301,8 @@ export interface FileRoutesById {
   '/community/': typeof CommunityIndexRoute
   '/courses/': typeof CoursesIndexRoute
   '/experts/': typeof ExpertsIndexRoute
+  '/learning-paths/': typeof LearningPathsIndexRoute
+  '/media/': typeof MediaIndexRoute
   '/resource-principals/': typeof ResourcePrincipalsIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/webinars/': typeof WebinarsIndexRoute
@@ -267,6 +312,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/assistant'
     | '/auth'
     | '/become-a-resource-principal'
     | '/certificates'
@@ -279,6 +325,8 @@ export interface FileRouteTypes {
     | '/privacy-policy'
     | '/profile'
     | '/refund-policy'
+    | '/request-a-speaker'
+    | '/sponsorships'
     | '/terms'
     | '/verification'
     | '/courses/$slug'
@@ -289,6 +337,8 @@ export interface FileRouteTypes {
     | '/community/'
     | '/courses/'
     | '/experts/'
+    | '/learning-paths/'
+    | '/media/'
     | '/resource-principals/'
     | '/resources/'
     | '/webinars/'
@@ -296,6 +346,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/assistant'
     | '/auth'
     | '/become-a-resource-principal'
     | '/certificates'
@@ -308,6 +359,8 @@ export interface FileRouteTypes {
     | '/privacy-policy'
     | '/profile'
     | '/refund-policy'
+    | '/request-a-speaker'
+    | '/sponsorships'
     | '/terms'
     | '/verification'
     | '/courses/$slug'
@@ -318,6 +371,8 @@ export interface FileRouteTypes {
     | '/community'
     | '/courses'
     | '/experts'
+    | '/learning-paths'
+    | '/media'
     | '/resource-principals'
     | '/resources'
     | '/webinars'
@@ -325,6 +380,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/assistant'
     | '/auth'
     | '/become-a-resource-principal'
     | '/certificates'
@@ -337,6 +393,8 @@ export interface FileRouteTypes {
     | '/privacy-policy'
     | '/profile'
     | '/refund-policy'
+    | '/request-a-speaker'
+    | '/sponsorships'
     | '/terms'
     | '/verification'
     | '/courses/$slug'
@@ -347,6 +405,8 @@ export interface FileRouteTypes {
     | '/community/'
     | '/courses/'
     | '/experts/'
+    | '/learning-paths/'
+    | '/media/'
     | '/resource-principals/'
     | '/resources/'
     | '/webinars/'
@@ -355,6 +415,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AssistantRoute: typeof AssistantRoute
   AuthRoute: typeof AuthRoute
   BecomeAResourcePrincipalRoute: typeof BecomeAResourcePrincipalRoute
   CertificatesRoute: typeof CertificatesRoute
@@ -367,6 +428,8 @@ export interface RootRouteChildren {
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   ProfileRoute: typeof ProfileRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
+  RequestASpeakerRoute: typeof RequestASpeakerRoute
+  SponsorshipsRoute: typeof SponsorshipsRoute
   TermsRoute: typeof TermsRoute
   VerificationRoute: typeof VerificationRoute
   CoursesSlugRoute: typeof CoursesSlugRoute
@@ -377,6 +440,8 @@ export interface RootRouteChildren {
   CommunityIndexRoute: typeof CommunityIndexRoute
   CoursesIndexRoute: typeof CoursesIndexRoute
   ExpertsIndexRoute: typeof ExpertsIndexRoute
+  LearningPathsIndexRoute: typeof LearningPathsIndexRoute
+  MediaIndexRoute: typeof MediaIndexRoute
   ResourcePrincipalsIndexRoute: typeof ResourcePrincipalsIndexRoute
   ResourcesIndexRoute: typeof ResourcesIndexRoute
   WebinarsIndexRoute: typeof WebinarsIndexRoute
@@ -396,6 +461,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assistant': {
+      id: '/assistant'
+      path: '/assistant'
+      fullPath: '/assistant'
+      preLoaderRoute: typeof AssistantRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -482,6 +554,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RefundPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/request-a-speaker': {
+      id: '/request-a-speaker'
+      path: '/request-a-speaker'
+      fullPath: '/request-a-speaker'
+      preLoaderRoute: typeof RequestASpeakerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sponsorships': {
+      id: '/sponsorships'
+      path: '/sponsorships'
+      fullPath: '/sponsorships'
+      preLoaderRoute: typeof SponsorshipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -529,6 +615,20 @@ declare module '@tanstack/react-router' {
       path: '/learn/$slug'
       fullPath: '/learn/$slug'
       preLoaderRoute: typeof LearnSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learning-paths/': {
+      id: '/learning-paths/'
+      path: '/learning-paths'
+      fullPath: '/learning-paths/'
+      preLoaderRoute: typeof LearningPathsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/media/': {
+      id: '/media/'
+      path: '/media'
+      fullPath: '/media/'
+      preLoaderRoute: typeof MediaIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resource-principals/': {
@@ -579,6 +679,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AssistantRoute: AssistantRoute,
   AuthRoute: AuthRoute,
   BecomeAResourcePrincipalRoute: BecomeAResourcePrincipalRoute,
   CertificatesRoute: CertificatesRoute,
@@ -591,6 +692,8 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   ProfileRoute: ProfileRoute,
   RefundPolicyRoute: RefundPolicyRoute,
+  RequestASpeakerRoute: RequestASpeakerRoute,
+  SponsorshipsRoute: SponsorshipsRoute,
   TermsRoute: TermsRoute,
   VerificationRoute: VerificationRoute,
   CoursesSlugRoute: CoursesSlugRoute,
@@ -601,6 +704,8 @@ const rootRouteChildren: RootRouteChildren = {
   CommunityIndexRoute: CommunityIndexRoute,
   CoursesIndexRoute: CoursesIndexRoute,
   ExpertsIndexRoute: ExpertsIndexRoute,
+  LearningPathsIndexRoute: LearningPathsIndexRoute,
+  MediaIndexRoute: MediaIndexRoute,
   ResourcePrincipalsIndexRoute: ResourcePrincipalsIndexRoute,
   ResourcesIndexRoute: ResourcesIndexRoute,
   WebinarsIndexRoute: WebinarsIndexRoute,
