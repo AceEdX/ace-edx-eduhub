@@ -30,6 +30,7 @@ import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
 import { Route as ExpertsIndexRouteImport } from './routes/experts.index'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
+import { Route as LearningPathsIndexRouteImport } from './routes/learning-paths.index'
 import { Route as MediaIndexRouteImport } from './routes/media.index'
 import { Route as ResourcePrincipalsIndexRouteImport } from './routes/resource-principals.index'
 import { Route as ResourcePrincipalsSlugRouteImport } from './routes/resource-principals.$slug'
@@ -144,6 +145,11 @@ const LearnSlugRoute = LearnSlugRouteImport.update({
   path: '/learn/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LearningPathsIndexRoute = LearningPathsIndexRouteImport.update({
+  id: '/learning-paths/',
+  path: '/learning-paths/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MediaIndexRoute = MediaIndexRouteImport.update({
   id: '/media/',
   path: '/media/',
@@ -205,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/community/': typeof CommunityIndexRoute
   '/courses/': typeof CoursesIndexRoute
   '/experts/': typeof ExpertsIndexRoute
+  '/learning-paths/': typeof LearningPathsIndexRoute
   '/media/': typeof MediaIndexRoute
   '/resource-principals/': typeof ResourcePrincipalsIndexRoute
   '/resources/': typeof ResourcesIndexRoute
@@ -235,6 +242,7 @@ export interface FileRoutesByTo {
   '/community': typeof CommunityIndexRoute
   '/courses': typeof CoursesIndexRoute
   '/experts': typeof ExpertsIndexRoute
+  '/learning-paths': typeof LearningPathsIndexRoute
   '/media': typeof MediaIndexRoute
   '/resource-principals': typeof ResourcePrincipalsIndexRoute
   '/resources': typeof ResourcesIndexRoute
@@ -266,6 +274,7 @@ export interface FileRoutesById {
   '/community/': typeof CommunityIndexRoute
   '/courses/': typeof CoursesIndexRoute
   '/experts/': typeof ExpertsIndexRoute
+  '/learning-paths/': typeof LearningPathsIndexRoute
   '/media/': typeof MediaIndexRoute
   '/resource-principals/': typeof ResourcePrincipalsIndexRoute
   '/resources/': typeof ResourcesIndexRoute
@@ -298,6 +307,7 @@ export interface FileRouteTypes {
     | '/community/'
     | '/courses/'
     | '/experts/'
+    | '/learning-paths/'
     | '/media/'
     | '/resource-principals/'
     | '/resources/'
@@ -328,6 +338,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/courses'
     | '/experts'
+    | '/learning-paths'
     | '/media'
     | '/resource-principals'
     | '/resources'
@@ -358,6 +369,7 @@ export interface FileRouteTypes {
     | '/community/'
     | '/courses/'
     | '/experts/'
+    | '/learning-paths/'
     | '/media/'
     | '/resource-principals/'
     | '/resources/'
@@ -389,6 +401,7 @@ export interface RootRouteChildren {
   CommunityIndexRoute: typeof CommunityIndexRoute
   CoursesIndexRoute: typeof CoursesIndexRoute
   ExpertsIndexRoute: typeof ExpertsIndexRoute
+  LearningPathsIndexRoute: typeof LearningPathsIndexRoute
   MediaIndexRoute: typeof MediaIndexRoute
   ResourcePrincipalsIndexRoute: typeof ResourcePrincipalsIndexRoute
   ResourcesIndexRoute: typeof ResourcesIndexRoute
@@ -544,6 +557,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearnSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/learning-paths/': {
+      id: '/learning-paths/'
+      path: '/learning-paths'
+      fullPath: '/learning-paths/'
+      preLoaderRoute: typeof LearningPathsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/media/': {
       id: '/media/'
       path: '/media'
@@ -621,6 +641,7 @@ const rootRouteChildren: RootRouteChildren = {
   CommunityIndexRoute: CommunityIndexRoute,
   CoursesIndexRoute: CoursesIndexRoute,
   ExpertsIndexRoute: ExpertsIndexRoute,
+  LearningPathsIndexRoute: LearningPathsIndexRoute,
   MediaIndexRoute: MediaIndexRoute,
   ResourcePrincipalsIndexRoute: ResourcePrincipalsIndexRoute,
   ResourcesIndexRoute: ResourcesIndexRoute,
