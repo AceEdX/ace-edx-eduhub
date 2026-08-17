@@ -23,6 +23,7 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
+import { Route as SponsorshipsRouteImport } from './routes/sponsorships'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as VerificationRouteImport } from './routes/verification'
 import { Route as CommunityIndexRouteImport } from './routes/community.index'
@@ -108,6 +109,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const RefundPolicyRoute = RefundPolicyRouteImport.update({
   id: '/refund-policy',
   path: '/refund-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SponsorshipsRoute = SponsorshipsRouteImport.update({
+  id: '/sponsorships',
+  path: '/sponsorships',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -201,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/sponsorships': typeof SponsorshipsRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
   '/courses/$slug': typeof CoursesSlugRoute
@@ -232,6 +239,7 @@ export interface FileRoutesByTo {
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/sponsorships': typeof SponsorshipsRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
   '/courses/$slug': typeof CoursesSlugRoute
@@ -264,6 +272,7 @@ export interface FileRoutesById {
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/sponsorships': typeof SponsorshipsRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
   '/courses/$slug': typeof CoursesSlugRoute
@@ -297,6 +306,7 @@ export interface FileRouteTypes {
     | '/privacy-policy'
     | '/profile'
     | '/refund-policy'
+    | '/sponsorships'
     | '/terms'
     | '/verification'
     | '/courses/$slug'
@@ -328,6 +338,7 @@ export interface FileRouteTypes {
     | '/privacy-policy'
     | '/profile'
     | '/refund-policy'
+    | '/sponsorships'
     | '/terms'
     | '/verification'
     | '/courses/$slug'
@@ -359,6 +370,7 @@ export interface FileRouteTypes {
     | '/privacy-policy'
     | '/profile'
     | '/refund-policy'
+    | '/sponsorships'
     | '/terms'
     | '/verification'
     | '/courses/$slug'
@@ -391,6 +403,7 @@ export interface RootRouteChildren {
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   ProfileRoute: typeof ProfileRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
+  SponsorshipsRoute: typeof SponsorshipsRoute
   TermsRoute: typeof TermsRoute
   VerificationRoute: typeof VerificationRoute
   CoursesSlugRoute: typeof CoursesSlugRoute
@@ -506,6 +519,13 @@ declare module '@tanstack/react-router' {
       path: '/refund-policy'
       fullPath: '/refund-policy'
       preLoaderRoute: typeof RefundPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sponsorships': {
+      id: '/sponsorships'
+      path: '/sponsorships'
+      fullPath: '/sponsorships'
+      preLoaderRoute: typeof SponsorshipsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -631,6 +651,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   ProfileRoute: ProfileRoute,
   RefundPolicyRoute: RefundPolicyRoute,
+  SponsorshipsRoute: SponsorshipsRoute,
   TermsRoute: TermsRoute,
   VerificationRoute: VerificationRoute,
   CoursesSlugRoute: CoursesSlugRoute,
