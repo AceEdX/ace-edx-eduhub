@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BecomeAResourcePrincipalRouteImport } from './routes/become-a-resource-principal'
 import { Route as CertificatesRouteImport } from './routes/certificates'
@@ -49,6 +50,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssistantRoute = AssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -201,6 +207,7 @@ const WebinarsSlugRoute = WebinarsSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/become-a-resource-principal': typeof BecomeAResourcePrincipalRoute
   '/certificates': typeof CertificatesRoute
@@ -234,6 +241,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/become-a-resource-principal': typeof BecomeAResourcePrincipalRoute
   '/certificates': typeof CertificatesRoute
@@ -268,6 +276,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/become-a-resource-principal': typeof BecomeAResourcePrincipalRoute
   '/certificates': typeof CertificatesRoute
@@ -303,6 +312,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/assistant'
     | '/auth'
     | '/become-a-resource-principal'
     | '/certificates'
@@ -336,6 +346,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/assistant'
     | '/auth'
     | '/become-a-resource-principal'
     | '/certificates'
@@ -369,6 +380,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/assistant'
     | '/auth'
     | '/become-a-resource-principal'
     | '/certificates'
@@ -403,6 +415,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AssistantRoute: typeof AssistantRoute
   AuthRoute: typeof AuthRoute
   BecomeAResourcePrincipalRoute: typeof BecomeAResourcePrincipalRoute
   CertificatesRoute: typeof CertificatesRoute
@@ -448,6 +461,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assistant': {
+      id: '/assistant'
+      path: '/assistant'
+      fullPath: '/assistant'
+      preLoaderRoute: typeof AssistantRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -659,6 +679,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AssistantRoute: AssistantRoute,
   AuthRoute: AuthRoute,
   BecomeAResourcePrincipalRoute: BecomeAResourcePrincipalRoute,
   CertificatesRoute: CertificatesRoute,
