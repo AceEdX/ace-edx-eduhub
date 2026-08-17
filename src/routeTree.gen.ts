@@ -30,6 +30,7 @@ import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
 import { Route as ExpertsIndexRouteImport } from './routes/experts.index'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
+import { Route as MediaIndexRouteImport } from './routes/media.index'
 import { Route as ResourcePrincipalsIndexRouteImport } from './routes/resource-principals.index'
 import { Route as ResourcePrincipalsSlugRouteImport } from './routes/resource-principals.$slug'
 import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
@@ -143,6 +144,11 @@ const LearnSlugRoute = LearnSlugRouteImport.update({
   path: '/learn/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MediaIndexRoute = MediaIndexRouteImport.update({
+  id: '/media/',
+  path: '/media/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResourcePrincipalsIndexRoute = ResourcePrincipalsIndexRouteImport.update({
   id: '/resource-principals/',
   path: '/resource-principals/',
@@ -199,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/community/': typeof CommunityIndexRoute
   '/courses/': typeof CoursesIndexRoute
   '/experts/': typeof ExpertsIndexRoute
+  '/media/': typeof MediaIndexRoute
   '/resource-principals/': typeof ResourcePrincipalsIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/webinars/': typeof WebinarsIndexRoute
@@ -228,6 +235,7 @@ export interface FileRoutesByTo {
   '/community': typeof CommunityIndexRoute
   '/courses': typeof CoursesIndexRoute
   '/experts': typeof ExpertsIndexRoute
+  '/media': typeof MediaIndexRoute
   '/resource-principals': typeof ResourcePrincipalsIndexRoute
   '/resources': typeof ResourcesIndexRoute
   '/webinars': typeof WebinarsIndexRoute
@@ -258,6 +266,7 @@ export interface FileRoutesById {
   '/community/': typeof CommunityIndexRoute
   '/courses/': typeof CoursesIndexRoute
   '/experts/': typeof ExpertsIndexRoute
+  '/media/': typeof MediaIndexRoute
   '/resource-principals/': typeof ResourcePrincipalsIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/webinars/': typeof WebinarsIndexRoute
@@ -289,6 +298,7 @@ export interface FileRouteTypes {
     | '/community/'
     | '/courses/'
     | '/experts/'
+    | '/media/'
     | '/resource-principals/'
     | '/resources/'
     | '/webinars/'
@@ -318,6 +328,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/courses'
     | '/experts'
+    | '/media'
     | '/resource-principals'
     | '/resources'
     | '/webinars'
@@ -347,6 +358,7 @@ export interface FileRouteTypes {
     | '/community/'
     | '/courses/'
     | '/experts/'
+    | '/media/'
     | '/resource-principals/'
     | '/resources/'
     | '/webinars/'
@@ -377,6 +389,7 @@ export interface RootRouteChildren {
   CommunityIndexRoute: typeof CommunityIndexRoute
   CoursesIndexRoute: typeof CoursesIndexRoute
   ExpertsIndexRoute: typeof ExpertsIndexRoute
+  MediaIndexRoute: typeof MediaIndexRoute
   ResourcePrincipalsIndexRoute: typeof ResourcePrincipalsIndexRoute
   ResourcesIndexRoute: typeof ResourcesIndexRoute
   WebinarsIndexRoute: typeof WebinarsIndexRoute
@@ -531,6 +544,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearnSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/media/': {
+      id: '/media/'
+      path: '/media'
+      fullPath: '/media/'
+      preLoaderRoute: typeof MediaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resource-principals/': {
       id: '/resource-principals/'
       path: '/resource-principals'
@@ -601,6 +621,7 @@ const rootRouteChildren: RootRouteChildren = {
   CommunityIndexRoute: CommunityIndexRoute,
   CoursesIndexRoute: CoursesIndexRoute,
   ExpertsIndexRoute: ExpertsIndexRoute,
+  MediaIndexRoute: MediaIndexRoute,
   ResourcePrincipalsIndexRoute: ResourcePrincipalsIndexRoute,
   ResourcesIndexRoute: ResourcesIndexRoute,
   WebinarsIndexRoute: WebinarsIndexRoute,
