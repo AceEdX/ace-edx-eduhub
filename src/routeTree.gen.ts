@@ -23,6 +23,7 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
+import { Route as RequestASpeakerRouteImport } from './routes/request-a-speaker'
 import { Route as SponsorshipsRouteImport } from './routes/sponsorships'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as VerificationRouteImport } from './routes/verification'
@@ -109,6 +110,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const RefundPolicyRoute = RefundPolicyRouteImport.update({
   id: '/refund-policy',
   path: '/refund-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RequestASpeakerRoute = RequestASpeakerRouteImport.update({
+  id: '/request-a-speaker',
+  path: '/request-a-speaker',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SponsorshipsRoute = SponsorshipsRouteImport.update({
@@ -207,6 +213,7 @@ export interface FileRoutesByFullPath {
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/request-a-speaker': typeof RequestASpeakerRoute
   '/sponsorships': typeof SponsorshipsRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
@@ -239,6 +246,7 @@ export interface FileRoutesByTo {
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/request-a-speaker': typeof RequestASpeakerRoute
   '/sponsorships': typeof SponsorshipsRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
@@ -272,6 +280,7 @@ export interface FileRoutesById {
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/request-a-speaker': typeof RequestASpeakerRoute
   '/sponsorships': typeof SponsorshipsRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
@@ -306,6 +315,7 @@ export interface FileRouteTypes {
     | '/privacy-policy'
     | '/profile'
     | '/refund-policy'
+    | '/request-a-speaker'
     | '/sponsorships'
     | '/terms'
     | '/verification'
@@ -338,6 +348,7 @@ export interface FileRouteTypes {
     | '/privacy-policy'
     | '/profile'
     | '/refund-policy'
+    | '/request-a-speaker'
     | '/sponsorships'
     | '/terms'
     | '/verification'
@@ -370,6 +381,7 @@ export interface FileRouteTypes {
     | '/privacy-policy'
     | '/profile'
     | '/refund-policy'
+    | '/request-a-speaker'
     | '/sponsorships'
     | '/terms'
     | '/verification'
@@ -403,6 +415,7 @@ export interface RootRouteChildren {
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   ProfileRoute: typeof ProfileRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
+  RequestASpeakerRoute: typeof RequestASpeakerRoute
   SponsorshipsRoute: typeof SponsorshipsRoute
   TermsRoute: typeof TermsRoute
   VerificationRoute: typeof VerificationRoute
@@ -519,6 +532,13 @@ declare module '@tanstack/react-router' {
       path: '/refund-policy'
       fullPath: '/refund-policy'
       preLoaderRoute: typeof RefundPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/request-a-speaker': {
+      id: '/request-a-speaker'
+      path: '/request-a-speaker'
+      fullPath: '/request-a-speaker'
+      preLoaderRoute: typeof RequestASpeakerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sponsorships': {
@@ -651,6 +671,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   ProfileRoute: ProfileRoute,
   RefundPolicyRoute: RefundPolicyRoute,
+  RequestASpeakerRoute: RequestASpeakerRoute,
   SponsorshipsRoute: SponsorshipsRoute,
   TermsRoute: TermsRoute,
   VerificationRoute: VerificationRoute,
