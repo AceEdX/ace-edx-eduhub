@@ -233,7 +233,13 @@ function LearnPage() {
             </p>
           )}
 
+          <CourseAssistant
+            courseTitle={course.data.title}
+            lessonTitle={active.title}
+            lessonContent={active.content}
+          />
         </div>
+
 
         <aside className="card-surface h-fit p-5">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
