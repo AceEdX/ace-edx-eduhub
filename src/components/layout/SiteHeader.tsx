@@ -32,27 +32,43 @@ export function SiteHeader() {
   const initials = (user?.email ?? "A").slice(0, 2).toUpperCase();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-xl">
-      <div className="container-page flex h-16 items-center gap-4">
+    <header className="sticky top-0 z-50 w-full overflow-x-clip border-b border-border/70 bg-background/85 backdrop-blur-xl">
+      <div className="container-page flex h-16 min-w-0 items-center gap-3">
         <Logo />
 
-        <nav className="ml-4 hidden items-center gap-1 lg:flex" aria-label="Main">
-          {NAV_LINKS.map((link) => (
+        <nav className="hidden min-w-0 items-center gap-1 lg:flex" aria-label="Main">
+          {NAV_LINKS.slice(0, 5).map((link) => (
             <Link
               key={link.to}
               to={link.to}
-              className="rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="whitespace-nowrap rounded-full px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground xl:px-3"
               activeProps={{ className: "bg-secondary text-foreground" }}
               activeOptions={{ exact: link.to === "/" }}
             >
               {link.label}
             </Link>
           ))}
+          {NAV_LINKS.length > 5 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="whitespace-nowrap rounded-full px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground xl:px-3">
+                  More
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56">
+                {NAV_LINKS.slice(5).map((link) => (
+                  <DropdownMenuItem key={link.to} asChild>
+                    <Link to={link.to}>{link.label}</Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </nav>
 
-        <div className="ml-auto hidden items-center gap-2 md:flex">
+        <div className="ml-auto hidden min-w-0 items-center gap-2 md:flex">
           <form
-            className="relative"
+            className="relative hidden xl:block"
             onSubmit={(e) => {
               e.preventDefault();
               navigate({ to: "/courses", search: { q: term } });
@@ -64,9 +80,10 @@ export function SiteHeader() {
               onChange={(e) => setTerm(e.target.value)}
               placeholder="Search courses, webinars, experts"
               aria-label="Search the platform"
-              className="h-9 w-64 rounded-full pl-9"
+              className="h-9 w-56 rounded-full pl-9"
             />
           </form>
+
 
           {user ? (
             <>
