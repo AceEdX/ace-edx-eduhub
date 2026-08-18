@@ -1,10 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { toPlainText } from "@/lib/plain-text";
 
 const MODEL = "google/gemini-2.5-flash";
 
 type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
+
+const PLAIN_TEXT_RULE =
+  "Write clean plain text only. Never use markdown: no asterisks, no bold or italic markers, no hash headings, no dash or bullet characters at the start of lines, no horizontal rules, no em dashes. Use short paragraphs, plain section titles on their own line, and numbers like 1. 2. 3. for lists.";
 
 async function callGateway(messages: ChatMessage[]) {
   const apiKey = process.env["LOVABLE_API_KEY"];
@@ -31,7 +35,7 @@ async function callGateway(messages: ChatMessage[]) {
   };
   const text = json.choices?.[0]?.message?.content?.trim();
   if (!text) throw new Error("The AI service returned an empty response.");
-  return text;
+  return toPlainText(text);
 }
 
 type LogContext = {
@@ -76,7 +80,7 @@ export const buildWebinarPlan = createServerFn({ method: "POST" })
 Topic: ${data.topic}
 Audience: ${data.audience || "School principals, owners and senior academic leaders"}
 
-Return clean markdown with these sections:
+Return these sections as plain text:
 1. Title options (3)
 2. One-paragraph promotional description
 3. Learning outcomes (5 bullets)
@@ -89,7 +93,7 @@ Return clean markdown with these sections:
       {
         role: "system",
         content:
-          "You are an expert instructional designer for K-12 school leadership programmes in India. You reference NEP 2020, CBSE and NCF practice where relevant. Be concrete and practical.",
+          "You are an expert instructional designer for K-12 school leadership programmes in India. You reference NEP 2020, CBSE and NCF practice where relevant. Be concrete and practical." + " " + PLAIN_TEXT_RULE,
       },
       { role: "user", content: prompt },
     ]);
@@ -117,7 +121,7 @@ export const askCourseAssistant = createServerFn({ method: "POST" })
       {
         role: "system",
         content:
-          "You are the AceEdX course assistant helping a school principal understand a lesson. Answer in under 220 words, in plain English, with practical school examples. If the lesson notes do not cover the question, say so and give general best practice.",
+          "You are the AceEdX course assistant helping a school principal understand a lesson. Answer in under 220 words, in plain English, with practical school examples. If the lesson notes do not cover the question, say so and give general best practice." + " " + PLAIN_TEXT_RULE,
       },
       {
         role: "user",
@@ -151,7 +155,7 @@ export const processTranscript = createServerFn({ method: "POST" })
       {
         role: "system",
         content:
-          "You turn raw session transcripts into publishable learning assets for school leaders. Output clean markdown only.",
+          "You turn raw session transcripts into publishable learning assets for school leaders. Output clean plain text only." + " " + PLAIN_TEXT_RULE,
       },
       {
         role: "user",
@@ -197,7 +201,7 @@ export const repurposeContent = createServerFn({ method: "POST" })
       {
         role: "system",
         content:
-          "You are a social media editor for an education leadership brand. Write ready-to-post copy, no placeholders, no explanations. Use a heading for each channel.",
+          "You are a social media editor for an education leadership brand. Write ready-to-post copy, no placeholders, no explanations. Use a heading for each channel." + " " + PLAIN_TEXT_RULE,
       },
       {
         role: "user",
@@ -244,7 +248,7 @@ export const askPrincipalAssistant = createServerFn({ method: "POST" })
       {
         role: "system",
         content:
-          "You are the AceEdX Principal Assistant — a trusted advisor to school principals and owners in India. You help with school leadership, admissions and growth, NEP 2020 and NCF implementation, CBSE/state compliance, teacher development, parent communication, budgets, staffing and student wellbeing. Give specific, actionable answers with steps, templates or scripts where useful. Keep answers under 300 words unless asked for more. Never invent regulations — if unsure, say what to verify and where.",
+          "You are the AceEdX Principal Assistant — a trusted advisor to school principals and owners in India. You help with school leadership, admissions and growth, NEP 2020 and NCF implementation, CBSE/state compliance, teacher development, parent communication, budgets, staffing and student wellbeing. Give specific, actionable answers with steps, templates or scripts where useful. Keep answers under 300 words unless asked for more. Never invent regulations — if unsure, say what to verify and where." + " " + PLAIN_TEXT_RULE,
       },
       ...data.messages,
     ]);
