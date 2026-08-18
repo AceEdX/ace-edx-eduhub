@@ -785,12 +785,15 @@ export type Database = {
       }
       media_assets: {
         Row: {
+          clip_end_sec: number | null
+          clip_start_sec: number | null
           created_at: string
           description: string | null
           duration_sec: number
           id: string
           media_type: string
           published: boolean
+          source_url: string | null
           tags: string[]
           thumbnail_url: string | null
           title: string
@@ -800,12 +803,15 @@ export type Database = {
           views: number
         }
         Insert: {
+          clip_end_sec?: number | null
+          clip_start_sec?: number | null
           created_at?: string
           description?: string | null
           duration_sec?: number
           id?: string
           media_type?: string
           published?: boolean
+          source_url?: string | null
           tags?: string[]
           thumbnail_url?: string | null
           title: string
@@ -815,12 +821,15 @@ export type Database = {
           views?: number
         }
         Update: {
+          clip_end_sec?: number | null
+          clip_start_sec?: number | null
           created_at?: string
           description?: string | null
           duration_sec?: number
           id?: string
           media_type?: string
           published?: boolean
+          source_url?: string | null
           tags?: string[]
           thumbnail_url?: string | null
           title?: string
@@ -1360,6 +1369,7 @@ export type Database = {
           channel: string
           created_at: string
           created_by: string | null
+          error: string | null
           id: string
           link_url: string | null
           media_id: string | null
@@ -1373,6 +1383,7 @@ export type Database = {
           channel: string
           created_at?: string
           created_by?: string | null
+          error?: string | null
           id?: string
           link_url?: string | null
           media_id?: string | null
@@ -1386,6 +1397,7 @@ export type Database = {
           channel?: string
           created_at?: string
           created_by?: string | null
+          error?: string | null
           id?: string
           link_url?: string | null
           media_id?: string | null
