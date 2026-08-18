@@ -261,3 +261,66 @@ export const askPrincipalAssistant = createServerFn({ method: "POST" })
     );
     return { output };
   });
+
+/* ------------------------------ Reel clip planner --------------------------- */
+
+const clipPlanSchema = z.object({
+  title: z.string().max(300).optional(),
+  durationSec: z.number().int().min(30).max(60 * 60 * 6),
+  transcript: z.string().max(30000).optional(),
+  count: z.number().int().min(1).max(6).default(3),
+});
+
+export type ClipSuggestion = {
+  start: number;
+  end: number;
+  hook: string;
+  caption: string;
+};
+
+export const planReelClips = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => clipPlanSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const raw = await callGateway([
+      {
+        role: "system",
+        content:
+          "You are a short-form video editor for an education leadership brand. You choose the most shareable moments of a webinar and return only JSON.",
+      },
+      {
+        role: "user",
+        content: `Webinar: ${data.title ?? "Untitled webinar"}
+Total length: ${data.durationSec} seconds.
+${data.transcript ? `Transcript:\n"""\n${data.transcript}\n"""` : "No transcript is available, so spread the clips evenly across the recording and write generic but specific-sounding hooks based on the title."}
+
+Propose ${data.count} vertical reel clips of 20 to 60 seconds each.
+Respond with JSON only, no prose, in this exact shape:
+{"clips":[{"start":0,"end":45,"hook":"short on-screen hook under 60 characters","caption":"ready to post caption in plain text, no hashtags in the middle, up to 3 hashtags at the end"}]}
+All start and end values are whole seconds within the total length.`,
+      },
+    ]);
+
+    let clips: ClipSuggestion[] = [];
+    try {
+      const match = raw.match(/\{[\s\S]*\}/);
+      const parsed = JSON.parse(match ? match[0] : raw) as { clips?: ClipSuggestion[] };
+      clips = (parsed.clips ?? [])
+        .map((c) => ({
+          start: Math.max(0, Math.floor(Number(c.start) || 0)),
+          end: Math.min(data.durationSec, Math.floor(Number(c.end) || 0)),
+          hook: String(c.hook ?? "").slice(0, 120),
+          caption: String(c.caption ?? "").slice(0, 2200),
+        }))
+        .filter((c) => c.end > c.start);
+    } catch (error) {
+      console.error("[ai] clip plan parse failed", error);
+      throw new Error("The AI returned an unreadable clip plan. Please try again.");
+    }
+    if (!clips.length) throw new Error("No usable clips were suggested. Try again with a transcript.");
+
+    await logGeneration(context as unknown as LogContext, "clip_plan", data.title ?? "clips", raw, {
+      count: clips.length,
+    });
+    return { clips };
+  });
