@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Copy, Sparkles, Wand2 } from "lucide-react";
+import { Copy, Linkedin, Sparkles, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +15,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { buildWebinarPlan, processTranscript, repurposeContent } from "@/lib/ai.functions";
+import { publishLinkedInPost } from "@/lib/social.functions";
+import { ClipStudio } from "@/components/admin/ClipStudio";
 
 function OutputPanel({ text, busy }: { text: string; busy: boolean }) {
   if (busy) return <Skeleton className="mt-5 h-64 rounded-2xl" />;
@@ -177,6 +179,26 @@ function RepurposeStudio() {
   const [channels, setChannels] = useState<string[]>(["LinkedIn", "Instagram"]);
   const [output, setOutput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [posting, setPosting] = useState(false);
+
+  async function postLinkedIn() {
+    const section = output.split(/\n(?=Instagram|Reel|YouTube|Facebook|X \()/)[0]?.trim() ?? output.trim();
+    const text = section.replace(/^LinkedIn:?\s*/i, "").slice(0, 2900);
+    if (text.length < 5) {
+      toast.error("Generate the posts first");
+      return;
+    }
+    setPosting(true);
+    try {
+      const res = await publishLinkedInPost({ data: { text } });
+      toast.success("Published to LinkedIn");
+      window.open(res.publishedUrl, "_blank", "noopener");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "LinkedIn publishing failed");
+    } finally {
+      setPosting(false);
+    }
+  }
 
   function toggle(channel: string) {
     setChannels((prev) =>
@@ -233,9 +255,14 @@ function RepurposeStudio() {
           ))}
         </div>
       </div>
-      <Button variant="brand" className="mt-4" onClick={run} disabled={busy}>
-        <Sparkles className="h-4 w-4" /> {busy ? "Writing…" : "Generate posts"}
-      </Button>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Button variant="brand" onClick={run} disabled={busy}>
+          <Sparkles className="h-4 w-4" /> {busy ? "Writing…" : "Generate posts"}
+        </Button>
+        <Button variant="outline" onClick={postLinkedIn} disabled={busy || posting || !output}>
+          <Linkedin className="h-4 w-4" /> {posting ? "Publishing…" : "Post to LinkedIn"}
+        </Button>
+      </div>
       <OutputPanel text={output} busy={busy} />
     </div>
   );
@@ -248,6 +275,7 @@ export function AiStudioAdmin() {
         <TabsTrigger value="webinar">Webinar builder</TabsTrigger>
         <TabsTrigger value="transcript">Transcripts</TabsTrigger>
         <TabsTrigger value="repurpose">Repurposing</TabsTrigger>
+        <TabsTrigger value="clips">Video clips &amp; reels</TabsTrigger>
       </TabsList>
       <TabsContent value="webinar">
         <WebinarBuilder />
@@ -257,6 +285,9 @@ export function AiStudioAdmin() {
       </TabsContent>
       <TabsContent value="repurpose">
         <RepurposeStudio />
+      </TabsContent>
+      <TabsContent value="clips">
+        <ClipStudio />
       </TabsContent>
     </Tabs>
   );
