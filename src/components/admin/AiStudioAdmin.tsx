@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Copy, Linkedin, Sparkles, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import {
 import { buildWebinarPlan, processTranscript, repurposeContent } from "@/lib/ai.functions";
 import { publishLinkedInPost } from "@/lib/social.functions";
 import { ClipStudio } from "@/components/admin/ClipStudio";
+import { AiHistoryPanel, useAiHistory, useInvalidateAiHistory } from "@/components/admin/AiHistory";
 
 function OutputPanel({ text, busy }: { text: string; busy: boolean }) {
   if (busy) return <Skeleton className="mt-5 h-64 rounded-2xl" />;
@@ -47,6 +48,13 @@ function WebinarBuilder() {
   const [programType, setProgramType] = useState("webinar");
   const [output, setOutput] = useState("");
   const [busy, setBusy] = useState(false);
+  const history = useAiHistory("webinar_plan");
+  const refreshHistory = useInvalidateAiHistory();
+
+  useEffect(() => {
+    const latest = history.data?.[0];
+    if (latest && !output) setOutput(latest.output);
+  }, [history.data, output]);
 
   async function run() {
     if (topic.trim().length < 3) {
@@ -65,6 +73,8 @@ function WebinarBuilder() {
         },
       });
       setOutput(res.output);
+      refreshHistory("webinar_plan");
+      toast.success("Plan generated and saved");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not generate the plan");
     } finally {
@@ -119,6 +129,7 @@ function WebinarBuilder() {
         <Wand2 className="h-4 w-4" /> {busy ? "Designing…" : "Generate plan"}
       </Button>
       <OutputPanel text={output} busy={busy} />
+      <AiHistoryPanel kind="webinar_plan" onOpen={(row) => setOutput(row.output)} />
     </div>
   );
 }
@@ -128,6 +139,13 @@ function TranscriptStudio() {
   const [transcript, setTranscript] = useState("");
   const [output, setOutput] = useState("");
   const [busy, setBusy] = useState(false);
+  const history = useAiHistory("transcript");
+  const refreshHistory = useInvalidateAiHistory();
+
+  useEffect(() => {
+    const latest = history.data?.[0];
+    if (latest && !output) setOutput(latest.output);
+  }, [history.data, output]);
 
   async function run() {
     if (transcript.trim().length < 50) {
@@ -141,6 +159,8 @@ function TranscriptStudio() {
         data: { transcript: transcript.trim(), title: title.trim() },
       });
       setOutput(res.output);
+      refreshHistory("transcript");
+      toast.success("Transcript processed and saved");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not process the transcript");
     } finally {
@@ -168,6 +188,7 @@ function TranscriptStudio() {
         <Sparkles className="h-4 w-4" /> {busy ? "Processing…" : "Process transcript"}
       </Button>
       <OutputPanel text={output} busy={busy} />
+      <AiHistoryPanel kind="transcript" onOpen={(row) => setOutput(row.output)} />
     </div>
   );
 }
@@ -180,6 +201,13 @@ function RepurposeStudio() {
   const [output, setOutput] = useState("");
   const [busy, setBusy] = useState(false);
   const [posting, setPosting] = useState(false);
+  const history = useAiHistory("repurpose");
+  const refreshHistory = useInvalidateAiHistory();
+
+  useEffect(() => {
+    const latest = history.data?.[0];
+    if (latest && !output) setOutput(latest.output);
+  }, [history.data, output]);
 
   async function postLinkedIn() {
     const section = output.split(/\n(?=Instagram|Reel|YouTube|Facebook|X \()/)[0]?.trim() ?? output.trim();
@@ -220,6 +248,8 @@ function RepurposeStudio() {
     try {
       const res = await repurposeContent({ data: { source: source.trim(), channels } });
       setOutput(res.output);
+      refreshHistory("repurpose");
+      toast.success("Posts generated and saved");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not repurpose that content");
     } finally {
@@ -264,6 +294,7 @@ function RepurposeStudio() {
         </Button>
       </div>
       <OutputPanel text={output} busy={busy} />
+      <AiHistoryPanel kind="repurpose" onOpen={(row) => setOutput(row.output)} />
     </div>
   );
 }
