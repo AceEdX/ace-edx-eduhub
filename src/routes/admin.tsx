@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useAdminAlerts } from "@/hooks/useAdminAlerts";
 import {
   VerificationQueueAdmin,
   ResourcePrincipalsAdmin,
@@ -98,8 +99,19 @@ type LessonRow = {
   document_url: string | null;
 };
 
+function AlertDot({ count }: { count?: number }) {
+  if (!count) return null;
+  return (
+    <span
+      title={`${count} awaiting your response`}
+      className="ml-2 inline-flex h-2.5 w-2.5 animate-pulse rounded-full bg-success"
+    />
+  );
+}
+
 function AdminPage() {
   const { isAdmin, checking } = useAdmin();
+  const alerts = useAdminAlerts(isAdmin);
 
   if (checking) {
     return (
@@ -145,14 +157,26 @@ function AdminPage() {
             <TabsTrigger value="courses">Courses</TabsTrigger>
             <TabsTrigger value="webinars">Webinars</TabsTrigger>
             <TabsTrigger value="content">Course content</TabsTrigger>
-            <TabsTrigger value="verifications">Verifications</TabsTrigger>
-            <TabsTrigger value="principals">Resource Principals</TabsTrigger>
-            <TabsTrigger value="moderation">Community</TabsTrigger>
+            <TabsTrigger value="verifications">
+              Verifications
+              <AlertDot count={alerts.data?.verifications} />
+            </TabsTrigger>
+            <TabsTrigger value="principals">
+              Resource Principals
+              <AlertDot count={alerts.data?.principals} />
+            </TabsTrigger>
+            <TabsTrigger value="moderation">
+              Community
+              <AlertDot count={alerts.data?.moderation} />
+            </TabsTrigger>
             <TabsTrigger value="library">Library</TabsTrigger>
             <TabsTrigger value="ai">AI Studio</TabsTrigger>
             <TabsTrigger value="media">Media</TabsTrigger>
             <TabsTrigger value="monetization">Monetization</TabsTrigger>
-            <TabsTrigger value="growth">Growth</TabsTrigger>
+            <TabsTrigger value="growth">
+              Growth
+              <AlertDot count={alerts.data?.growth} />
+            </TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
