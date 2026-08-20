@@ -6,6 +6,12 @@ import { toast } from "sonner";
  * signed URL and trigger the browser download.
  */
 export async function downloadResource(opts: { fileUrl: string | null; title: string }) {
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (!sessionData.session) {
+    toast.error("Sign in to download resources from the library.");
+    return;
+  }
+
   if (!opts.fileUrl) {
     toast.error("This file is being prepared and will be available shortly.");
     return;

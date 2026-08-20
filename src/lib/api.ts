@@ -121,6 +121,7 @@ export const coursesQuery = {
     const { data, error } = await supabase
       .from("courses")
       .select(COURSE_SELECT)
+      .eq("published", true)
       .order("learners", { ascending: false });
     if (error) throw error;
     return (data ?? []) as unknown as Course[];
@@ -133,6 +134,7 @@ export const courseQuery = (slug: string) => ({
     const { data, error } = await supabase
       .from("courses")
       .select(COURSE_SELECT)
+      .eq("published", true)
       .eq("slug", slug)
       .maybeSingle();
     if (error) throw error;
@@ -162,6 +164,7 @@ export const webinarsQuery = {
     const { data, error } = await supabase
       .from("webinars")
       .select("*, experts(*)")
+      .eq("published", true)
       .order("starts_at", { ascending: true });
     if (error) throw error;
     return (data ?? []) as unknown as Webinar[];

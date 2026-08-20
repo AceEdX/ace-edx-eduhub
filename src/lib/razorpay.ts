@@ -57,14 +57,22 @@ export async function payAndUnlock(opts: {
         razorpay_signature: string;
       }) => {
         try {
-          await verifyPayment({
+          const result = await verifyPayment({
             data: {
               razorpayOrderId: response.razorpay_order_id,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpaySignature: response.razorpay_signature,
             },
           });
-          toast.success("Payment successful");
+          toast.success(`Payment confirmed — ${result.title}`, {
+            description:
+              "Your access link is in your notifications. Tap to get the confirmation on WhatsApp.",
+            duration: 12000,
+            action: {
+              label: "WhatsApp confirmation",
+              onClick: () => window.open(result.whatsappUrl, "_blank", "noopener"),
+            },
+          });
           await opts.onSuccess();
         } catch (error) {
           toast.error(error instanceof Error ? error.message : "Payment verification failed");

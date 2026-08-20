@@ -31,6 +31,24 @@ export function downloadCertificatePdf(certificate: Certificate, verifyUrl: stri
   doc.setLineWidth(0.35);
   doc.rect(13, 36, W - 26, H - 56);
 
+  // Corner flourishes
+  const corner = (x: number, y: number, dx: number, dy: number) => {
+    doc.setDrawColor(...ORANGE);
+    doc.setLineWidth(1.1);
+    doc.line(x, y, x + dx * 14, y);
+    doc.line(x, y, x, y + dy * 14);
+  };
+  corner(17, 40, 1, 1);
+  corner(W - 17, 40, -1, 1);
+  corner(17, H - 21, 1, -1);
+  corner(W - 17, H - 21, -1, -1);
+
+  // Watermark monogram
+  doc.setFont("times", "bold");
+  doc.setFontSize(120);
+  doc.setTextColor(238, 242, 246);
+  doc.text("AX", W / 2, H / 2 + 26, { align: "center" });
+
   // Header
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
@@ -123,12 +141,16 @@ export function downloadCertificatePdf(certificate: Certificate, verifyUrl: stri
     year: "numeric",
   }), 69, baseY - 3, { align: "center" });
   doc.text(certificate.issuer || "AceEdX", W - 69, baseY - 3, { align: "center" });
+  doc.setFont("times", "italic");
+  doc.setFontSize(15);
+  doc.setTextColor(...NAVY);
+  doc.text(certificate.issuer || "AceEdX", W - 69, baseY - 9, { align: "center" });
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8.5);
   doc.setTextColor(...GREY);
   doc.text("Date of issue", 69, baseY + 5, { align: "center" });
-  doc.text("Issuing authority", W - 69, baseY + 5, { align: "center" });
+  doc.text("Authorised signatory  ·  Issuing authority", W - 69, baseY + 5, { align: "center" });
 
   // Verification seal — orange star
   const cx = W / 2;
