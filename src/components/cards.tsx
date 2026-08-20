@@ -158,6 +158,7 @@ export function ExpertCard({ expert }: { expert: Expert }) {
 }
 
 export function ResourceCard({ resource }: { resource: Resource }) {
+  const { user } = useAuth();
   return (
     <article className="card-surface flex flex-col p-5">
       <div className="flex flex-wrap gap-2">
@@ -171,15 +172,23 @@ export function ResourceCard({ resource }: { resource: Resource }) {
         <span className="text-xs text-muted-foreground">
           {resource.downloads.toLocaleString()} downloads
         </span>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() =>
-            void downloadResource({ fileUrl: resource.file_url, title: resource.title })
-          }
-        >
-          <Download className="h-4 w-4" /> Download PDF
-        </Button>
+        {user ? (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() =>
+              void downloadResource({ fileUrl: resource.file_url, title: resource.title })
+            }
+          >
+            <Download className="h-4 w-4" /> Download PDF
+          </Button>
+        ) : (
+          <Button size="sm" variant="outline" asChild>
+            <Link to="/auth" search={{ mode: "signin" }}>
+              <Download className="h-4 w-4" /> Sign in to download
+            </Link>
+          </Button>
+        )}
       </div>
     </article>
   );
