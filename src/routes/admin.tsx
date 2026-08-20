@@ -60,7 +60,14 @@ type CourseRow = {
   published: boolean;
   format: string;
   duration_hours: number;
+  created_at: string;
 };
+
+function toLocalInput(value: string) {
+  const d = new Date(value);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 
 type WebinarRow = {
   id: string;
@@ -204,7 +211,7 @@ function CoursesAdmin() {
     queryFn: async (): Promise<CourseRow[]> => {
       const { data, error } = await supabase
         .from("courses")
-        .select("id, slug, title, summary, topic, level, price_inr, is_free, published, format, duration_hours")
+        .select("id, slug, title, summary, topic, level, price_inr, is_free, published, format, duration_hours, created_at")
         .order("title");
       if (error) throw error;
       return (data ?? []) as CourseRow[];
@@ -247,6 +254,8 @@ function CourseEditor({ course, onSaved }: { course: CourseRow; onSaved: () => v
         price_inr: next.price_inr,
         is_free: next.is_free,
         format: next.format,
+        duration_hours: next.duration_hours,
+        created_at: next.created_at,
       })
       .eq("id", course.id);
     setSaving(false);
@@ -308,6 +317,26 @@ function CourseEditor({ course, onSaved }: { course: CourseRow; onSaved: () => v
               <SelectItem value="mixed">Mixed (video + reading)</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+        <div>
+          <Label className="text-xs">Publish date</Label>
+          <Input
+            type="datetime-local"
+            value={toLocalInput(row.created_at)}
+            onChange={(e) => setRow({ ...row, created_at: new Date(e.target.value).toISOString() })}
+            onBlur={() => patch({ created_at: row.created_at })}
+          />
+        </div>
+        <div>
+          <Label className="text-xs">Duration (hours)</Label>
+          <Input
+            type="number"
+            min={0}
+            step="0.5"
+            value={row.duration_hours}
+            onChange={(e) => setRow({ ...row, duration_hours: Number(e.target.value) })}
+            onBlur={() => patch({ duration_hours: row.duration_hours })}
+          />
         </div>
       </div>
 
@@ -377,6 +406,8 @@ function WebinarEditor({ webinar, onSaved }: { webinar: WebinarRow; onSaved: () 
         price_inr: next.price_inr,
         is_free: next.is_free,
         status: next.status,
+        starts_at: next.starts_at,
+        duration_min: next.duration_min,
         meeting_url: next.meeting_url,
         recording_url: next.recording_url,
       })
@@ -439,6 +470,25 @@ function WebinarEditor({ webinar, onSaved }: { webinar: WebinarRow; onSaved: () 
               <SelectItem value="recorded">Recorded</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+        <div>
+          <Label className="text-xs">Date &amp; time</Label>
+          <Input
+            type="datetime-local"
+            value={toLocalInput(row.starts_at)}
+            onChange={(e) => setRow({ ...row, starts_at: new Date(e.target.value).toISOString() })}
+            onBlur={() => patch({ starts_at: row.starts_at })}
+          />
+        </div>
+        <div>
+          <Label className="text-xs">Duration (minutes)</Label>
+          <Input
+            type="number"
+            min={5}
+            value={row.duration_min}
+            onChange={(e) => setRow({ ...row, duration_min: Number(e.target.value) })}
+            onBlur={() => patch({ duration_min: row.duration_min })}
+          />
         </div>
         <div className="sm:col-span-3 grid gap-4 sm:grid-cols-2">
           <div>
