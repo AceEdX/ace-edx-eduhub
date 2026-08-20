@@ -58,6 +58,7 @@ function WebinarDetail() {
       const { data, error } = await supabase
         .from("webinars")
         .select("*, experts(*)")
+        .eq("published", true)
         .eq("slug", slug)
         .maybeSingle();
       if (error) throw error;
