@@ -380,6 +380,7 @@ export type Database = {
           level: string
           outcomes: string[]
           price_inr: number
+          principal_id: string | null
           published: boolean
           rating: number
           slug: string
@@ -404,6 +405,7 @@ export type Database = {
           level?: string
           outcomes?: string[]
           price_inr?: number
+          principal_id?: string | null
           published?: boolean
           rating?: number
           slug: string
@@ -428,6 +430,7 @@ export type Database = {
           level?: string
           outcomes?: string[]
           price_inr?: number
+          principal_id?: string | null
           published?: boolean
           rating?: number
           slug?: string
@@ -442,6 +445,13 @@ export type Database = {
             columns: ["expert_id"]
             isOneToOne: false
             referencedRelation: "experts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courses_principal_id_fkey"
+            columns: ["principal_id"]
+            isOneToOne: false
+            referencedRelation: "resource_principals"
             referencedColumns: ["id"]
           },
         ]
@@ -1687,6 +1697,7 @@ export type Database = {
           is_free: boolean
           meeting_url: string | null
           price_inr: number
+          principal_id: string | null
           program_type: string
           published: boolean
           recording_url: string | null
@@ -1694,6 +1705,7 @@ export type Database = {
           slug: string
           starts_at: string
           status: string
+          stream_provider: string
           title: string
           topic: string
         }
@@ -1708,6 +1720,7 @@ export type Database = {
           is_free?: boolean
           meeting_url?: string | null
           price_inr?: number
+          principal_id?: string | null
           program_type?: string
           published?: boolean
           recording_url?: string | null
@@ -1715,6 +1728,7 @@ export type Database = {
           slug: string
           starts_at: string
           status?: string
+          stream_provider?: string
           title: string
           topic?: string
         }
@@ -1729,6 +1743,7 @@ export type Database = {
           is_free?: boolean
           meeting_url?: string | null
           price_inr?: number
+          principal_id?: string | null
           program_type?: string
           published?: boolean
           recording_url?: string | null
@@ -1736,6 +1751,7 @@ export type Database = {
           slug?: string
           starts_at?: string
           status?: string
+          stream_provider?: string
           title?: string
           topic?: string
         }
@@ -1745,6 +1761,13 @@ export type Database = {
             columns: ["expert_id"]
             isOneToOne: false
             referencedRelation: "experts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "webinars_principal_id_fkey"
+            columns: ["principal_id"]
+            isOneToOne: false
+            referencedRelation: "resource_principals"
             referencedColumns: ["id"]
           },
         ]
@@ -1771,6 +1794,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_active_principal: {
+        Args: { _principal_id: string; _user_id: string }
         Returns: boolean
       }
       verify_certificate: {
