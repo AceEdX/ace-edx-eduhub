@@ -8,6 +8,15 @@ function verifyUrl(id: string) {
   return `${origin}/verify/${id}`;
 }
 
+function CornerRule({ className }: { className: string }) {
+  return (
+    <span
+      aria-hidden
+      className={`pointer-events-none absolute h-10 w-10 border-accent ${className}`}
+    />
+  );
+}
+
 /**
  * Print-quality certificate presentation, shared by the wallet and the public
  * verification page.
@@ -17,91 +26,120 @@ export function CertificateArtwork({ certificate }: { certificate: Certificate }
   const isWebinar = c.kind === "webinar";
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-      <div className="h-2 w-full bg-primary" />
+    <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-md">
+      {/* Header band */}
+      <div className="flex items-center justify-between bg-primary px-6 py-4">
+        <span className="font-display text-lg font-semibold tracking-wide text-primary-foreground">
+          AceEdX
+        </span>
+        <span className="text-[10px] uppercase tracking-[0.28em] text-primary-foreground/70">
+          Professional learning for school leaders
+        </span>
+      </div>
       <div className="h-1 w-full bg-accent" />
+
       <div className="relative m-3 rounded-xl border border-primary/25 p-1 sm:m-5">
-        <div className="rounded-lg border border-accent/40 px-5 py-8 text-center sm:px-10 sm:py-12">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-muted-foreground">
-            Certificate of {isWebinar ? "participation" : "completion"}
-          </p>
-          <div className="mx-auto mt-3 h-0.5 w-16 rounded-full bg-accent" />
+        <div className="relative overflow-hidden rounded-lg border border-accent/40 px-5 py-9 text-center sm:px-12 sm:py-14">
+          <CornerRule className="left-3 top-3 border-l-2 border-t-2" />
+          <CornerRule className="right-3 top-3 border-r-2 border-t-2" />
+          <CornerRule className="bottom-3 left-3 border-b-2 border-l-2" />
+          <CornerRule className="bottom-3 right-3 border-b-2 border-r-2" />
 
-          <p className="mt-8 text-sm text-muted-foreground">This is to certify that</p>
-          <h2 className="mt-2 font-display text-3xl font-semibold text-primary sm:text-4xl">
-            {c.recipient_name}
-          </h2>
-          <div className="mx-auto mt-3 h-px w-48 bg-border" />
+          {/* Watermark monogram */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 flex items-center justify-center font-display text-[9rem] font-bold text-primary/[0.04]"
+          >
+            AX
+          </span>
 
-          <p className="mt-6 text-sm text-muted-foreground">
-            {isWebinar
-              ? "has attended the live professional development webinar"
-              : "has successfully completed the professional development course"}
-          </p>
-          <h3 className="mx-auto mt-2 max-w-xl font-display text-xl font-semibold leading-snug sm:text-2xl">
-            {c.title}
-          </h3>
-
-          {(c.speaker || c.duration_text) && (
-            <p className="mt-3 text-xs text-muted-foreground">
-              {[c.speaker && `Facilitated by ${c.speaker}`, c.duration_text]
-                .filter(Boolean)
-                .join("   ·   ")}
+          <div className="relative">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.34em] text-muted-foreground">
+              Certificate of {isWebinar ? "participation" : "completion"}
             </p>
-          )}
-
-          <div className="mt-10 grid items-end gap-6 sm:grid-cols-3">
-            <div className="order-2 sm:order-1">
-              <div className="mx-auto h-px w-36 bg-border" />
-              <p className="mt-2 text-sm font-semibold">
-                {new Date(c.issued_at).toLocaleDateString(undefined, {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
-              </p>
-              <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                Date of issue
-              </p>
+            <div className="mx-auto mt-3 flex items-center justify-center gap-2">
+              <span className="h-px w-14 bg-border" />
+              <span className="h-1.5 w-1.5 rotate-45 bg-accent" />
+              <span className="h-px w-14 bg-border" />
             </div>
 
-            <div className="order-1 flex justify-center sm:order-2">
-              <div className="relative h-28 w-28">
-                <svg viewBox="0 0 100 100" className="h-full w-full drop-shadow-sm">
-                  <polygon
-                    points="50,3 61.8,35.5 96.4,35.5 68.3,56.5 79.1,90 50,69.5 20.9,90 31.7,56.5 3.6,35.5 38.2,35.5"
-                    className="fill-accent"
-                  />
-                  <polygon
-                    points="50,14 59.6,40.5 87.8,40.5 65,57.6 73.8,84.8 50,68.1 26.2,84.8 35,57.6 12.2,40.5 40.4,40.5"
-                    className="fill-accent-soft"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center pt-1 text-center">
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-accent">
-                    Verified
-                  </span>
-                  <span className="text-[7px] uppercase tracking-wider text-muted-foreground">
-                    Credential
-                  </span>
-                  <span className="text-[9px] font-bold text-primary">AceEdX</span>
+            <p className="mt-8 text-sm italic text-muted-foreground">This is to certify that</p>
+            <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-primary sm:text-[2.6rem]">
+              {c.recipient_name}
+            </h2>
+            <div className="mx-auto mt-3 h-px w-56 bg-border" />
+
+            <p className="mt-6 text-sm text-muted-foreground">
+              {isWebinar
+                ? "has attended the live professional development webinar"
+                : "has successfully completed the professional development course"}
+            </p>
+            <h3 className="mx-auto mt-2 max-w-xl font-display text-xl font-semibold leading-snug sm:text-2xl">
+              {c.title}
+            </h3>
+
+            {(c.speaker || c.duration_text) && (
+              <p className="mt-3 text-xs uppercase tracking-wide text-muted-foreground">
+                {[c.speaker && `Facilitated by ${c.speaker}`, c.duration_text]
+                  .filter(Boolean)
+                  .join("   ·   ")}
+              </p>
+            )}
+
+            <div className="mt-12 grid items-end gap-6 sm:grid-cols-3">
+              <div className="order-2 sm:order-1">
+                <div className="mx-auto h-px w-40 bg-border" />
+                <p className="mt-2 text-sm font-semibold">
+                  {new Date(c.issued_at).toLocaleDateString(undefined, {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </p>
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                  Date of issue
+                </p>
+              </div>
+
+              <div className="order-1 flex justify-center sm:order-2">
+                <div className="relative h-28 w-28">
+                  <svg viewBox="0 0 100 100" className="h-full w-full drop-shadow-sm">
+                    <polygon
+                      points="50,3 61.8,35.5 96.4,35.5 68.3,56.5 79.1,90 50,69.5 20.9,90 31.7,56.5 3.6,35.5 38.2,35.5"
+                      className="fill-accent"
+                    />
+                    <polygon
+                      points="50,14 59.6,40.5 87.8,40.5 65,57.6 73.8,84.8 50,68.1 26.2,84.8 35,57.6 12.2,40.5 40.4,40.5"
+                      className="fill-accent-soft"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pt-1 text-center">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-accent">
+                      Verified
+                    </span>
+                    <span className="text-[7px] uppercase tracking-wider text-muted-foreground">
+                      Credential
+                    </span>
+                    <span className="text-[9px] font-bold text-primary">AceEdX</span>
+                  </div>
                 </div>
+              </div>
+
+              <div className="order-3">
+                <p className="font-display text-lg italic text-primary">{c.issuer}</p>
+                <div className="mx-auto h-px w-40 bg-border" />
+                <p className="mt-2 text-sm font-semibold">Authorised signatory</p>
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                  Issuing authority
+                </p>
               </div>
             </div>
 
-
-            <div className="order-3">
-              <div className="mx-auto h-px w-36 bg-border" />
-              <p className="mt-2 text-sm font-semibold">{c.issuer}</p>
-              <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                Issuing authority
-              </p>
-            </div>
+            <p className="mt-9 font-mono text-[11px] text-muted-foreground">
+              ID {c.certificate_id} ·{" "}
+              {verifyUrl(c.certificate_id).replace(/^https?:\/\//, "")}
+            </p>
           </div>
-
-          <p className="mt-8 font-mono text-[11px] text-muted-foreground">
-            ID {c.certificate_id} · Verify at {verifyUrl(c.certificate_id).replace(/^https?:\/\//, "")}
-          </p>
         </div>
       </div>
     </div>
