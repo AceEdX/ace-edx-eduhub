@@ -3,6 +3,7 @@ import { Award, Clock, Star, Users, Video, Download, MessageSquare } from "lucid
 import { Button } from "@/components/ui/button";
 import { downloadResource } from "@/lib/resources";
 import { formatPrice } from "@/lib/brand";
+import { useAuth } from "@/hooks/useAuth";
 import type { Course, Expert, Post, Resource, Webinar } from "@/lib/api";
 
 function Pill({ children, tone = "muted" }: { children: React.ReactNode; tone?: string }) {
