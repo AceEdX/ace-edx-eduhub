@@ -38,6 +38,7 @@ const BENEFITS = [
   "Publish masterclasses and courses to a verified principal audience",
   "A premium public profile in the Resource Principal directory",
   "Priority placement in the community feed and Learning Hub",
+  "Conduct your own webinars and masterclasses over YouTube Live, Zoom or a direct link",
 ];
 
 function ApplyPage() {
@@ -96,7 +97,7 @@ function ApplyPage() {
       toast.error(error.message);
       return;
     }
-    toast.success("Application submitted — our team will review it shortly");
+    toast.success("Application submitted — next step: activate PrincipalX Pro");
     qc.invalidateQueries({ queryKey: ["my-rp-application", user.id] });
   }
 
@@ -256,6 +257,22 @@ function ApplyPage() {
               <li key={b}>• {b}</li>
             ))}
           </ul>
+
+          {application.data && (
+            <div className="mt-6 rounded-xl border border-accent/40 bg-accent-soft/40 p-4">
+              <p className="text-sm font-semibold">Next step: activate PrincipalX Pro</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Resource Principals host webinars and masterclasses on a Pro membership. Activate it
+                now so your studio is ready the moment your application is approved.
+              </p>
+              <Button variant="brand" size="sm" className="mt-3" asChild>
+                <Link to="/pricing">Activate PrincipalX Pro</Link>
+              </Button>
+              <Button variant="ghost" size="sm" className="mt-2 w-full" asChild>
+                <Link to="/studio">Open the Principal Studio</Link>
+              </Button>
+            </div>
+          )}
         </aside>
       </div>
     </PageShell>
