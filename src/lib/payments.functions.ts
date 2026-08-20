@@ -273,5 +273,43 @@ export const verifyPayment = createServerFn({ method: "POST" })
       }
     }
 
-    return { ok: true, itemType: order.item_type, itemId: order.item_id };
+    // Confirmation: in-app notification + a WhatsApp-ready confirmation message
+    let link = "/my-learning";
+    if (order.item_type === "course" && order.item_id) {
+      const { data: course } = await supabase
+        .from("courses")
+        .select("slug")
+        .eq("id", order.item_id)
+        .maybeSingle();
+      if (course?.slug) link = `/learn/${course.slug}`;
+    } else if (order.item_type === "webinar" && order.item_id) {
+      const { data: webinar } = await supabase
+        .from("webinars")
+        .select("slug")
+        .eq("id", order.item_id)
+        .maybeSingle();
+      if (webinar?.slug) link = `/webinars/${webinar.slug}`;
+    } else if (order.item_type === "subscription") {
+      link = "/pricing";
+    }
+
+    const message = `Payment confirmed on AceEdX PrincipalX.\n\nItem: ${order.item_title}\nAmount paid: Rs ${order.amount_inr}\nPayment id: ${data.razorpayPaymentId}\nAccess link: https://eduhub.aceedx.com${link}\n\nThank you.`;
+
+    await supabase.from("notifications").insert({
+      user_id: userId,
+      title: `Payment confirmed — ${order.item_title}`,
+      body: `We have received Rs ${order.amount_inr}. Your access link is ready. Payment id ${data.razorpayPaymentId}.`,
+      link,
+    });
+
+    return {
+      ok: true,
+      itemType: order.item_type,
+      itemId: order.item_id,
+      title: order.item_title,
+      amountInr: order.amount_inr,
+      paymentId: data.razorpayPaymentId,
+      link,
+      whatsappUrl: `https://wa.me/919373387800?text=${encodeURIComponent(message)}`,
+    };
   });
