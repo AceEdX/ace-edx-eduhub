@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { myApplicationQuery } from "@/lib/principals";
 import { Bell, LayoutDashboard, LogOut, Menu, Search, X } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -20,6 +22,8 @@ import { supabase } from "@/integrations/supabase/client";
 export function SiteHeader() {
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
+  const myApplication = useQuery(myApplicationQuery(user?.id));
+  const hasApplication = Boolean(myApplication.data);
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [term, setTerm] = useState("");
@@ -115,6 +119,11 @@ export function SiteHeader() {
                   <DropdownMenuItem asChild>
                     <Link to="/profile">My Profile</Link>
                   </DropdownMenuItem>
+                  {hasApplication && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/studio">Principal Studio</Link>
+                    </DropdownMenuItem>
+                  )}
                   {isAdmin && (
                     <>
                       <DropdownMenuSeparator />
