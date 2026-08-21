@@ -115,6 +115,11 @@ export function SiteHeader() {
                   <DropdownMenuItem asChild>
                     <Link to="/profile">My Profile</Link>
                   </DropdownMenuItem>
+                  {hasApplication && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/studio">Principal Studio</Link>
+                    </DropdownMenuItem>
+                  )}
                   {isAdmin && (
                     <>
                       <DropdownMenuSeparator />
