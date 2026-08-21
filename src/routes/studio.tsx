@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2, Video } from "lucide-react";
+import { Loader2, MessageCircle, Plus, Radio, Trash2, Video } from "lucide-react";
 import { PageHeading, PageShell, EmptyState } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { INTEREST_AREAS } from "@/lib/brand";
+import { useMembership, whatsappConfirmationUrl } from "@/lib/membership";
+import { ClipStudio } from "@/components/admin/ClipStudio";
 
 export const Route = createFileRoute("/studio")({
   head: () => ({
@@ -59,6 +61,8 @@ function toLocalInput(value: string) {
 
 function StudioPage() {
   const { user, loading } = useAuth();
+
+  const membership = useMembership(user?.id);
 
   const principal = useQuery({
     queryKey: ["my-principal", user?.id],
@@ -149,16 +153,73 @@ function StudioPage() {
         description={`Publish webinars, masterclasses and courses. You keep ${principal.data!.revenue_share_pct}% of every paid seat.`}
       />
       <div className="container-page py-10">
+        <div className="mb-6 grid gap-4 lg:grid-cols-[2fr_1fr]">
+          {membership.data && !membership.data.isPro && (
+            <div
+              className={`rounded-2xl border p-5 ${
+                membership.data.trialExpired
+                  ? "border-accent bg-accent-soft/50"
+                  : "border-border bg-card"
+              }`}
+            >
+              <p className="text-sm font-semibold">
+                {membership.data.trialExpired
+                  ? "Your free month has ended"
+                  : `You are on your free month — ${membership.data.trialDaysLeft} day${membership.data.trialDaysLeft === 1 ? "" : "s"} left`}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {membership.data.trialEndsAt
+                  ? `Trial ends ${new Date(membership.data.trialEndsAt).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" })}. `
+                  : ""}
+                Upgrade to PrincipalX Pro to keep hosting webinars and masterclasses, and to keep
+                earning your revenue share.
+              </p>
+              <Button variant="brand" size="sm" className="mt-3" asChild>
+                <Link to="/pricing">Upgrade to PrincipalX Pro</Link>
+              </Button>
+            </div>
+          )}
+          {membership.data?.isPro && (
+            <div className="rounded-2xl border border-border bg-card p-5">
+              <p className="text-sm font-semibold text-success">PrincipalX Pro active</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Hosting, revenue sharing and the remix studio are all unlocked.
+              </p>
+            </div>
+          )}
+          <div className="rounded-2xl border border-border bg-card p-5">
+            <p className="text-sm font-semibold">Need a hand going live?</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Message the PrincipalX team on WhatsApp and we will set up your first session with you.
+            </p>
+            <Button variant="outline" size="sm" className="mt-3" asChild>
+              <a
+                href={whatsappConfirmationUrl(
+                  `Hello PrincipalX team, this is ${principal.data!.display_name}. I am approved as a Resource Principal and would like help launching my first webinar.`,
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <MessageCircle className="h-4 w-4" /> WhatsApp support
+              </a>
+            </Button>
+          </div>
+        </div>
+
         <Tabs defaultValue="webinars">
           <TabsList className="mb-6 flex-wrap">
             <TabsTrigger value="webinars">Webinars & masterclasses</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
+            <TabsTrigger value="remix">Reels & posts</TabsTrigger>
           </TabsList>
           <TabsContent value="webinars">
             <StudioWebinars principalId={principalId} />
           </TabsContent>
           <TabsContent value="courses">
             <StudioCourses principalId={principalId} />
+          </TabsContent>
+          <TabsContent value="remix">
+            <ClipStudio />
           </TabsContent>
         </Tabs>
       </div>
@@ -477,12 +538,43 @@ function StudioWebinarEditor({
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
+        <Button
+          variant="brand"
+          size="sm"
+          disabled={!row.meeting_url}
+          onClick={() => {
+            if (!row.meeting_url) return;
+            void patch({ status: "live", published: true });
+            window.open(row.meeting_url, "_blank", "noopener");
+          }}
+        >
+          <Radio className="h-4 w-4" /> Go live now
+        </Button>
         <Button variant="outline" size="sm" asChild>
+          <a
+            href="https://studio.youtube.com/channel/UC/livestreaming"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Open YouTube Live
+          </a>
+        </Button>
+        <Button variant="outline" size="sm" asChild>
+          <a href="https://zoom.us/meeting/schedule" target="_blank" rel="noopener noreferrer">
+            Schedule on Zoom
+          </a>
+        </Button>
+        <Button variant="ghost" size="sm" asChild>
           <Link to="/webinars/$slug" params={{ slug: row.slug }}>
             <Video className="h-4 w-4" /> View page
           </Link>
         </Button>
       </div>
+      {!row.meeting_url && (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Paste your Zoom, YouTube Live or other join link above to enable the go live button.
+        </p>
+      )}
     </div>
   );
 }
