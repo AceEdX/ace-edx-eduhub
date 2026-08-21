@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -44,6 +44,7 @@ const BENEFITS = [
 function ApplyPage() {
   const { user, loading } = useAuth();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const verification = useQuery(myVerificationQuery(user?.id));
   const application = useQuery(myApplicationQuery(user?.id));
 
@@ -97,8 +98,9 @@ function ApplyPage() {
       toast.error(error.message);
       return;
     }
-    toast.success("Application submitted — next step: activate PrincipalX Pro");
+    toast.success("Application submitted — start your free month of PrincipalX Pro");
     qc.invalidateQueries({ queryKey: ["my-rp-application", user.id] });
+    navigate({ to: "/pricing" });
   }
 
   if (loading || verification.isLoading || application.isLoading) {
