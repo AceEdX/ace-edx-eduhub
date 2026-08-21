@@ -293,11 +293,24 @@ export function ResourcePrincipalsAdmin() {
     }
     await supabase.from("user_roles").insert({ user_id: app.user_id, role: "expert" });
     await setStatus(app.id, "approved");
+    const { data: verif } = await supabase
+      .from("school_verifications")
+      .select("mobile")
+      .eq("user_id", app.user_id)
+      .maybeSingle();
+
+    const waMessage = `Congratulations ${displayName}! You are approved as an AceEdX PrincipalX Resource Principal. Open your Principal Studio to publish and go live: https://eduhub.aceedx.com/studio\n\nYour first month of PrincipalX Pro is free.`;
+    const mobile = (verif?.mobile ?? "").replace(/\D/g, "");
+    if (mobile) {
+      const to = mobile.length === 10 ? `91${mobile}` : mobile;
+      window.open(`https://wa.me/${to}?text=${encodeURIComponent(waMessage)}`, "_blank", "noopener");
+    }
+
     await supabase.from("notifications").insert({
       user_id: app.user_id,
       title: "You are now an AceEdX Resource Principal",
-      body: "Your profile is live in the Resource Principal directory.",
-      link: "/resource-principals",
+      body: "Your Principal Studio is open. Publish a webinar and go live on Zoom or YouTube Live. Your first month of PrincipalX Pro is free.",
+      link: "/studio",
     });
     void qc.invalidateQueries({ queryKey: ["admin-rp-directory"] });
   }

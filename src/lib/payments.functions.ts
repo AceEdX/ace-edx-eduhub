@@ -290,7 +290,12 @@ export const verifyPayment = createServerFn({ method: "POST" })
         .maybeSingle();
       if (webinar?.slug) link = `/webinars/${webinar.slug}`;
     } else if (order.item_type === "subscription") {
-      link = "/pricing";
+      const { data: application } = await supabase
+        .from("resource_principal_applications")
+        .select("id")
+        .eq("user_id", userId)
+        .maybeSingle();
+      link = application ? "/studio" : "/dashboard";
     }
 
     const message = `Payment confirmed on AceEdX PrincipalX.\n\nItem: ${order.item_title}\nAmount paid: Rs ${order.amount_inr}\nPayment id: ${data.razorpayPaymentId}\nAccess link: https://eduhub.aceedx.com${link}\n\nThank you.`;
