@@ -21,7 +21,6 @@ export const POLICY_LINKS = [
 
 export const NAV_LINKS = [
   { to: "/", label: "Home" },
-  { to: "/learning-hub", label: "Learning Hub" },
   { to: "/learning-paths", label: "Paths" },
   { to: "/courses", label: "Courses" },
   { to: "/webinars", label: "Webinars" },

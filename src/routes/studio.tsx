@@ -179,7 +179,7 @@ function StudioWebinars({ principalId }: { principalId: string }) {
   const qc = useQueryClient();
   const [busy, setBusy] = useState(false);
   const [title, setTitle] = useState("");
-  const [topic, setTopic] = useState(INTEREST_AREAS[0] ?? "Leadership");
+  const [topic, setTopic] = useState<string>(INTEREST_AREAS[0] ?? "Leadership");
   const [programType, setProgramType] = useState("webinar");
 
   const list = useQuery({
@@ -504,7 +504,7 @@ type StudioCourse = {
 function StudioCourses({ principalId }: { principalId: string }) {
   const qc = useQueryClient();
   const [title, setTitle] = useState("");
-  const [topic, setTopic] = useState(INTEREST_AREAS[0] ?? "Leadership");
+  const [topic, setTopic] = useState<string>(INTEREST_AREAS[0] ?? "Leadership");
   const [busy, setBusy] = useState(false);
 
   const list = useQuery({
