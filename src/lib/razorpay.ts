@@ -64,6 +64,7 @@ export async function payAndUnlock(opts: {
               razorpaySignature: response.razorpay_signature,
             },
           });
+          window.open(result.whatsappUrl, "_blank", "noopener");
           toast.success(`Payment confirmed — ${result.title}`, {
             description:
               "Your access link is in your notifications. Tap to get the confirmation on WhatsApp.",
@@ -74,6 +75,9 @@ export async function payAndUnlock(opts: {
             },
           });
           await opts.onSuccess();
+          if (opts.itemType === "subscription") {
+            window.location.assign(result.link);
+          }
         } catch (error) {
           toast.error(error instanceof Error ? error.message : "Payment verification failed");
         }
