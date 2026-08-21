@@ -20,6 +20,8 @@ import { supabase } from "@/integrations/supabase/client";
 export function SiteHeader() {
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
+  const myApplication = useQuery(myApplicationQuery(user?.id));
+  const hasApplication = Boolean(myApplication.data);
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [term, setTerm] = useState("");
