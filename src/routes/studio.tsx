@@ -652,6 +652,9 @@ function StudioCourses({ principalId }: { principalId: string }) {
   const qc = useQueryClient();
   const [title, setTitle] = useState("");
   const [topic, setTopic] = useState<string>(INTEREST_AREAS[0] ?? "Leadership");
+  const [summary, setSummary] = useState("");
+  const [isFree, setIsFree] = useState(true);
+  const [price, setPrice] = useState("0");
   const [busy, setBusy] = useState(false);
 
   const list = useQuery({
@@ -677,9 +680,12 @@ function StudioCourses({ principalId }: { principalId: string }) {
       principal_id: principalId,
       slug: `${slugify(title)}-${Math.random().toString(36).slice(2, 6)}`,
       title: title.trim(),
+      summary: summary.trim() || null,
       topic,
       level: "Foundational",
       format: "video",
+      is_free: isFree,
+      price_inr: isFree ? 0 : Number(price) || 0,
       published: false,
     });
     setBusy(false);
@@ -688,9 +694,11 @@ function StudioCourses({ principalId }: { principalId: string }) {
       return;
     }
     setTitle("");
+    setSummary("");
     toast.success("Course draft created");
     qc.invalidateQueries({ queryKey: ["studio-courses", principalId] });
   }
+
 
   async function patch(course: StudioCourse, values: Partial<StudioCourse>) {
     const { error } = await supabase.from("courses").update(values).eq("id", course.id);
