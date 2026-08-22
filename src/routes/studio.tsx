@@ -860,3 +860,28 @@ function StudioCourses({ principalId }: { principalId: string }) {
     </div>
   );
 }
+
+function CourseSummaryField({
+  courseTitle,
+  initial,
+  onSave,
+}: {
+  courseTitle: string;
+  initial: string;
+  onSave: (value: string) => void;
+}) {
+  const [value, setValue] = useState(initial);
+  return (
+    <AiDescriptionField
+      kind="course"
+      title={courseTitle}
+      rows={3}
+      value={value}
+      onChange={setValue}
+      onCommit={(v) => {
+        if (v !== initial) onSave(v);
+      }}
+    />
+  );
+
+}
