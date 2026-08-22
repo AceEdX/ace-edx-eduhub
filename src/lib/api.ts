@@ -66,8 +66,8 @@ export type Webinar = {
   certificate: boolean;
   registered_count: number;
   expert_id: string | null;
-  meeting_url?: string | null;
-  recording_url?: string | null;
+  has_meeting_link?: boolean | null;
+  has_recording?: boolean | null;
   image_url?: string | null;
   experts?: Expert | null;
 };
