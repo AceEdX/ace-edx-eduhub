@@ -297,8 +297,8 @@ function StudioWebinars({ principalId }: { principalId: string }) {
 
   return (
     <div className="space-y-5">
-      <div className="card-surface grid gap-4 p-5 sm:grid-cols-[2fr_1fr_1fr_auto] sm:items-end">
-        <div>
+      <div className="card-surface grid gap-4 p-5 sm:grid-cols-4">
+        <div className="sm:col-span-2">
           <Label className="text-xs">New session title</Label>
           <Input
             value={title}
@@ -333,10 +333,41 @@ function StudioWebinars({ principalId }: { principalId: string }) {
             </SelectContent>
           </Select>
         </div>
-        <Button variant="brand" disabled={busy} onClick={create}>
-          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Create
-        </Button>
+        <div>
+          <Label className="text-xs">Free session</Label>
+          <div className="flex h-10 items-center gap-2">
+            <Switch checked={isFree} onCheckedChange={setIsFree} />
+            <span className="text-sm text-muted-foreground">{isFree ? "Free" : "Paid"}</span>
+          </div>
+        </div>
+        <div>
+          <Label className="text-xs">Price (₹)</Label>
+          <Input
+            type="number"
+            min={0}
+            disabled={isFree}
+            value={isFree ? 0 : price}
+            onChange={(e) => setPrice(e.target.value)}
+          />
+        </div>
+        <div className="sm:col-span-4">
+          <AiDescriptionField
+            kind={programType === "masterclass" ? "masterclass" : "webinar"}
+            title={title}
+            topic={topic}
+            value={description}
+            onChange={setDescription}
+            rows={4}
+          />
+        </div>
+        <div className="sm:col-span-4">
+          <Button variant="brand" disabled={busy} onClick={create}>
+            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}{" "}
+            Create session
+          </Button>
+        </div>
       </div>
+
 
       {list.isLoading ? (
         <Skeleton className="h-56 rounded-2xl" />
