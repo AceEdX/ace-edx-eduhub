@@ -6,7 +6,6 @@ import { EmptyState } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,9 +16,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { AiDescriptionField } from "@/components/AiDescriptionField";
+import { MediaThumb } from "@/components/MediaThumb";
+import { deriveThumbnail } from "@/lib/media-thumb";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
-const MEDIA_TYPES = ["video", "reel", "recording", "podcast"];
+export const MEDIA_TYPES = ["video", "reel", "clip", "recording", "podcast"];
 const CHANNELS = ["linkedin", "instagram", "facebook", "youtube"];
 
 export function MediaLibraryAdmin() {
