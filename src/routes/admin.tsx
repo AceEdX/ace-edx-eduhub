@@ -501,6 +501,30 @@ function WebinarEditor({ webinar, onSaved }: { webinar: WebinarRow; onSaved: () 
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-3">
+        <div className="sm:col-span-3">
+          <AiDescriptionField
+            kind="webinar"
+            title={row.title}
+            durationMin={row.duration_min}
+            value={row.description ?? ""}
+            onChange={(v) => setRow({ ...row, description: v })}
+            onCommit={(v) => patch({ description: v })}
+          />
+        </div>
+        {row.principal_id && (
+          <div className="sm:col-span-3">
+            <Label className="text-xs">Resource Principal share (%)</Label>
+            <Input
+              type="number"
+              min={0}
+              max={100}
+              value={row.revenue_share_pct ?? 0}
+              onChange={(e) => setRow({ ...row, revenue_share_pct: Number(e.target.value) })}
+              onBlur={() => patch({ revenue_share_pct: row.revenue_share_pct })}
+            />
+          </div>
+        )}
+
         <div>
           <Label className="text-xs">Price (₹)</Label>
           <Input
