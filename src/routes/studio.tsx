@@ -540,10 +540,19 @@ function StudioWebinarEditor({
         </div>
         <div>
           <Label className="text-xs">Free session</Label>
-          <div className="flex h-10 items-center">
+          <div className="flex h-10 items-center gap-2">
             <Switch checked={row.is_free} onCheckedChange={(v) => patch({ is_free: v })} />
+            <span className="text-sm text-muted-foreground">{row.is_free ? "Free" : "Paid"}</span>
           </div>
         </div>
+        {!row.is_free && (
+          <div className="sm:col-span-3 rounded-xl border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+            Payments for this session are collected by AceEdX. Your share
+            {row.revenue_share_pct !== null ? ` is ${row.revenue_share_pct}%` : " follows your agreed percentage"} and
+            is released by the admin from the Earnings tab.
+          </div>
+        )}
+
         <div>
           <Label className="text-xs">Streaming platform</Label>
           <Select value={row.stream_provider} onValueChange={(v) => patch({ stream_provider: v })}>
