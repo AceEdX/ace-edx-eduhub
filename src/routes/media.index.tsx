@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Clapperboard, Play } from "lucide-react";
+import { Play } from "lucide-react";
 import { PageHeading, PageShell, EmptyState } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Pill } from "@/components/cards";
 import { toEmbedUrl } from "@/components/LessonMedia";
+import { MediaThumb } from "@/components/MediaThumb";
 import { supabase } from "@/integrations/supabase/client";
 
 type MediaAsset = {
@@ -143,9 +144,6 @@ function MediaPage() {
                     mediaType={m.media_type}
                     thumbnailUrl={m.thumbnail_url}
                   />
-                  <span className="sr-only">
-                    <Clapperboard className="h-0 w-0" aria-hidden />
-                  </span>
                   <span className="absolute inset-0 flex items-center justify-center bg-primary/30 opacity-0 transition-opacity group-hover:opacity-100">
                     <Play className="h-10 w-10 text-primary-foreground" />
                   </span>
