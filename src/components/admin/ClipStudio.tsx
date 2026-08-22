@@ -37,7 +37,7 @@ const SIZES: Record<Orientation, { w: number; h: number }> = {
   landscape: { w: 1280, h: 720 },
 };
 
-export function ClipStudio() {
+export function ClipStudio({ allowLinkedIn = true }: { allowLinkedIn?: boolean } = {}) {
   const qc = useQueryClient();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [sourceUrl, setSourceUrl] = useState("");
@@ -46,6 +46,7 @@ export function ClipStudio() {
   const [duration, setDuration] = useState(0);
   const [title, setTitle] = useState("");
   const [transcript, setTranscript] = useState("");
+  const [transcribing, setTranscribing] = useState(false);
   const [start, setStart] = useState(0);
   const [end, setEnd] = useState(45);
   const [orientation, setOrientation] = useState<Orientation>("vertical");
@@ -60,19 +61,46 @@ export function ClipStudio() {
   const [savedUrl, setSavedUrl] = useState("");
   const [busy, setBusy] = useState(false);
 
+  async function transcribe(source: File | Blob | string, label?: string) {
+    setTranscribing(true);
+    try {
+      const { base64 } = await extractWavBase64(source, 600);
+      const res = await transcribeMedia({
+        data: { audioBase64: base64, format: "wav", title: label || title || "Recording" },
+      });
+      setTranscript(res.output);
+      toast.success("Transcript generated");
+      return res.output;
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error instanceof Error
+          ? `Automatic transcript failed: ${error.message}`
+          : "Automatic transcript failed",
+      );
+      return "";
+    } finally {
+      setTranscribing(false);
+    }
+  }
+
   function loadFile(file: File) {
     const url = URL.createObjectURL(file);
     setSourceUrl(url);
     setSourceLabel(file.name);
     setIsRemote(false);
-    if (!title) setTitle(file.name.replace(/\.[^.]+$/, ""));
+    const label = file.name.replace(/\.[^.]+$/, "");
+    if (!title) setTitle(label);
+    void transcribe(file, label);
   }
 
   function loadRemote(url: string) {
     setSourceUrl(url);
     setSourceLabel(url);
     setIsRemote(true);
+    void transcribe(url);
   }
+
 
   async function plan() {
     if (!duration) {
