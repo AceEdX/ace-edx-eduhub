@@ -1698,6 +1698,8 @@ export type Database = {
           description: string | null
           duration_min: number
           expert_id: string | null
+          has_meeting_link: boolean | null
+          has_recording: boolean | null
           id: string
           image_url: string | null
           is_free: boolean
@@ -1722,6 +1724,8 @@ export type Database = {
           description?: string | null
           duration_min?: number
           expert_id?: string | null
+          has_meeting_link?: boolean | null
+          has_recording?: boolean | null
           id?: string
           image_url?: string | null
           is_free?: boolean
@@ -1746,6 +1750,8 @@ export type Database = {
           description?: string | null
           duration_min?: number
           expert_id?: string | null
+          has_meeting_link?: boolean | null
+          has_recording?: boolean | null
           id?: string
           image_url?: string | null
           is_free?: boolean
@@ -1822,6 +1828,13 @@ export type Database = {
           revoked: boolean
           speaker: string
           title: string
+        }[]
+      }
+      webinar_links: {
+        Args: { _webinar_id: string }
+        Returns: {
+          meeting_url: string
+          recording_url: string
         }[]
       }
     }
