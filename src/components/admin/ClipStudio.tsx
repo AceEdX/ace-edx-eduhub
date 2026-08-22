@@ -289,6 +289,7 @@ export function ClipStudio({ allowLinkedIn = true }: { allowLinkedIn?: boolean }
 
       setSavedUrl(signed.signedUrl);
       qc.invalidateQueries({ queryKey: ["admin-media"] });
+      qc.invalidateQueries({ queryKey: ["media-assets"] });
       qc.invalidateQueries({ queryKey: ["media-library"] });
       qc.invalidateQueries({ queryKey: ["studio-clips"] });
       toast.success("Clip saved to the media library");
