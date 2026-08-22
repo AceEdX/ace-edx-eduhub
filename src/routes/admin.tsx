@@ -368,14 +368,31 @@ function CourseEditor({ course, onSaved }: { course: CourseRow; onSaved: () => v
             onBlur={() => patch({ duration_hours: row.duration_hours })}
           />
         </div>
+        {row.principal_id && (
+          <div>
+            <Label className="text-xs">Resource Principal share (%)</Label>
+            <Input
+              type="number"
+              min={0}
+              max={100}
+              value={row.revenue_share_pct ?? 0}
+              onChange={(e) => setRow({ ...row, revenue_share_pct: Number(e.target.value) })}
+              onBlur={() => patch({ revenue_share_pct: row.revenue_share_pct })}
+            />
+          </div>
+        )}
+        <div className="sm:col-span-3">
+          <AiDescriptionField
+            kind="course"
+            title={row.title}
+            topic={row.topic}
+            value={row.summary ?? ""}
+            onChange={(v) => setRow({ ...row, summary: v })}
+            onCommit={(v) => patch({ summary: v })}
+          />
+        </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        <Button variant="outline" size="sm" asChild>
-          <Link to="/courses/$slug" params={{ slug: row.slug }}>
-            View page
-          </Link>
-        </Button>
         <Button variant="ghost" size="sm" disabled={saving} onClick={() => patch({})}>
           <Save className="h-4 w-4" /> {saving ? "Saving…" : "Save"}
         </Button>
