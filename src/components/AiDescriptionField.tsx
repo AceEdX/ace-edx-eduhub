@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { writeDescription } from "@/lib/ai.functions";
 
 type Props = {
-  kind: "webinar" | "masterclass" | "workshop" | "course";
+  kind: "webinar" | "masterclass" | "workshop" | "course" | "media";
   title: string;
   topic?: string;
   durationMin?: number;
