@@ -558,9 +558,17 @@ export function ClipStudio({ allowLinkedIn = true }: { allowLinkedIn?: boolean }
                   <Download className="h-4 w-4" /> Download
                 </a>
               </Button>
-              <Button variant="outline" size="sm" onClick={postToLinkedIn} disabled={busy}>
-                <Linkedin className="h-4 w-4" /> Post to LinkedIn
-              </Button>
+              {allowLinkedIn && (
+                <Button variant="outline" size="sm" onClick={postToLinkedIn} disabled={busy}>
+                  <Linkedin className="h-4 w-4" /> Post to LinkedIn
+                </Button>
+              )}
+              {!allowLinkedIn && (
+                <Button variant="outline" size="sm" onClick={() => queueChannel("linkedin" as "instagram")}>
+                  <Linkedin className="h-4 w-4" /> Queue for LinkedIn
+                </Button>
+              )}
+
               <Button variant="outline" size="sm" onClick={() => queueChannel("instagram")}>
                 Queue for Instagram
               </Button>
