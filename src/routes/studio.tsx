@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { useWebinarLinks } from "@/lib/webinar-links";
 import { useAuth } from "@/hooks/useAuth";
 import { INTEREST_AREAS } from "@/lib/brand";
 import { useMembership, whatsappConfirmationUrl } from "@/lib/membership";
@@ -262,7 +263,7 @@ function StudioWebinars({ principalId }: { principalId: string }) {
       const { data, error } = await supabase
         .from("webinars")
         .select(
-          "id, slug, title, description, starts_at, duration_min, price_inr, is_free, published, status, stream_provider, meeting_url, recording_url, program_type, revenue_share_pct",
+          "id, slug, title, description, starts_at, duration_min, price_inr, is_free, published, status, stream_provider, program_type, revenue_share_pct",
         )
         .eq("principal_id", principalId)
         .order("starts_at", { ascending: false });
@@ -425,7 +426,21 @@ function StudioWebinarEditor({
   webinar: StudioWebinar;
   onChanged: () => void;
 }) {
-  const [row, setRow] = useState(webinar);
+  const [row, setRow] = useState<StudioWebinar>({
+    ...webinar,
+    meeting_url: null,
+    recording_url: null,
+  });
+
+  const links = useWebinarLinks(webinar.id);
+  useEffect(() => {
+    if (!links.data) return;
+    setRow((r) => ({
+      ...r,
+      meeting_url: links.data.meeting_url,
+      recording_url: links.data.recording_url,
+    }));
+  }, [links.data]);
 
   async function patch(values: Partial<StudioWebinar>) {
     const next = { ...row, ...values };
