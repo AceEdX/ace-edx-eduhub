@@ -459,6 +459,7 @@ function WebinarEditor({ webinar, onSaved }: { webinar: WebinarRow; onSaved: () 
       .from("webinars")
       .update({
         published: next.published,
+        description: next.description,
         price_inr: next.price_inr,
         is_free: next.is_free,
         status: next.status,
@@ -466,7 +467,9 @@ function WebinarEditor({ webinar, onSaved }: { webinar: WebinarRow; onSaved: () 
         duration_min: next.duration_min,
         meeting_url: next.meeting_url,
         recording_url: next.recording_url,
+        revenue_share_pct: next.revenue_share_pct,
       })
+
       .eq("id", webinar.id);
     if (error) {
       toast.error(error.message);
