@@ -242,6 +242,9 @@ function StudioWebinars({ principalId }: { principalId: string }) {
   const [title, setTitle] = useState("");
   const [topic, setTopic] = useState<string>(INTEREST_AREAS[0] ?? "Leadership");
   const [programType, setProgramType] = useState("webinar");
+  const [isFree, setIsFree] = useState(true);
+  const [price, setPrice] = useState("0");
+  const [description, setDescription] = useState("");
 
   const list = useQuery({
     queryKey: ["studio-webinars", principalId],
@@ -249,7 +252,7 @@ function StudioWebinars({ principalId }: { principalId: string }) {
       const { data, error } = await supabase
         .from("webinars")
         .select(
-          "id, slug, title, description, starts_at, duration_min, price_inr, is_free, published, status, stream_provider, meeting_url, recording_url, program_type",
+          "id, slug, title, description, starts_at, duration_min, price_inr, is_free, published, status, stream_provider, meeting_url, recording_url, program_type, revenue_share_pct",
         )
         .eq("principal_id", principalId)
         .order("starts_at", { ascending: false });
@@ -270,11 +273,14 @@ function StudioWebinars({ principalId }: { principalId: string }) {
       principal_id: principalId,
       slug: `${slugify(title)}-${Math.random().toString(36).slice(2, 6)}`,
       title: title.trim(),
+      description: description.trim() || null,
       topic,
       program_type: programType,
       starts_at: starts.toISOString(),
       status: "upcoming",
       stream_provider: "youtube_live",
+      is_free: isFree,
+      price_inr: isFree ? 0 : Number(price) || 0,
       published: false,
     });
     setBusy(false);
@@ -283,9 +289,11 @@ function StudioWebinars({ principalId }: { principalId: string }) {
       return;
     }
     setTitle("");
+    setDescription("");
     toast.success("Draft created — add the details and publish when ready");
     qc.invalidateQueries({ queryKey: ["studio-webinars", principalId] });
   }
+
 
   return (
     <div className="space-y-5">
