@@ -393,10 +393,17 @@ function CourseEditor({ course, onSaved }: { course: CourseRow; onSaved: () => v
         </div>
       </div>
 
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" asChild>
+          <Link to="/courses/$slug" params={{ slug: row.slug }}>
+            View page
+          </Link>
+        </Button>
         <Button variant="ghost" size="sm" disabled={saving} onClick={() => patch({})}>
           <Save className="h-4 w-4" /> {saving ? "Saving…" : "Save"}
         </Button>
       </div>
+
     </div>
   );
 }
