@@ -893,3 +893,89 @@ function CourseSummaryField({
   );
 
 }
+
+/* --------------------------------- Earnings -------------------------------- */
+
+function StudioEarnings({
+  principalId,
+  defaultSharePct,
+}: {
+  principalId: string;
+  defaultSharePct: number;
+}) {
+  const shares = useQuery({
+    queryKey: ["studio-earnings", principalId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("revenue_shares")
+        .select("id, item_title, gross_inr, share_pct, payout_inr, status, created_at")
+        .eq("principal_id", principalId)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const rows = shares.data ?? [];
+  const pending = rows
+    .filter((r) => r.status !== "paid")
+    .reduce((sum, r) => sum + (r.payout_inr ?? 0), 0);
+  const paid = rows
+    .filter((r) => r.status === "paid")
+    .reduce((sum, r) => sum + (r.payout_inr ?? 0), 0);
+
+  return (
+    <div className="space-y-5">
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="card-surface p-5">
+          <p className="text-xs text-muted-foreground">Your default share</p>
+          <p className="font-display text-2xl font-semibold">{defaultSharePct}%</p>
+        </div>
+        <div className="card-surface p-5">
+          <p className="text-xs text-muted-foreground">Awaiting payout</p>
+          <p className="font-display text-2xl font-semibold">₹{pending.toLocaleString("en-IN")}</p>
+        </div>
+        <div className="card-surface p-5">
+          <p className="text-xs text-muted-foreground">Paid out</p>
+          <p className="font-display text-2xl font-semibold">₹{paid.toLocaleString("en-IN")}</p>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+        All payments are collected by AceEdX first. Your share is calculated per sale and released by
+        the admin. Percentages are set by the admin and can differ per session or course.
+      </div>
+
+      {shares.isLoading ? (
+        <Skeleton className="h-40 rounded-2xl" />
+      ) : !rows.length ? (
+        <EmptyState
+          title="No earnings yet"
+          description="Once a paid seat is sold, your share appears here."
+        />
+      ) : (
+        <div className="card-surface divide-y divide-border">
+          {rows.map((r) => (
+            <div key={r.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
+              <div className="min-w-0">
+                <p className="truncate font-medium">{r.item_title}</p>
+                <p className="text-xs text-muted-foreground">
+                  {new Date(r.created_at).toLocaleDateString()} · Gross ₹
+                  {r.gross_inr.toLocaleString("en-IN")} · {r.share_pct}%
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="font-semibold">₹{r.payout_inr.toLocaleString("en-IN")}</p>
+                <p
+                  className={`text-xs ${r.status === "paid" ? "text-success" : "text-muted-foreground"}`}
+                >
+                  {r.status === "paid" ? "Paid" : "Pending"}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
