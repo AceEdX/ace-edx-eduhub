@@ -383,6 +383,7 @@ export type Database = {
           principal_id: string | null
           published: boolean
           rating: number
+          revenue_share_pct: number | null
           slug: string
           summary: string | null
           title: string
@@ -408,6 +409,7 @@ export type Database = {
           principal_id?: string | null
           published?: boolean
           rating?: number
+          revenue_share_pct?: number | null
           slug: string
           summary?: string | null
           title: string
@@ -433,6 +435,7 @@ export type Database = {
           principal_id?: string | null
           published?: boolean
           rating?: number
+          revenue_share_pct?: number | null
           slug?: string
           summary?: string | null
           title?: string
@@ -798,6 +801,7 @@ export type Database = {
           clip_end_sec: number | null
           clip_start_sec: number | null
           created_at: string
+          created_by: string | null
           description: string | null
           duration_sec: number
           id: string
@@ -816,6 +820,7 @@ export type Database = {
           clip_end_sec?: number | null
           clip_start_sec?: number | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
           duration_sec?: number
           id?: string
@@ -834,6 +839,7 @@ export type Database = {
           clip_end_sec?: number | null
           clip_start_sec?: number | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
           duration_sec?: number
           id?: string
@@ -1702,6 +1708,7 @@ export type Database = {
           published: boolean
           recording_url: string | null
           registered_count: number
+          revenue_share_pct: number | null
           slug: string
           starts_at: string
           status: string
@@ -1725,6 +1732,7 @@ export type Database = {
           published?: boolean
           recording_url?: string | null
           registered_count?: number
+          revenue_share_pct?: number | null
           slug: string
           starts_at: string
           status?: string
@@ -1748,6 +1756,7 @@ export type Database = {
           published?: boolean
           recording_url?: string | null
           registered_count?: number
+          revenue_share_pct?: number | null
           slug?: string
           starts_at?: string
           status?: string
@@ -1800,6 +1809,7 @@ export type Database = {
         Args: { _principal_id: string; _user_id: string }
         Returns: boolean
       }
+      is_resource_principal: { Args: { _user_id: string }; Returns: boolean }
       verify_certificate: {
         Args: { _certificate_id: string }
         Returns: {
