@@ -144,18 +144,14 @@ function WebinarDetail() {
     return () => clearInterval(id);
   }, [watching]);
 
-  async function saveAttendance(minutes: number, attended: boolean) {
+  async function saveAttendance(minutes: number, _attended: boolean) {
     const w = webinar.data;
     if (!user || !w) return;
-    await supabase
-      .from("webinar_registrations")
-      .update({
-        attended,
-        attendance_minutes: minutes,
-        joined_at: registration.data?.joined_at ?? new Date().toISOString(),
-      })
-      .eq("user_id", user.id)
-      .eq("webinar_id", w.id);
+    // Attendance is validated and capped server-side; the client cannot mark itself present.
+    await supabase.rpc("record_webinar_attendance", {
+      _webinar_id: w.id,
+      _minutes: minutes,
+    });
   }
 
   async function issueCertificate(minutes: number) {
@@ -164,33 +160,19 @@ function WebinarDetail() {
     setIssuing(true);
     await saveAttendance(minutes, true);
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    const { data: existing } = await supabase
-      .from("certificates")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("webinar_id", w.id)
-      .maybeSingle();
-
-    if (!existing && w.certificate) {
-      await supabase.from("certificates").insert({
-        user_id: user.id,
-        recipient_name: profile?.full_name || user.email || "AceEdX Member",
-        kind: "webinar",
-        title: w.title,
-        speaker: w.experts?.name ?? "AceEdX Faculty",
-        duration_text: `${w.duration_min} minutes`,
-        webinar_id: w.id,
+    if (w.certificate) {
+      const { error } = await supabase.rpc("issue_certificate", {
+        _kind: "webinar",
+        _webinar_id: w.id,
       });
-      toast.success("Session complete — your participation certificate has been issued");
+      if (!error) {
+        toast.success("Session complete — your participation certificate has been issued");
+      }
     }
     await registration.refetch();
+    setIssuing(false);
   }
+
 
   // Persist watch time periodically and unlock the certificate at 80% watched.
   useEffect(() => {
