@@ -259,6 +259,8 @@ export function ClipStudio({ allowLinkedIn = true }: { allowLinkedIn?: boolean }
     if (!clipBlob) return;
     setBusy(true);
     try {
+      const { data: auth } = await supabase.auth.getUser();
+      const userId = auth.user?.id ?? null;
       const path = `clips/${Date.now()}-${(title || "clip").toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40)}.webm`;
       const { error: upErr } = await supabase.storage
         .from("media")
@@ -279,13 +281,16 @@ export function ClipStudio({ allowLinkedIn = true }: { allowLinkedIn?: boolean }
         source_url: isRemote ? sourceUrl : null,
         clip_start_sec: Math.round(start),
         clip_end_sec: Math.round(end),
+        transcript: transcript.trim() || null,
         published: true,
+        created_by: userId,
       });
       if (insErr) throw insErr;
 
       setSavedUrl(signed.signedUrl);
       qc.invalidateQueries({ queryKey: ["admin-media"] });
       qc.invalidateQueries({ queryKey: ["media-library"] });
+      qc.invalidateQueries({ queryKey: ["studio-clips"] });
       toast.success("Clip saved to the media library");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not save the clip");
@@ -322,11 +327,13 @@ export function ClipStudio({ allowLinkedIn = true }: { allowLinkedIn?: boolean }
       toast.error("Write or generate a caption first");
       return;
     }
+    const { data: auth } = await supabase.auth.getUser();
     const { error } = await supabase.from("social_publications").insert({
       channel,
       caption: caption.trim(),
       link_url: savedUrl || null,
       status: "scheduled",
+      created_by: auth.user?.id ?? null,
     });
     if (error) {
       toast.error(error.message);
@@ -335,6 +342,7 @@ export function ClipStudio({ allowLinkedIn = true }: { allowLinkedIn?: boolean }
     toast.success(`Queued for ${channel}`);
     qc.invalidateQueries({ queryKey: ["admin-publications"] });
   }
+
 
   return (
     <div className="space-y-5">
