@@ -23,6 +23,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { INTEREST_AREAS } from "@/lib/brand";
 import { useMembership, whatsappConfirmationUrl } from "@/lib/membership";
 import { ClipStudio } from "@/components/admin/ClipStudio";
+import { AiDescriptionField } from "@/components/AiDescriptionField";
+
 
 export const Route = createFileRoute("/studio")({
   head: () => ({
