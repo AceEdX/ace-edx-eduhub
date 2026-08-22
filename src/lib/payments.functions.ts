@@ -214,20 +214,24 @@ export const verifyPayment = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (!order) throw new Error("Order not found.");
 
-    await supabase
+    // Orders can only be marked paid by trusted server code, never by the client.
+    const { supabaseAdmin: ordersAdmin } = await import("@/integrations/supabase/client.server");
+    await ordersAdmin
       .from("orders")
       .update({ status: "paid", provider_payment_id: data.razorpayPaymentId })
-      .eq("id", order.id);
+      .eq("id", order.id)
+      .eq("user_id", userId);
+
 
     if (order.item_type === "course" && order.item_id) {
       await supabase
         .from("enrollments")
-        .upsert({ user_id: userId, course_id: order.item_id }, { onConflict: "user_id,course_id" });
+        .upsert({ user_id: userId, course_id: order.item_id }, { onConflict: "user_id,course_id", ignoreDuplicates: true });
     }
     if (order.item_type === "webinar" && order.item_id) {
       await supabase
         .from("webinar_registrations")
-        .upsert({ user_id: userId, webinar_id: order.item_id }, { onConflict: "user_id,webinar_id" });
+        .upsert({ user_id: userId, webinar_id: order.item_id }, { onConflict: "user_id,webinar_id", ignoreDuplicates: true });
     }
 
     // Revenue share: income lands with AceEdX first, then the admin releases the payout.

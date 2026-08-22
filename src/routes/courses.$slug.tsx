@@ -86,7 +86,7 @@ function CourseDetail() {
 
     const { error } = await supabase
       .from("enrollments")
-      .upsert({ user_id: user.id, course_id: data.id }, { onConflict: "user_id,course_id" });
+      .upsert({ user_id: user.id, course_id: data.id }, { onConflict: "user_id,course_id", ignoreDuplicates: true });
     if (error) {
       toast.error(error.message);
       return;

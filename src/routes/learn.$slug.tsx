@@ -109,22 +109,12 @@ function LearnPage() {
       );
     }
 
-    const pct = Math.round((next.size / flat.length) * 100);
-    await supabase
-      .from("enrollments")
-      .update({
-        progress: pct,
-        completed_at: pct === 100 ? new Date().toISOString() : null,
-      })
-      .eq("user_id", user.id)
-      .eq("course_id", course.data.id);
+    // Progress is recalculated server-side from the lessons actually completed.
+    const { data: pct } = await supabase.rpc("sync_course_progress", {
+      _course_id: course.data.id,
+    });
 
-    if (pct === 100) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("full_name")
-        .eq("id", user.id)
-        .maybeSingle();
+    if (pct === 100 && course.data.certificate) {
       const { data: existing } = await supabase
         .from("certificates")
         .select("id")
@@ -132,17 +122,14 @@ function LearnPage() {
         .eq("course_id", course.data.id)
         .maybeSingle();
       if (!existing) {
-        await supabase.from("certificates").insert({
-          user_id: user.id,
-          recipient_name: profile?.full_name || user.email || "AceEdX Member",
-          kind: "course",
-          title: course.data.title,
-          duration_text: `${course.data.duration_hours} hours`,
-          course_id: course.data.id,
+        const { error } = await supabase.rpc("issue_certificate", {
+          _kind: "course",
+          _course_id: course.data.id,
         });
-        toast.success("Course complete — your certificate has been issued");
+        if (!error) toast.success("Course complete — your certificate has been issued");
       }
     }
+
   }
 
   function move(delta: number) {
