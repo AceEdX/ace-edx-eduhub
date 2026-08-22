@@ -839,13 +839,13 @@ function StudioCourses({ principalId }: { principalId: string }) {
                 </Select>
               </div>
               <div className="sm:col-span-3">
-                <Label className="text-xs">Summary</Label>
-                <Textarea
-                  rows={2}
-                  defaultValue={c.summary ?? ""}
-                  onBlur={(e) => void patch(c, { summary: e.target.value })}
+                <CourseSummaryField
+                  courseTitle={c.title}
+                  initial={c.summary ?? ""}
+                  onSave={(v) => void patch(c, { summary: v })}
                 />
               </div>
+
             </div>
             <div className="mt-4">
               <Button variant="outline" size="sm" asChild>
