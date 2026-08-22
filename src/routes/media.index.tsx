@@ -138,16 +138,14 @@ function MediaPage() {
                   className="group relative block aspect-video w-full bg-primary"
                   aria-label={`Play ${m.title}`}
                 >
-                  {m.thumbnail_url ? (
-                    <img
-                      src={m.thumbnail_url}
-                      alt={m.title}
-                      loading="lazy"
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <Clapperboard className="absolute inset-0 m-auto h-12 w-12 text-primary-foreground opacity-70" />
-                  )}
+                  <MediaThumb
+                    title={m.title}
+                    mediaType={m.media_type}
+                    thumbnailUrl={m.thumbnail_url}
+                  />
+                  <span className="sr-only">
+                    <Clapperboard className="h-0 w-0" aria-hidden />
+                  </span>
                   <span className="absolute inset-0 flex items-center justify-center bg-primary/30 opacity-0 transition-opacity group-hover:opacity-100">
                     <Play className="h-10 w-10 text-primary-foreground" />
                   </span>
