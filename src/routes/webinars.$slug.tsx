@@ -11,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { LessonMedia } from "@/components/LessonMedia";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useWebinarLinks } from "@/lib/webinar-links";
 import { formatPrice } from "@/lib/brand";
 import { payAndUnlock } from "@/lib/razorpay";
 import type { Webinar } from "@/lib/api";
@@ -57,7 +58,9 @@ function WebinarDetail() {
     queryFn: async (): Promise<Webinar | null> => {
       const { data, error } = await supabase
         .from("webinars")
-        .select("*, experts(*)")
+        .select(
+          "id, slug, title, description, topic, starts_at, duration_min, price_inr, is_free, status, certificate, image_url, registered_count, expert_id, published, program_type, principal_id, stream_provider, has_recording, has_meeting_link, experts(*)",
+        )
         .eq("published", true)
         .eq("slug", slug)
         .maybeSingle();
@@ -80,6 +83,10 @@ function WebinarDetail() {
       return data;
     },
   });
+
+  const links = useWebinarLinks(webinar.data?.id, Boolean(user && registration.data));
+  const meetingUrl = links.data?.meeting_url ?? null;
+  const recordingUrl = links.data?.recording_url ?? null;
 
   const countdown = useCountdown(webinar.data?.starts_at);
 
@@ -203,7 +210,7 @@ function WebinarDetail() {
   async function startLiveSession() {
     const w = webinar.data;
     if (!w) return;
-    if (w.meeting_url) window.open(w.meeting_url, "_blank", "noopener,noreferrer");
+    if (meetingUrl) window.open(meetingUrl, "_blank", "noopener,noreferrer");
     await saveAttendance(registration.data?.attendance_minutes ?? 0, false);
     await registration.refetch();
   }
@@ -248,7 +255,7 @@ function WebinarDetail() {
   const w = webinar.data;
   const date = new Date(w.starts_at);
   const isRegistered = Boolean(registration.data);
-  const isRecorded = w.status === "recorded" || Boolean(w.recording_url);
+  const isRecorded = w.status === "recorded" || Boolean(w.has_recording);
   const requiredSec = Math.round(w.duration_min * 60 * 0.8);
   const watchPct = Math.min(100, Math.round((watchedSec / requiredSec) * 100));
   const certificateEarned = Boolean(registration.data?.attended);
@@ -316,7 +323,7 @@ function WebinarDetail() {
                     <Button
                       variant="brand"
                       className="mt-4 w-full"
-                      disabled={!w.recording_url}
+                      disabled={!recordingUrl}
                       onClick={() => {
                         setWatching(true);
                         document
@@ -325,7 +332,7 @@ function WebinarDetail() {
                       }}
                     >
                       <Video className="h-4 w-4" />
-                      {w.recording_url ? "Watch the recording" : "Recording coming soon"}
+                      {recordingUrl ? "Watch the recording" : "Recording coming soon"}
                     </Button>
                     <Progress value={watchPct} className="mt-4" />
                     <p className="mt-2 text-xs text-muted-foreground">
@@ -339,11 +346,11 @@ function WebinarDetail() {
                     <Button
                       variant="brand"
                       className="mt-4 w-full"
-                      disabled={!w.meeting_url}
+                      disabled={!meetingUrl}
                       onClick={startLiveSession}
                     >
                       <Video className="h-4 w-4" />
-                      {w.meeting_url ? "Join live session" : "Joining link coming soon"}
+                      {meetingUrl ? "Join live session" : "Joining link coming soon"}
                     </Button>
                     <Button
                       variant="outline"
@@ -393,7 +400,7 @@ function WebinarDetail() {
         </div>
       </section>
 
-      {isRegistered && isRecorded && watching && w.recording_url && (
+      {isRegistered && isRecorded && watching && recordingUrl && (
         <div id="watch" className="container-page pt-10">
           <h2 className="font-display text-xl font-semibold">Recording</h2>
           <LessonMedia
@@ -401,7 +408,7 @@ function WebinarDetail() {
               title: w.title,
               kind: "video",
               duration_min: w.duration_min,
-              video_url: w.recording_url,
+              video_url: recordingUrl,
             }}
           />
           <div className="mt-4 max-w-xl">

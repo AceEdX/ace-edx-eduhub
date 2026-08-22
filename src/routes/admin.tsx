@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { useWebinarLinks } from "@/lib/webinar-links";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useAdminAlerts } from "@/hooks/useAdminAlerts";
 import {
@@ -420,7 +421,7 @@ function WebinarsAdmin() {
       const { data, error } = await supabase
         .from("webinars")
         .select(
-          "id, slug, title, description, starts_at, duration_min, price_inr, is_free, published, status, meeting_url, recording_url, principal_id, revenue_share_pct",
+          "id, slug, title, description, starts_at, duration_min, price_inr, is_free, published, status, principal_id, revenue_share_pct",
         )
         .order("starts_at", { ascending: false });
       if (error) throw error;
@@ -449,8 +450,22 @@ function WebinarsAdmin() {
 }
 
 function WebinarEditor({ webinar, onSaved }: { webinar: WebinarRow; onSaved: () => void }) {
-  const [row, setRow] = useState(webinar);
-  useEffect(() => setRow(webinar), [webinar]);
+  const [row, setRow] = useState<WebinarRow>({
+    ...webinar,
+    meeting_url: null,
+    recording_url: null,
+  });
+  useEffect(() => setRow((r) => ({ ...webinar, meeting_url: r.meeting_url, recording_url: r.recording_url })), [webinar]);
+
+  const links = useWebinarLinks(webinar.id);
+  useEffect(() => {
+    if (!links.data) return;
+    setRow((r) => ({
+      ...r,
+      meeting_url: links.data.meeting_url,
+      recording_url: links.data.recording_url,
+    }));
+  }, [links.data]);
 
   async function patch(values: Partial<WebinarRow>) {
     const next = { ...row, ...values };

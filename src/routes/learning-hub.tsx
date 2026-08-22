@@ -58,7 +58,7 @@ function LearningHubPage() {
       ),
       masterclasses: all.filter((w) => programType(w) === "masterclass"),
       workshops: all.filter((w) => programType(w) === "workshop"),
-      recordings: all.filter((w) => Boolean(w.recording_url)),
+      recordings: all.filter((w) => Boolean(w.has_recording)),
     };
   }, [webinars.data]);
 

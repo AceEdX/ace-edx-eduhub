@@ -66,8 +66,8 @@ export type Webinar = {
   certificate: boolean;
   registered_count: number;
   expert_id: string | null;
-  meeting_url?: string | null;
-  recording_url?: string | null;
+  has_meeting_link?: boolean | null;
+  has_recording?: boolean | null;
   image_url?: string | null;
   experts?: Expert | null;
 };
@@ -163,7 +163,9 @@ export const webinarsQuery = {
   queryFn: async (): Promise<Webinar[]> => {
     const { data, error } = await supabase
       .from("webinars")
-      .select("*, experts(*)")
+      .select(
+        "id, slug, title, description, topic, starts_at, duration_min, price_inr, is_free, status, certificate, image_url, registered_count, expert_id, published, program_type, principal_id, stream_provider, has_recording, has_meeting_link, experts(*)",
+      )
       .eq("published", true)
       .order("starts_at", { ascending: true });
     if (error) throw error;
