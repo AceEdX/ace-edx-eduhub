@@ -394,7 +394,7 @@ function WebinarsAdmin() {
       const { data, error } = await supabase
         .from("webinars")
         .select(
-          "id, slug, title, description, starts_at, duration_min, price_inr, is_free, published, status, meeting_url, recording_url",
+          "id, slug, title, description, starts_at, duration_min, price_inr, is_free, published, status, meeting_url, recording_url, principal_id, revenue_share_pct",
         )
         .order("starts_at", { ascending: false });
       if (error) throw error;
