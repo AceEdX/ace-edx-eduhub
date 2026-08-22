@@ -485,14 +485,17 @@ function StudioWebinarEditor({
 
       <div className="mt-5 grid gap-4 sm:grid-cols-3">
         <div className="sm:col-span-3">
-          <Label className="text-xs">Description</Label>
-          <Textarea
-            rows={3}
+          <AiDescriptionField
+            kind={row.program_type === "masterclass" ? "masterclass" : "webinar"}
+            title={row.title}
+            durationMin={row.duration_min}
+            rows={4}
             value={row.description ?? ""}
-            onChange={(e) => setRow({ ...row, description: e.target.value })}
-            onBlur={() => patch({ description: row.description })}
+            onChange={(v) => setRow({ ...row, description: v })}
+            onCommit={(v) => void patch({ description: v })}
           />
         </div>
+
         <div>
           <Label className="text-xs">Date &amp; time</Label>
           <Input
