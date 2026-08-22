@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { AiDescriptionField } from "@/components/AiDescriptionField";
+
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -62,6 +64,9 @@ type CourseRow = {
   format: string;
   duration_hours: number;
   created_at: string;
+  principal_id: string | null;
+  revenue_share_pct: number | null;
+
 };
 
 function toLocalInput(value: string) {
@@ -83,7 +88,10 @@ type WebinarRow = {
   status: string;
   meeting_url: string | null;
   recording_url: string | null;
+  principal_id: string | null;
+  revenue_share_pct: number | null;
 };
+
 
 type LessonRow = {
   id: string;
@@ -235,7 +243,7 @@ function CoursesAdmin() {
     queryFn: async (): Promise<CourseRow[]> => {
       const { data, error } = await supabase
         .from("courses")
-        .select("id, slug, title, summary, topic, level, price_inr, is_free, published, format, duration_hours, created_at")
+        .select("id, slug, title, summary, topic, level, price_inr, is_free, published, format, duration_hours, created_at, principal_id, revenue_share_pct")
         .order("title");
       if (error) throw error;
       return (data ?? []) as CourseRow[];
@@ -362,6 +370,29 @@ function CourseEditor({ course, onSaved }: { course: CourseRow; onSaved: () => v
             onBlur={() => patch({ duration_hours: row.duration_hours })}
           />
         </div>
+        {row.principal_id && (
+          <div>
+            <Label className="text-xs">Resource Principal share (%)</Label>
+            <Input
+              type="number"
+              min={0}
+              max={100}
+              value={row.revenue_share_pct ?? 0}
+              onChange={(e) => setRow({ ...row, revenue_share_pct: Number(e.target.value) })}
+              onBlur={() => patch({ revenue_share_pct: row.revenue_share_pct })}
+            />
+          </div>
+        )}
+        <div className="sm:col-span-3">
+          <AiDescriptionField
+            kind="course"
+            title={row.title}
+            topic={row.topic}
+            value={row.summary ?? ""}
+            onChange={(v) => setRow({ ...row, summary: v })}
+            onCommit={(v) => patch({ summary: v })}
+          />
+        </div>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
@@ -374,6 +405,7 @@ function CourseEditor({ course, onSaved }: { course: CourseRow; onSaved: () => v
           <Save className="h-4 w-4" /> {saving ? "Saving…" : "Save"}
         </Button>
       </div>
+
     </div>
   );
 }
@@ -388,7 +420,7 @@ function WebinarsAdmin() {
       const { data, error } = await supabase
         .from("webinars")
         .select(
-          "id, slug, title, description, starts_at, duration_min, price_inr, is_free, published, status, meeting_url, recording_url",
+          "id, slug, title, description, starts_at, duration_min, price_inr, is_free, published, status, meeting_url, recording_url, principal_id, revenue_share_pct",
         )
         .order("starts_at", { ascending: false });
       if (error) throw error;
@@ -427,6 +459,7 @@ function WebinarEditor({ webinar, onSaved }: { webinar: WebinarRow; onSaved: () 
       .from("webinars")
       .update({
         published: next.published,
+        description: next.description,
         price_inr: next.price_inr,
         is_free: next.is_free,
         status: next.status,
@@ -434,7 +467,9 @@ function WebinarEditor({ webinar, onSaved }: { webinar: WebinarRow; onSaved: () 
         duration_min: next.duration_min,
         meeting_url: next.meeting_url,
         recording_url: next.recording_url,
+        revenue_share_pct: next.revenue_share_pct,
       })
+
       .eq("id", webinar.id);
     if (error) {
       toast.error(error.message);
@@ -466,6 +501,30 @@ function WebinarEditor({ webinar, onSaved }: { webinar: WebinarRow; onSaved: () 
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-3">
+        <div className="sm:col-span-3">
+          <AiDescriptionField
+            kind="webinar"
+            title={row.title}
+            durationMin={row.duration_min}
+            value={row.description ?? ""}
+            onChange={(v) => setRow({ ...row, description: v })}
+            onCommit={(v) => patch({ description: v })}
+          />
+        </div>
+        {row.principal_id && (
+          <div className="sm:col-span-3">
+            <Label className="text-xs">Resource Principal share (%)</Label>
+            <Input
+              type="number"
+              min={0}
+              max={100}
+              value={row.revenue_share_pct ?? 0}
+              onChange={(e) => setRow({ ...row, revenue_share_pct: Number(e.target.value) })}
+              onBlur={() => patch({ revenue_share_pct: row.revenue_share_pct })}
+            />
+          </div>
+        )}
+
         <div>
           <Label className="text-xs">Price (₹)</Label>
           <Input

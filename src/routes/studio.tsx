@@ -23,6 +23,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { INTEREST_AREAS } from "@/lib/brand";
 import { useMembership, whatsappConfirmationUrl } from "@/lib/membership";
 import { ClipStudio } from "@/components/admin/ClipStudio";
+import { AiDescriptionField } from "@/components/AiDescriptionField";
+
 
 export const Route = createFileRoute("/studio")({
   head: () => ({
@@ -211,6 +213,7 @@ function StudioPage() {
             <TabsTrigger value="webinars">Webinars & masterclasses</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
             <TabsTrigger value="remix">Reels & posts</TabsTrigger>
+            <TabsTrigger value="earnings">Earnings</TabsTrigger>
           </TabsList>
           <TabsContent value="webinars">
             <StudioWebinars principalId={principalId} />
@@ -221,6 +224,13 @@ function StudioPage() {
           <TabsContent value="remix">
             <ClipStudio />
           </TabsContent>
+          <TabsContent value="earnings">
+            <StudioEarnings
+              principalId={principalId}
+              defaultSharePct={principal.data!.revenue_share_pct}
+            />
+          </TabsContent>
+
         </Tabs>
       </div>
     </PageShell>
@@ -242,6 +252,9 @@ function StudioWebinars({ principalId }: { principalId: string }) {
   const [title, setTitle] = useState("");
   const [topic, setTopic] = useState<string>(INTEREST_AREAS[0] ?? "Leadership");
   const [programType, setProgramType] = useState("webinar");
+  const [isFree, setIsFree] = useState(true);
+  const [price, setPrice] = useState("0");
+  const [description, setDescription] = useState("");
 
   const list = useQuery({
     queryKey: ["studio-webinars", principalId],
@@ -249,7 +262,7 @@ function StudioWebinars({ principalId }: { principalId: string }) {
       const { data, error } = await supabase
         .from("webinars")
         .select(
-          "id, slug, title, description, starts_at, duration_min, price_inr, is_free, published, status, stream_provider, meeting_url, recording_url, program_type",
+          "id, slug, title, description, starts_at, duration_min, price_inr, is_free, published, status, stream_provider, meeting_url, recording_url, program_type, revenue_share_pct",
         )
         .eq("principal_id", principalId)
         .order("starts_at", { ascending: false });
@@ -270,11 +283,14 @@ function StudioWebinars({ principalId }: { principalId: string }) {
       principal_id: principalId,
       slug: `${slugify(title)}-${Math.random().toString(36).slice(2, 6)}`,
       title: title.trim(),
+      description: description.trim() || null,
       topic,
       program_type: programType,
       starts_at: starts.toISOString(),
       status: "upcoming",
       stream_provider: "youtube_live",
+      is_free: isFree,
+      price_inr: isFree ? 0 : Number(price) || 0,
       published: false,
     });
     setBusy(false);
@@ -283,14 +299,16 @@ function StudioWebinars({ principalId }: { principalId: string }) {
       return;
     }
     setTitle("");
+    setDescription("");
     toast.success("Draft created — add the details and publish when ready");
     qc.invalidateQueries({ queryKey: ["studio-webinars", principalId] });
   }
 
+
   return (
     <div className="space-y-5">
-      <div className="card-surface grid gap-4 p-5 sm:grid-cols-[2fr_1fr_1fr_auto] sm:items-end">
-        <div>
+      <div className="card-surface grid gap-4 p-5 sm:grid-cols-4">
+        <div className="sm:col-span-2">
           <Label className="text-xs">New session title</Label>
           <Input
             value={title}
@@ -325,10 +343,41 @@ function StudioWebinars({ principalId }: { principalId: string }) {
             </SelectContent>
           </Select>
         </div>
-        <Button variant="brand" disabled={busy} onClick={create}>
-          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Create
-        </Button>
+        <div>
+          <Label className="text-xs">Free session</Label>
+          <div className="flex h-10 items-center gap-2">
+            <Switch checked={isFree} onCheckedChange={setIsFree} />
+            <span className="text-sm text-muted-foreground">{isFree ? "Free" : "Paid"}</span>
+          </div>
+        </div>
+        <div>
+          <Label className="text-xs">Price (₹)</Label>
+          <Input
+            type="number"
+            min={0}
+            disabled={isFree}
+            value={isFree ? 0 : price}
+            onChange={(e) => setPrice(e.target.value)}
+          />
+        </div>
+        <div className="sm:col-span-4">
+          <AiDescriptionField
+            kind={programType === "masterclass" ? "masterclass" : "webinar"}
+            title={title}
+            topic={topic}
+            value={description}
+            onChange={setDescription}
+            rows={4}
+          />
+        </div>
+        <div className="sm:col-span-4">
+          <Button variant="brand" disabled={busy} onClick={create}>
+            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}{" "}
+            Create session
+          </Button>
+        </div>
       </div>
+
 
       {list.isLoading ? (
         <Skeleton className="h-56 rounded-2xl" />
@@ -365,6 +414,8 @@ type StudioWebinar = {
   meeting_url: string | null;
   recording_url: string | null;
   program_type: string;
+  revenue_share_pct: number | null;
+
 };
 
 function StudioWebinarEditor({
@@ -442,14 +493,17 @@ function StudioWebinarEditor({
 
       <div className="mt-5 grid gap-4 sm:grid-cols-3">
         <div className="sm:col-span-3">
-          <Label className="text-xs">Description</Label>
-          <Textarea
-            rows={3}
+          <AiDescriptionField
+            kind={row.program_type === "masterclass" ? "masterclass" : "webinar"}
+            title={row.title}
+            durationMin={row.duration_min}
+            rows={4}
             value={row.description ?? ""}
-            onChange={(e) => setRow({ ...row, description: e.target.value })}
-            onBlur={() => patch({ description: row.description })}
+            onChange={(v) => setRow({ ...row, description: v })}
+            onCommit={(v) => void patch({ description: v })}
           />
         </div>
+
         <div>
           <Label className="text-xs">Date &amp; time</Label>
           <Input
@@ -494,10 +548,19 @@ function StudioWebinarEditor({
         </div>
         <div>
           <Label className="text-xs">Free session</Label>
-          <div className="flex h-10 items-center">
+          <div className="flex h-10 items-center gap-2">
             <Switch checked={row.is_free} onCheckedChange={(v) => patch({ is_free: v })} />
+            <span className="text-sm text-muted-foreground">{row.is_free ? "Free" : "Paid"}</span>
           </div>
         </div>
+        {!row.is_free && (
+          <div className="sm:col-span-3 rounded-xl border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+            Payments for this session are collected by AceEdX. Your share
+            {row.revenue_share_pct !== null ? ` is ${row.revenue_share_pct}%` : " follows your agreed percentage"} and
+            is released by the admin from the Earnings tab.
+          </div>
+        )}
+
         <div>
           <Label className="text-xs">Streaming platform</Label>
           <Select value={row.stream_provider} onValueChange={(v) => patch({ stream_provider: v })}>
@@ -597,6 +660,9 @@ function StudioCourses({ principalId }: { principalId: string }) {
   const qc = useQueryClient();
   const [title, setTitle] = useState("");
   const [topic, setTopic] = useState<string>(INTEREST_AREAS[0] ?? "Leadership");
+  const [summary, setSummary] = useState("");
+  const [isFree, setIsFree] = useState(true);
+  const [price, setPrice] = useState("0");
   const [busy, setBusy] = useState(false);
 
   const list = useQuery({
@@ -622,9 +688,12 @@ function StudioCourses({ principalId }: { principalId: string }) {
       principal_id: principalId,
       slug: `${slugify(title)}-${Math.random().toString(36).slice(2, 6)}`,
       title: title.trim(),
+      summary: summary.trim() || null,
       topic,
       level: "Foundational",
       format: "video",
+      is_free: isFree,
+      price_inr: isFree ? 0 : Number(price) || 0,
       published: false,
     });
     setBusy(false);
@@ -633,9 +702,11 @@ function StudioCourses({ principalId }: { principalId: string }) {
       return;
     }
     setTitle("");
+    setSummary("");
     toast.success("Course draft created");
     qc.invalidateQueries({ queryKey: ["studio-courses", principalId] });
   }
+
 
   async function patch(course: StudioCourse, values: Partial<StudioCourse>) {
     const { error } = await supabase.from("courses").update(values).eq("id", course.id);
@@ -659,8 +730,8 @@ function StudioCourses({ principalId }: { principalId: string }) {
 
   return (
     <div className="space-y-5">
-      <div className="card-surface grid gap-4 p-5 sm:grid-cols-[2fr_1fr_auto] sm:items-end">
-        <div>
+      <div className="card-surface grid gap-4 p-5 sm:grid-cols-4">
+        <div className="sm:col-span-2">
           <Label className="text-xs">New course title</Label>
           <Input
             value={title}
@@ -683,10 +754,41 @@ function StudioCourses({ principalId }: { principalId: string }) {
             </SelectContent>
           </Select>
         </div>
-        <Button variant="brand" disabled={busy} onClick={create}>
-          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Create
-        </Button>
+        <div>
+          <Label className="text-xs">Free course</Label>
+          <div className="flex h-10 items-center gap-2">
+            <Switch checked={isFree} onCheckedChange={setIsFree} />
+            <span className="text-sm text-muted-foreground">{isFree ? "Free" : "Paid"}</span>
+          </div>
+        </div>
+        <div>
+          <Label className="text-xs">Price (₹)</Label>
+          <Input
+            type="number"
+            min={0}
+            disabled={isFree}
+            value={isFree ? 0 : price}
+            onChange={(e) => setPrice(e.target.value)}
+          />
+        </div>
+        <div className="sm:col-span-3">
+          <AiDescriptionField
+            kind="course"
+            title={title}
+            topic={topic}
+            value={summary}
+            onChange={setSummary}
+            rows={3}
+          />
+        </div>
+        <div className="sm:col-span-4">
+          <Button variant="brand" disabled={busy} onClick={create}>
+            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}{" "}
+            Create course
+          </Button>
+        </div>
       </div>
+
 
       {list.isLoading ? (
         <Skeleton className="h-56 rounded-2xl" />
@@ -745,13 +847,13 @@ function StudioCourses({ principalId }: { principalId: string }) {
                 </Select>
               </div>
               <div className="sm:col-span-3">
-                <Label className="text-xs">Summary</Label>
-                <Textarea
-                  rows={2}
-                  defaultValue={c.summary ?? ""}
-                  onBlur={(e) => void patch(c, { summary: e.target.value })}
+                <CourseSummaryField
+                  courseTitle={c.title}
+                  initial={c.summary ?? ""}
+                  onSave={(v) => void patch(c, { summary: v })}
                 />
               </div>
+
             </div>
             <div className="mt-4">
               <Button variant="outline" size="sm" asChild>
@@ -762,6 +864,117 @@ function StudioCourses({ principalId }: { principalId: string }) {
             </div>
           </div>
         ))
+      )}
+    </div>
+  );
+}
+
+function CourseSummaryField({
+  courseTitle,
+  initial,
+  onSave,
+}: {
+  courseTitle: string;
+  initial: string;
+  onSave: (value: string) => void;
+}) {
+  const [value, setValue] = useState(initial);
+  return (
+    <AiDescriptionField
+      kind="course"
+      title={courseTitle}
+      rows={3}
+      value={value}
+      onChange={setValue}
+      onCommit={(v) => {
+        if (v !== initial) onSave(v);
+      }}
+    />
+  );
+
+}
+
+/* --------------------------------- Earnings -------------------------------- */
+
+function StudioEarnings({
+  principalId,
+  defaultSharePct,
+}: {
+  principalId: string;
+  defaultSharePct: number;
+}) {
+  const shares = useQuery({
+    queryKey: ["studio-earnings", principalId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("revenue_shares")
+        .select("id, item_title, gross_inr, share_pct, payout_inr, status, created_at")
+        .eq("principal_id", principalId)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const rows = shares.data ?? [];
+  const pending = rows
+    .filter((r) => r.status !== "paid")
+    .reduce((sum, r) => sum + (r.payout_inr ?? 0), 0);
+  const paid = rows
+    .filter((r) => r.status === "paid")
+    .reduce((sum, r) => sum + (r.payout_inr ?? 0), 0);
+
+  return (
+    <div className="space-y-5">
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="card-surface p-5">
+          <p className="text-xs text-muted-foreground">Your default share</p>
+          <p className="font-display text-2xl font-semibold">{defaultSharePct}%</p>
+        </div>
+        <div className="card-surface p-5">
+          <p className="text-xs text-muted-foreground">Awaiting payout</p>
+          <p className="font-display text-2xl font-semibold">₹{pending.toLocaleString("en-IN")}</p>
+        </div>
+        <div className="card-surface p-5">
+          <p className="text-xs text-muted-foreground">Paid out</p>
+          <p className="font-display text-2xl font-semibold">₹{paid.toLocaleString("en-IN")}</p>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+        All payments are collected by AceEdX first. Your share is calculated per sale and released by
+        the admin. Percentages are set by the admin and can differ per session or course.
+      </div>
+
+      {shares.isLoading ? (
+        <Skeleton className="h-40 rounded-2xl" />
+      ) : !rows.length ? (
+        <EmptyState
+          title="No earnings yet"
+          description="Once a paid seat is sold, your share appears here."
+        />
+      ) : (
+        <div className="card-surface divide-y divide-border">
+          {rows.map((r) => (
+            <div key={r.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
+              <div className="min-w-0">
+                <p className="truncate font-medium">{r.item_title}</p>
+                <p className="text-xs text-muted-foreground">
+                  {new Date(r.created_at).toLocaleDateString()} · Gross ₹
+                  {r.gross_inr.toLocaleString("en-IN")} · {r.share_pct}%
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="font-semibold">₹{r.payout_inr.toLocaleString("en-IN")}</p>
+                <p
+                  className={`text-xs ${r.status === "paid" ? "text-success" : "text-muted-foreground"}`}
+                >
+                  {r.status === "paid" ? "Paid" : "Pending"}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

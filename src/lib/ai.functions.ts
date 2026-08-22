@@ -10,7 +10,42 @@ type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
 const PLAIN_TEXT_RULE =
   "Write clean plain text only. Never use markdown: no asterisks, no bold or italic markers, no hash headings, no dash or bullet characters at the start of lines, no horizontal rules, no em dashes. Use short paragraphs, plain section titles on their own line, and numbers like 1. 2. 3. for lists.";
 
+type GatewayContent =
+  | string
+  | Array<
+      | { type: "text"; text: string }
+      | { type: "input_audio"; input_audio: { data: string; format: string } }
+    >;
+
+async function callGatewayRaw(
+  messages: { role: string; content: GatewayContent }[],
+  model = MODEL,
+) {
+  const apiKey = process.env["LOVABLE_API_KEY"];
+  if (!apiKey) throw new Error("The AI service is not configured yet.");
+
+  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({ model, messages }),
+  });
+
+  if (res.status === 429) throw new Error("The AI studio is busy right now. Please try again shortly.");
+  if (res.status === 402) throw new Error("AI credits are exhausted. Please top up to continue.");
+  if (!res.ok) {
+    const body = await res.text();
+    console.error("[ai] gateway error", res.status, body);
+    throw new Error("The AI service could not complete that request.");
+  }
+
+  const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+  const text = json.choices?.[0]?.message?.content?.trim();
+  if (!text) throw new Error("The AI service returned an empty response.");
+  return text;
+}
+
 async function callGateway(messages: ChatMessage[]) {
+
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) throw new Error("The AI service is not configured yet.");
 
@@ -323,4 +358,87 @@ All start and end values are whole seconds within the total length.`,
       count: clips.length,
     });
     return { clips };
+  });
+
+/* ------------------------- Description / summary writer --------------------- */
+
+const describeSchema = z.object({
+  kind: z.enum(["webinar", "masterclass", "workshop", "course"]),
+  title: z.string().min(3).max(300),
+  topic: z.string().max(120).optional(),
+  audience: z.string().max(200).optional(),
+  durationMin: z.number().int().min(5).max(600).optional(),
+});
+
+export const writeDescription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => describeSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const isCourse = data.kind === "course";
+    const prompt = `${isCourse ? "Course" : "Session"} title: ${data.title}
+Topic: ${data.topic ?? "School leadership"}
+Audience: ${data.audience ?? "School principals, owners and senior academic leaders in India"}
+${data.durationMin ? `Length: ${data.durationMin} minutes` : ""}
+
+Write ${isCourse ? "a course summary" : "a promotional description"} of 90 to 140 words in two short paragraphs.
+Paragraph one: what this ${isCourse ? "course" : "session"} covers and why it matters to a principal right now.
+Paragraph two: what the participant will be able to do afterwards.
+Plain prose only. No lists, no headings, no bullet characters, no asterisks, no dashes at line starts.`;
+
+    const output = await callGateway([
+      {
+        role: "system",
+        content:
+          "You write crisp, credible marketing copy for professional development programmes for school leaders in India. Practitioner tone, specific, never hype." +
+          " " +
+          PLAIN_TEXT_RULE,
+      },
+      { role: "user", content: prompt },
+    ]);
+
+    await logGeneration(context as unknown as LogContext, "description", data.title, output, {
+      kind: data.kind,
+    });
+    return { output };
+  });
+
+/* --------------------------------- Transcript -------------------------------- */
+
+const transcribeSchema = z.object({
+  audioBase64: z.string().min(100),
+  format: z.string().max(10).default("wav"),
+  title: z.string().max(300).optional(),
+});
+
+export const transcribeMedia = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => transcribeSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const raw = await callGatewayRaw([
+      {
+        role: "system",
+        content:
+          "You transcribe recordings of education webinars accurately. Return the spoken words only, as clean plain text in short paragraphs. Do not add commentary, headings, timestamps or markdown.",
+      },
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: `Transcribe this recording${data.title ? ` titled "${data.title}"` : ""}.`,
+          },
+          { type: "input_audio", input_audio: { data: data.audioBase64, format: data.format } },
+        ],
+      },
+    ]);
+
+    const output = toPlainText(raw);
+    await logGeneration(
+      context as unknown as LogContext,
+      "transcript_auto",
+      data.title ?? "recording",
+      output,
+      {},
+    );
+    return { output };
   });

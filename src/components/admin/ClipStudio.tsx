@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { planReelClips, type ClipSuggestion } from "@/lib/ai.functions";
+import { planReelClips, transcribeMedia, type ClipSuggestion } from "@/lib/ai.functions";
 import { publishLinkedInPost } from "@/lib/social.functions";
+import { extractWavBase64 } from "@/lib/audio-extract";
+
 
 const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
 
@@ -35,7 +37,7 @@ const SIZES: Record<Orientation, { w: number; h: number }> = {
   landscape: { w: 1280, h: 720 },
 };
 
-export function ClipStudio() {
+export function ClipStudio({ allowLinkedIn = true }: { allowLinkedIn?: boolean } = {}) {
   const qc = useQueryClient();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [sourceUrl, setSourceUrl] = useState("");
@@ -44,6 +46,7 @@ export function ClipStudio() {
   const [duration, setDuration] = useState(0);
   const [title, setTitle] = useState("");
   const [transcript, setTranscript] = useState("");
+  const [transcribing, setTranscribing] = useState(false);
   const [start, setStart] = useState(0);
   const [end, setEnd] = useState(45);
   const [orientation, setOrientation] = useState<Orientation>("vertical");
@@ -58,19 +61,46 @@ export function ClipStudio() {
   const [savedUrl, setSavedUrl] = useState("");
   const [busy, setBusy] = useState(false);
 
+  async function transcribe(source: File | Blob | string, label?: string) {
+    setTranscribing(true);
+    try {
+      const { base64 } = await extractWavBase64(source, 600);
+      const res = await transcribeMedia({
+        data: { audioBase64: base64, format: "wav", title: label || title || "Recording" },
+      });
+      setTranscript(res.output);
+      toast.success("Transcript generated");
+      return res.output;
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error instanceof Error
+          ? `Automatic transcript failed: ${error.message}`
+          : "Automatic transcript failed",
+      );
+      return "";
+    } finally {
+      setTranscribing(false);
+    }
+  }
+
   function loadFile(file: File) {
     const url = URL.createObjectURL(file);
     setSourceUrl(url);
     setSourceLabel(file.name);
     setIsRemote(false);
-    if (!title) setTitle(file.name.replace(/\.[^.]+$/, ""));
+    const label = file.name.replace(/\.[^.]+$/, "");
+    if (!title) setTitle(label);
+    void transcribe(file, label);
   }
 
   function loadRemote(url: string) {
     setSourceUrl(url);
     setSourceLabel(url);
     setIsRemote(true);
+    void transcribe(url);
   }
+
 
   async function plan() {
     if (!duration) {
@@ -229,6 +259,8 @@ export function ClipStudio() {
     if (!clipBlob) return;
     setBusy(true);
     try {
+      const { data: auth } = await supabase.auth.getUser();
+      const userId = auth.user?.id ?? null;
       const path = `clips/${Date.now()}-${(title || "clip").toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40)}.webm`;
       const { error: upErr } = await supabase.storage
         .from("media")
@@ -249,13 +281,16 @@ export function ClipStudio() {
         source_url: isRemote ? sourceUrl : null,
         clip_start_sec: Math.round(start),
         clip_end_sec: Math.round(end),
+        transcript: transcript.trim() || null,
         published: true,
+        created_by: userId,
       });
       if (insErr) throw insErr;
 
       setSavedUrl(signed.signedUrl);
       qc.invalidateQueries({ queryKey: ["admin-media"] });
       qc.invalidateQueries({ queryKey: ["media-library"] });
+      qc.invalidateQueries({ queryKey: ["studio-clips"] });
       toast.success("Clip saved to the media library");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not save the clip");
@@ -292,11 +327,13 @@ export function ClipStudio() {
       toast.error("Write or generate a caption first");
       return;
     }
+    const { data: auth } = await supabase.auth.getUser();
     const { error } = await supabase.from("social_publications").insert({
       channel,
       caption: caption.trim(),
       link_url: savedUrl || null,
       status: "scheduled",
+      created_by: auth.user?.id ?? null,
     });
     if (error) {
       toast.error(error.message);
@@ -305,6 +342,7 @@ export function ClipStudio() {
     toast.success(`Queued for ${channel}`);
     qc.invalidateQueries({ queryKey: ["admin-publications"] });
   }
+
 
   return (
     <div className="space-y-5">
@@ -351,9 +389,22 @@ export function ClipStudio() {
             <Input value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs">Transcript (optional, improves clip picks)</Label>
+            <div className="flex items-center justify-between">
+              <Label className="text-xs">
+                Transcript {transcribing ? "(generating automatically…)" : "(auto-generated)"}
+              </Label>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={!sourceUrl || transcribing}
+                onClick={() => void transcribe(isRemote ? sourceUrl : sourceUrl)}
+              >
+                <Sparkles className="h-3.5 w-3.5" /> Regenerate
+              </Button>
+            </div>
             <Textarea rows={2} value={transcript} onChange={(e) => setTranscript(e.target.value)} />
           </div>
+
         </div>
 
         {sourceUrl ? (
@@ -507,9 +558,17 @@ export function ClipStudio() {
                   <Download className="h-4 w-4" /> Download
                 </a>
               </Button>
-              <Button variant="outline" size="sm" onClick={postToLinkedIn} disabled={busy}>
-                <Linkedin className="h-4 w-4" /> Post to LinkedIn
-              </Button>
+              {allowLinkedIn && (
+                <Button variant="outline" size="sm" onClick={postToLinkedIn} disabled={busy}>
+                  <Linkedin className="h-4 w-4" /> Post to LinkedIn
+                </Button>
+              )}
+              {!allowLinkedIn && (
+                <Button variant="outline" size="sm" onClick={() => queueChannel("linkedin" as "instagram")}>
+                  <Linkedin className="h-4 w-4" /> Queue for LinkedIn
+                </Button>
+              )}
+
               <Button variant="outline" size="sm" onClick={() => queueChannel("instagram")}>
                 Queue for Instagram
               </Button>
