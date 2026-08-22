@@ -230,8 +230,39 @@ export const verifyPayment = createServerFn({ method: "POST" })
         .upsert({ user_id: userId, webinar_id: order.item_id }, { onConflict: "user_id,webinar_id" });
     }
 
+    // Revenue share: income lands with AceEdX first, then the admin releases the payout.
+    if ((order.item_type === "course" || order.item_type === "webinar") && order.item_id) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const table = order.item_type === "course" ? "courses" : "webinars";
+      const { data: item } = await supabaseAdmin
+        .from(table)
+        .select("principal_id, revenue_share_pct")
+        .eq("id", order.item_id)
+        .maybeSingle();
+      if (item?.principal_id) {
+        const { data: principal } = await supabaseAdmin
+          .from("resource_principals")
+          .select("revenue_share_pct")
+          .eq("id", item.principal_id)
+          .maybeSingle();
+        const pct = item.revenue_share_pct ?? principal?.revenue_share_pct ?? 0;
+        if (pct > 0) {
+          await supabaseAdmin.from("revenue_shares").insert({
+            principal_id: item.principal_id,
+            order_id: order.id,
+            item_title: order.item_title,
+            gross_inr: order.amount_inr,
+            share_pct: pct,
+            payout_inr: Math.round((order.amount_inr * pct) / 100),
+            status: "pending",
+          });
+        }
+      }
+    }
+
     const needsAdmin = order.item_type === "subscription" || Boolean(order.coupon_code);
     if (needsAdmin) {
+
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
       if (order.item_type === "subscription" && order.item_id) {
