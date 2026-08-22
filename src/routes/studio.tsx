@@ -24,6 +24,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { INTEREST_AREAS } from "@/lib/brand";
 import { useMembership, whatsappConfirmationUrl } from "@/lib/membership";
 import { ClipStudio } from "@/components/admin/ClipStudio";
+import { MediaLibraryAdmin } from "@/components/admin/MediaAdmin";
 import { AiDescriptionField } from "@/components/AiDescriptionField";
 
 
@@ -213,6 +214,7 @@ function StudioPage() {
           <TabsList className="mb-6 flex-wrap">
             <TabsTrigger value="webinars">Webinars & masterclasses</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
+            <TabsTrigger value="media">Video library</TabsTrigger>
             <TabsTrigger value="remix">Reels & posts</TabsTrigger>
             <TabsTrigger value="earnings">Earnings</TabsTrigger>
           </TabsList>
@@ -221,6 +223,9 @@ function StudioPage() {
           </TabsContent>
           <TabsContent value="courses">
             <StudioCourses principalId={principalId} />
+          </TabsContent>
+          <TabsContent value="media">
+            <MediaLibraryAdmin ownerOnly />
           </TabsContent>
           <TabsContent value="remix">
             <ClipStudio />

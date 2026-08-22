@@ -363,7 +363,7 @@ All start and end values are whole seconds within the total length.`,
 /* ------------------------- Description / summary writer --------------------- */
 
 const describeSchema = z.object({
-  kind: z.enum(["webinar", "masterclass", "workshop", "course"]),
+  kind: z.enum(["webinar", "masterclass", "workshop", "course", "media"]),
   title: z.string().min(3).max(300),
   topic: z.string().max(120).optional(),
   audience: z.string().max(200).optional(),

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Clapperboard, Play } from "lucide-react";
+import { Play } from "lucide-react";
 import { PageHeading, PageShell, EmptyState } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Pill } from "@/components/cards";
 import { toEmbedUrl } from "@/components/LessonMedia";
+import { MediaThumb } from "@/components/MediaThumb";
 import { supabase } from "@/integrations/supabase/client";
 
 type MediaAsset = {
@@ -36,7 +37,7 @@ const mediaQuery = {
   },
 };
 
-const FILTERS = ["All", "video", "reel", "podcast", "clip"] as const;
+const FILTERS = ["All", "video", "reel", "clip", "recording", "podcast"] as const;
 
 export const Route = createFileRoute("/media/")({
   head: () => ({
@@ -138,16 +139,11 @@ function MediaPage() {
                   className="group relative block aspect-video w-full bg-primary"
                   aria-label={`Play ${m.title}`}
                 >
-                  {m.thumbnail_url ? (
-                    <img
-                      src={m.thumbnail_url}
-                      alt={m.title}
-                      loading="lazy"
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <Clapperboard className="absolute inset-0 m-auto h-12 w-12 text-primary-foreground opacity-70" />
-                  )}
+                  <MediaThumb
+                    title={m.title}
+                    mediaType={m.media_type}
+                    thumbnailUrl={m.thumbnail_url}
+                  />
                   <span className="absolute inset-0 flex items-center justify-center bg-primary/30 opacity-0 transition-opacity group-hover:opacity-100">
                     <Play className="h-10 w-10 text-primary-foreground" />
                   </span>

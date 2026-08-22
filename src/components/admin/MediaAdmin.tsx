@@ -6,7 +6,6 @@ import { EmptyState } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,34 +16,55 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { AiDescriptionField } from "@/components/AiDescriptionField";
+import { MediaThumb } from "@/components/MediaThumb";
+import { deriveThumbnail } from "@/lib/media-thumb";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
-const MEDIA_TYPES = ["video", "reel", "recording", "podcast"];
+export const MEDIA_TYPES = ["video", "reel", "clip", "recording", "podcast"];
 const CHANNELS = ["linkedin", "instagram", "facebook", "youtube"];
 
-export function MediaLibraryAdmin() {
+/**
+ * Video library manager. Used by the admin console and, scoped to the signed-in
+ * Resource Principal (`ownerOnly`), by Principal Studio.
+ */
+export function MediaLibraryAdmin({ ownerOnly = false }: { ownerOnly?: boolean }) {
   const qc = useQueryClient();
+  const { user } = useAuth();
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [description, setDescription] = useState("");
+  const [thumbnail, setThumbnail] = useState("");
   const [mediaType, setMediaType] = useState("video");
   const [busy, setBusy] = useState(false);
 
+  function refresh() {
+    qc.invalidateQueries({ queryKey: ["admin-media"] });
+    qc.invalidateQueries({ queryKey: ["media-assets"] });
+    qc.invalidateQueries({ queryKey: ["media-library"] });
+  }
+
   const { data, isLoading } = useQuery({
-    queryKey: ["admin-media"],
+    queryKey: ["admin-media", ownerOnly ? (user?.id ?? "anon") : "all"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("media_assets")
-        .select("*")
-        .order("created_at", { ascending: false });
+      let query = supabase.from("media_assets").select("*");
+      if (ownerOnly && user) query = query.eq("created_by", user.id);
+      const { data, error } = await query.order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
+    enabled: !ownerOnly || Boolean(user),
   });
 
   async function add() {
     if (!title.trim() || !url.trim()) {
       toast.error("Title and link are required");
+      return;
+    }
+    if (!user) {
+      toast.error("Sign in again to upload media");
       return;
     }
     setBusy(true);
@@ -53,6 +73,9 @@ export function MediaLibraryAdmin() {
       url: url.trim(),
       description: description.trim() || null,
       media_type: mediaType,
+      thumbnail_url: thumbnail.trim() || deriveThumbnail(url.trim()),
+      published: true,
+      created_by: user.id,
     });
     setBusy(false);
     if (error) {
@@ -63,18 +86,17 @@ export function MediaLibraryAdmin() {
     setTitle("");
     setUrl("");
     setDescription("");
-    qc.invalidateQueries({ queryKey: ["admin-media"] });
-    qc.invalidateQueries({ queryKey: ["media-library"] });
+    setThumbnail("");
+    refresh();
   }
 
-  async function update(id: string, values: { published?: boolean }) {
+  async function update(id: string, values: { published?: boolean; thumbnail_url?: string | null }) {
     const { error } = await supabase.from("media_assets").update(values).eq("id", id);
     if (error) {
       toast.error(error.message);
       return;
     }
-    qc.invalidateQueries({ queryKey: ["admin-media"] });
-    qc.invalidateQueries({ queryKey: ["media-library"] });
+    refresh();
   }
 
   async function remove(id: string) {
@@ -84,9 +106,10 @@ export function MediaLibraryAdmin() {
       return;
     }
     toast.success("Removed");
-    qc.invalidateQueries({ queryKey: ["admin-media"] });
-    qc.invalidateQueries({ queryKey: ["media-library"] });
+    refresh();
   }
+
+  const previewThumb = thumbnail.trim() || (url.trim() ? deriveThumbnail(url.trim()) : null);
 
   return (
     <div className="space-y-5">
@@ -117,17 +140,43 @@ export function MediaLibraryAdmin() {
             </Select>
           </div>
           <div>
-            <Label className="text-xs">Description</Label>
-            <Textarea
-              rows={2}
+            <Label className="text-xs">Thumbnail image link (optional)</Label>
+            <Input
+              value={thumbnail}
+              onChange={(e) => setThumbnail(e.target.value)}
+              placeholder="Auto-detected for YouTube and Vimeo links"
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <AiDescriptionField
+              kind="media"
+              title={title}
+              topic={title}
+              label="Description"
+              rows={3}
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={setDescription}
             />
           </div>
         </div>
-        <Button variant="brand" size="sm" onClick={add} disabled={busy}>
-          <Plus className="h-4 w-4" /> {busy ? "Adding…" : "Add media"}
-        </Button>
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="aspect-video w-48 overflow-hidden rounded-xl border border-border">
+            <MediaThumb
+              title={title || "Your next leadership video"}
+              mediaType={mediaType}
+              thumbnailUrl={previewThumb}
+            />
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">
+              Preview of the cover learners will see. Without an image link we generate a text
+              thumbnail from the topic.
+            </p>
+            <Button variant="brand" size="sm" className="mt-3" onClick={add} disabled={busy}>
+              <Plus className="h-4 w-4" /> {busy ? "Adding…" : "Add media"}
+            </Button>
+          </div>
+        </div>
       </div>
 
       {isLoading ? (
@@ -138,11 +187,28 @@ export function MediaLibraryAdmin() {
         <div className="space-y-3">
           {data.map((m) => (
             <div key={m.id} className="card-surface flex flex-wrap items-center gap-4 p-4">
+              <div className="aspect-video w-32 shrink-0 overflow-hidden rounded-lg border border-border">
+                <MediaThumb
+                  title={m.title}
+                  mediaType={m.media_type}
+                  thumbnailUrl={m.thumbnail_url}
+                />
+              </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{m.title}</p>
                 <p className="truncate text-xs text-muted-foreground">
                   {m.media_type} · {m.url}
                 </p>
+                {!m.thumbnail_url && deriveThumbnail(m.url) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => update(m.id, { thumbnail_url: deriveThumbnail(m.url) })}
+                  >
+                    Use video thumbnail
+                  </Button>
+                )}
               </div>
               <label className="flex items-center gap-2 text-xs">
                 <Switch
