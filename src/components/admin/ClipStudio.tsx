@@ -389,9 +389,22 @@ export function ClipStudio({ allowLinkedIn = true }: { allowLinkedIn?: boolean }
             <Input value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs">Transcript (optional, improves clip picks)</Label>
+            <div className="flex items-center justify-between">
+              <Label className="text-xs">
+                Transcript {transcribing ? "(generating automatically…)" : "(auto-generated)"}
+              </Label>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={!sourceUrl || transcribing}
+                onClick={() => void transcribe(isRemote ? sourceUrl : sourceUrl)}
+              >
+                <Sparkles className="h-3.5 w-3.5" /> Regenerate
+              </Button>
+            </div>
             <Textarea rows={2} value={transcript} onChange={(e) => setTranscript(e.target.value)} />
           </div>
+
         </div>
 
         {sourceUrl ? (
