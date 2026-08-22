@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { planReelClips, type ClipSuggestion } from "@/lib/ai.functions";
+import { planReelClips, transcribeMedia, type ClipSuggestion } from "@/lib/ai.functions";
 import { publishLinkedInPost } from "@/lib/social.functions";
+import { extractWavBase64 } from "@/lib/audio-extract";
+
 
 const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
 
