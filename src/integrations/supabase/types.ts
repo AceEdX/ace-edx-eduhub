@@ -1816,6 +1816,15 @@ export type Database = {
         Returns: boolean
       }
       is_resource_principal: { Args: { _user_id: string }; Returns: boolean }
+      issue_certificate: {
+        Args: { _course_id?: string; _kind: string; _webinar_id?: string }
+        Returns: string
+      }
+      record_webinar_attendance: {
+        Args: { _minutes: number; _webinar_id: string }
+        Returns: boolean
+      }
+      sync_course_progress: { Args: { _course_id: string }; Returns: number }
       verify_certificate: {
         Args: { _certificate_id: string }
         Returns: {
