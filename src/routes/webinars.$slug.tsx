@@ -93,7 +93,7 @@ function WebinarDetail() {
   async function confirmRegistration(w: Webinar) {
     const { error } = await supabase
       .from("webinar_registrations")
-      .upsert({ user_id: user!.id, webinar_id: w.id }, { onConflict: "user_id,webinar_id" });
+      .upsert({ user_id: user!.id, webinar_id: w.id }, { onConflict: "user_id,webinar_id", ignoreDuplicates: true });
     if (error) {
       toast.error(error.message);
       return;

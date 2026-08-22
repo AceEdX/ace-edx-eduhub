@@ -226,12 +226,12 @@ export const verifyPayment = createServerFn({ method: "POST" })
     if (order.item_type === "course" && order.item_id) {
       await supabase
         .from("enrollments")
-        .upsert({ user_id: userId, course_id: order.item_id }, { onConflict: "user_id,course_id" });
+        .upsert({ user_id: userId, course_id: order.item_id }, { onConflict: "user_id,course_id", ignoreDuplicates: true });
     }
     if (order.item_type === "webinar" && order.item_id) {
       await supabase
         .from("webinar_registrations")
-        .upsert({ user_id: userId, webinar_id: order.item_id }, { onConflict: "user_id,webinar_id" });
+        .upsert({ user_id: userId, webinar_id: order.item_id }, { onConflict: "user_id,webinar_id", ignoreDuplicates: true });
     }
 
     // Revenue share: income lands with AceEdX first, then the admin releases the payout.
