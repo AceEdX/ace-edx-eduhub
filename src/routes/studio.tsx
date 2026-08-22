@@ -406,6 +406,8 @@ type StudioWebinar = {
   meeting_url: string | null;
   recording_url: string | null;
   program_type: string;
+  revenue_share_pct: number | null;
+
 };
 
 function StudioWebinarEditor({
