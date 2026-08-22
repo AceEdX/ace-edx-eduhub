@@ -156,7 +156,7 @@ function DashboardPage() {
                       </p>
                     </div>
                     <Button variant="brand" size="sm" asChild>
-                      <Link to="/learn/$slug" params={{ slug: e.courses.slug }}>
+                      <Link to="/learn/$slug" params={{ slug: e.courses?.slug ?? "" }}>
                         {e.progress > 0 ? "Resume" : "Start"}
                       </Link>
                     </Button>
