@@ -36,7 +36,7 @@ const mediaQuery = {
   },
 };
 
-const FILTERS = ["All", "video", "reel", "podcast", "clip"] as const;
+const FILTERS = ["All", "video", "reel", "clip", "recording", "podcast"] as const;
 
 export const Route = createFileRoute("/media/")({
   head: () => ({
