@@ -86,7 +86,10 @@ type WebinarRow = {
   status: string;
   meeting_url: string | null;
   recording_url: string | null;
+  principal_id: string | null;
+  revenue_share_pct: number | null;
 };
+
 
 type LessonRow = {
   id: string;
