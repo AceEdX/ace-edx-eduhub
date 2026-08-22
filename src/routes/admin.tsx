@@ -241,7 +241,7 @@ function CoursesAdmin() {
     queryFn: async (): Promise<CourseRow[]> => {
       const { data, error } = await supabase
         .from("courses")
-        .select("id, slug, title, summary, topic, level, price_inr, is_free, published, format, duration_hours, created_at")
+        .select("id, slug, title, summary, topic, level, price_inr, is_free, published, format, duration_hours, created_at, principal_id, revenue_share_pct")
         .order("title");
       if (error) throw error;
       return (data ?? []) as CourseRow[];
