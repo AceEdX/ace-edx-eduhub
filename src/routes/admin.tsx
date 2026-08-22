@@ -62,6 +62,9 @@ type CourseRow = {
   format: string;
   duration_hours: number;
   created_at: string;
+  principal_id: string | null;
+  revenue_share_pct: number | null;
+
 };
 
 function toLocalInput(value: string) {
