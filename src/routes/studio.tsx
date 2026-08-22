@@ -213,6 +213,7 @@ function StudioPage() {
             <TabsTrigger value="webinars">Webinars & masterclasses</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
             <TabsTrigger value="remix">Reels & posts</TabsTrigger>
+            <TabsTrigger value="earnings">Earnings</TabsTrigger>
           </TabsList>
           <TabsContent value="webinars">
             <StudioWebinars principalId={principalId} />
@@ -223,6 +224,13 @@ function StudioPage() {
           <TabsContent value="remix">
             <ClipStudio />
           </TabsContent>
+          <TabsContent value="earnings">
+            <StudioEarnings
+              principalId={principalId}
+              defaultSharePct={principal.data!.revenue_share_pct}
+            />
+          </TabsContent>
+
         </Tabs>
       </div>
     </PageShell>
