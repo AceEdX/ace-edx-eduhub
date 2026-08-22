@@ -10,7 +10,42 @@ type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
 const PLAIN_TEXT_RULE =
   "Write clean plain text only. Never use markdown: no asterisks, no bold or italic markers, no hash headings, no dash or bullet characters at the start of lines, no horizontal rules, no em dashes. Use short paragraphs, plain section titles on their own line, and numbers like 1. 2. 3. for lists.";
 
+type GatewayContent =
+  | string
+  | Array<
+      | { type: "text"; text: string }
+      | { type: "input_audio"; input_audio: { data: string; format: string } }
+    >;
+
+async function callGatewayRaw(
+  messages: { role: string; content: GatewayContent }[],
+  model = MODEL,
+) {
+  const apiKey = process.env["LOVABLE_API_KEY"];
+  if (!apiKey) throw new Error("The AI service is not configured yet.");
+
+  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({ model, messages }),
+  });
+
+  if (res.status === 429) throw new Error("The AI studio is busy right now. Please try again shortly.");
+  if (res.status === 402) throw new Error("AI credits are exhausted. Please top up to continue.");
+  if (!res.ok) {
+    const body = await res.text();
+    console.error("[ai] gateway error", res.status, body);
+    throw new Error("The AI service could not complete that request.");
+  }
+
+  const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+  const text = json.choices?.[0]?.message?.content?.trim();
+  if (!text) throw new Error("The AI service returned an empty response.");
+  return text;
+}
+
 async function callGateway(messages: ChatMessage[]) {
+
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) throw new Error("The AI service is not configured yet.");
 
