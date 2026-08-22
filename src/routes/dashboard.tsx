@@ -54,11 +54,12 @@ function DashboardPage() {
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as unknown as Array<{
+      return ((data ?? []) as unknown as Array<{
         id: string;
         progress: number;
-        courses: Course;
-      }>;
+        courses: Course | null;
+      }>).filter((e) => Boolean(e.courses));
+
     },
   });
 
