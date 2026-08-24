@@ -185,7 +185,7 @@ function MediaPage() {
           </DialogHeader>
           {playing && (
             <div className="overflow-hidden rounded-xl border border-border bg-primary">
-              {/\.(mp4|webm|ogg)$/i.test(playing.url) ? (
+              {isDirectVideoUrl(playing.url) ? (
                 <video className="aspect-video w-full" controls src={playing.url} />
               ) : (
                 <iframe
