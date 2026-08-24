@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Pill } from "@/components/cards";
-import { toEmbedUrl } from "@/components/LessonMedia";
+import { toEmbedUrl, isDirectVideoUrl } from "@/components/LessonMedia";
 import { MediaThumb } from "@/components/MediaThumb";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -185,7 +185,7 @@ function MediaPage() {
           </DialogHeader>
           {playing && (
             <div className="overflow-hidden rounded-xl border border-border bg-primary">
-              {/\.(mp4|webm|ogg)$/i.test(playing.url) ? (
+              {isDirectVideoUrl(playing.url) ? (
                 <video className="aspect-video w-full" controls src={playing.url} />
               ) : (
                 <iframe

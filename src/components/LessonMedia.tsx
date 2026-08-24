@@ -10,29 +10,52 @@ export type MediaLesson = {
 };
 
 export function toEmbedUrl(url: string): string | null {
+  const value = (url ?? "").trim();
+  if (!value) return null;
   try {
-    const u = new URL(url);
-    if (u.hostname.includes("youtube.com")) {
-      const id = u.searchParams.get("v");
-      if (id) return `https://www.youtube.com/embed/${id}`;
-      if (u.pathname.startsWith("/embed/")) return url;
+    const u = new URL(value);
+    const host = u.hostname.replace(/^www\./, "");
+
+    // YouTube in all its forms: watch, shorts, live, youtu.be, embed
+    if (host.endsWith("youtube.com") || host === "youtu.be" || host.endsWith("youtube-nocookie.com")) {
+      const id =
+        u.searchParams.get("v") ??
+        value.match(/(?:shorts\/|live\/|embed\/|youtu\.be\/)([\w-]{6,})/i)?.[1] ??
+        null;
+      const start = u.searchParams.get("t")?.replace(/[^\d]/g, "");
+      if (id) {
+        return `https://www.youtube.com/embed/${id}?rel=0${start ? `&start=${start}` : ""}`;
+      }
     }
-    if (u.hostname === "youtu.be") return `https://www.youtube.com/embed${u.pathname}`;
-    if (u.hostname.includes("vimeo.com") && !u.hostname.includes("player")) {
-      return `https://player.vimeo.com/video${u.pathname}`;
+
+    if (host.endsWith("vimeo.com") && !host.startsWith("player.")) {
+      const id = value.match(/vimeo\.com\/(?:video\/)?(\d+)/i)?.[1];
+      if (id) return `https://player.vimeo.com/video/${id}`;
     }
-    if (u.hostname.includes("drive.google.com")) {
-      const match = u.pathname.match(/\/d\/([^/]+)/);
-      if (match) return `https://drive.google.com/file/d/${match[1]}/preview`;
+
+    if (host.includes("drive.google.com")) {
+      const match = u.pathname.match(/\/d\/([^/]+)/) ?? [null, u.searchParams.get("id")];
+      if (match[1]) return `https://drive.google.com/file/d/${match[1]}/preview`;
     }
-    return url;
+
+    if (host.includes("docs.google.com")) return value.replace(/\/(edit|view).*$/, "/preview");
+
+    if (host.includes("loom.com")) return value.replace("/share/", "/embed/");
+
+    return value;
   } catch {
     return null;
   }
 }
 
+/** True when the URL points at a file the <video> element can play directly. */
+export function isDirectVideoUrl(url: string): boolean {
+  return /\.(mp4|webm|ogg|ogv|m4v|mov)(\?|#|$)/i.test((url ?? "").trim());
+}
+
+
 export function LessonMedia({ lesson }: { lesson: MediaLesson }) {
-  const isDirectVideo = Boolean(lesson.video_url && /\.(mp4|webm|ogg)$/i.test(lesson.video_url));
+  const isDirectVideo = Boolean(lesson.video_url && isDirectVideoUrl(lesson.video_url));
   const embed = lesson.video_url ? toEmbedUrl(lesson.video_url) : null;
 
   if (lesson.kind === "video" && lesson.video_url) {

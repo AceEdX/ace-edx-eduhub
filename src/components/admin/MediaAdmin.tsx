@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Send, Trash2 } from "lucide-react";
+import { Play, Plus, Send, Trash2 } from "lucide-react";
 import { EmptyState } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { AiDescriptionField } from "@/components/AiDescriptionField";
 import { MediaThumb } from "@/components/MediaThumb";
+import { toEmbedUrl, isDirectVideoUrl } from "@/components/LessonMedia";
+
 import { deriveThumbnail } from "@/lib/media-thumb";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,6 +41,8 @@ export function MediaLibraryAdmin({ ownerOnly = false }: { ownerOnly?: boolean }
   const [thumbnail, setThumbnail] = useState("");
   const [mediaType, setMediaType] = useState("video");
   const [busy, setBusy] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+
 
   function refresh() {
     qc.invalidateQueries({ queryKey: ["admin-media"] });
@@ -186,44 +190,70 @@ export function MediaLibraryAdmin({ ownerOnly = false }: { ownerOnly?: boolean }
       ) : (
         <div className="space-y-3">
           {data.map((m) => (
-            <div key={m.id} className="card-surface flex flex-wrap items-center gap-4 p-4">
-              <div className="aspect-video w-32 shrink-0 overflow-hidden rounded-lg border border-border">
-                <MediaThumb
-                  title={m.title}
-                  mediaType={m.media_type}
-                  thumbnailUrl={m.thumbnail_url}
-                />
+            <div key={m.id} className="card-surface space-y-3 p-4">
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="aspect-video w-32 shrink-0 overflow-hidden rounded-lg border border-border">
+                  <MediaThumb
+                    title={m.title}
+                    mediaType={m.media_type}
+                    thumbnailUrl={m.thumbnail_url}
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">{m.title}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {m.media_type} · {m.url}
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPreview(preview === m.id ? null : m.id)}
+                    >
+                      <Play className="h-4 w-4" /> {preview === m.id ? "Close" : "Play"}
+                    </Button>
+                    {!m.thumbnail_url && deriveThumbnail(m.url) && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => update(m.id, { thumbnail_url: deriveThumbnail(m.url) })}
+                      >
+                        Use video thumbnail
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <label className="flex items-center gap-2 text-xs">
+                  <Switch
+                    checked={m.published}
+                    onCheckedChange={(v) => update(m.id, { published: v })}
+                  />
+                  {m.published ? "Visible" : "Hidden"}
+                </label>
+                <Button variant="outline" size="sm" onClick={() => remove(m.id)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-medium">{m.title}</p>
-                <p className="truncate text-xs text-muted-foreground">
-                  {m.media_type} · {m.url}
-                </p>
-                {!m.thumbnail_url && deriveThumbnail(m.url) && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-2"
-                    onClick={() => update(m.id, { thumbnail_url: deriveThumbnail(m.url) })}
-                  >
-                    Use video thumbnail
-                  </Button>
-                )}
-              </div>
-              <label className="flex items-center gap-2 text-xs">
-                <Switch
-                  checked={m.published}
-                  onCheckedChange={(v) => update(m.id, { published: v })}
-                />
-                {m.published ? "Visible" : "Hidden"}
-              </label>
-              <Button variant="outline" size="sm" onClick={() => remove(m.id)}>
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              {preview === m.id && (
+                <div className="overflow-hidden rounded-xl border border-border bg-primary">
+                  {isDirectVideoUrl(m.url) ? (
+                    <video className="aspect-video w-full" controls src={m.url} />
+                  ) : (
+                    <iframe
+                      className="aspect-video w-full"
+                      src={toEmbedUrl(m.url) ?? m.url}
+                      title={m.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
+                      allowFullScreen
+                    />
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
       )}
+
     </div>
   );
 }
