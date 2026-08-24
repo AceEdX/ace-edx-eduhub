@@ -19,6 +19,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { AiDescriptionField } from "@/components/AiDescriptionField";
 import { MediaThumb } from "@/components/MediaThumb";
+import { toEmbedUrl, isDirectVideoUrl } from "@/components/LessonMedia";
+
 import { deriveThumbnail } from "@/lib/media-thumb";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
