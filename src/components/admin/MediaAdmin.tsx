@@ -41,6 +41,8 @@ export function MediaLibraryAdmin({ ownerOnly = false }: { ownerOnly?: boolean }
   const [thumbnail, setThumbnail] = useState("");
   const [mediaType, setMediaType] = useState("video");
   const [busy, setBusy] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+
 
   function refresh() {
     qc.invalidateQueries({ queryKey: ["admin-media"] });
