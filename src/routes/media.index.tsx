@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Pill } from "@/components/cards";
-import { toEmbedUrl } from "@/components/LessonMedia";
+import { toEmbedUrl, isDirectVideoUrl } from "@/components/LessonMedia";
 import { MediaThumb } from "@/components/MediaThumb";
 import { supabase } from "@/integrations/supabase/client";
 
