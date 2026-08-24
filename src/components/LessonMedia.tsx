@@ -55,7 +55,7 @@ export function isDirectVideoUrl(url: string): boolean {
 
 
 export function LessonMedia({ lesson }: { lesson: MediaLesson }) {
-  const isDirectVideo = Boolean(lesson.video_url && /\.(mp4|webm|ogg)$/i.test(lesson.video_url));
+  const isDirectVideo = Boolean(lesson.video_url && isDirectVideoUrl(lesson.video_url));
   const embed = lesson.video_url ? toEmbedUrl(lesson.video_url) : null;
 
   if (lesson.kind === "video" && lesson.video_url) {
