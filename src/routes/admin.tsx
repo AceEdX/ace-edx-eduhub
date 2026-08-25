@@ -34,6 +34,8 @@ import { AiStudioAdmin } from "@/components/admin/AiStudioAdmin";
 import { MediaAdmin } from "@/components/admin/MediaAdmin";
 import { MonetizationAdmin } from "@/components/admin/MonetizationAdmin";
 import { GrowthAdmin } from "@/components/admin/GrowthAdmin";
+import { CourseContentEditor } from "@/components/admin/CourseContent";
+import { SocialPostsPanel } from "@/components/admin/SocialPosts";
 
 
 export const Route = createFileRoute("/admin")({
@@ -93,20 +95,6 @@ type WebinarRow = {
   revenue_share_pct: number | null;
 };
 
-
-type LessonRow = {
-  id: string;
-  course_id: string;
-  module_title: string;
-  module_order: number;
-  title: string;
-  lesson_order: number;
-  kind: string;
-  duration_min: number;
-  content: string | null;
-  video_url: string | null;
-  document_url: string | null;
-};
 
 function AlertDot({ count }: { count?: number }) {
   if (!count) return null;
@@ -181,6 +169,7 @@ function AdminPage() {
             <TabsTrigger value="library">Library</TabsTrigger>
             <TabsTrigger value="ai">AI Studio</TabsTrigger>
             <TabsTrigger value="media">Media</TabsTrigger>
+            <TabsTrigger value="social">Social</TabsTrigger>
             <TabsTrigger value="monetization">Monetization</TabsTrigger>
             <TabsTrigger value="growth">
               Growth
@@ -196,7 +185,7 @@ function AdminPage() {
             <WebinarsAdmin />
           </TabsContent>
           <TabsContent value="content">
-            <ContentAdmin />
+            <CourseContentEditor />
           </TabsContent>
           <TabsContent value="verifications">
             <VerificationQueueAdmin />
@@ -215,6 +204,9 @@ function AdminPage() {
           </TabsContent>
           <TabsContent value="media">
             <MediaAdmin />
+          </TabsContent>
+          <TabsContent value="social">
+            <SocialPostsPanel />
           </TabsContent>
           <TabsContent value="monetization">
             <MonetizationAdmin />
