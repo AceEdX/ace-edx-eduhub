@@ -1820,6 +1820,14 @@ export type Database = {
         Args: { _course_id?: string; _kind: string; _webinar_id?: string }
         Returns: string
       }
+      principal_session_stats: {
+        Args: { _principal_id: string }
+        Returns: {
+          attended: number
+          registered: number
+          webinar_id: string
+        }[]
+      }
       record_webinar_attendance: {
         Args: { _minutes: number; _webinar_id: string }
         Returns: boolean
