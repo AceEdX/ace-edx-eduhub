@@ -17,7 +17,12 @@ export const publishLinkedInPost = createServerFn({ method: "POST" })
       _user_id: userId,
       _role: "admin",
     });
-    if (!isAdmin) throw new Error("Only admins can publish to LinkedIn.");
+    const { data: isPrincipal } = await supabase.rpc("is_resource_principal", {
+      _user_id: userId,
+    });
+    if (!isAdmin && !isPrincipal) {
+      throw new Error("Only admins and Resource Principals can publish to LinkedIn.");
+    }
 
     const lovableKey = process.env["LOVABLE_API_KEY"];
     const linkedInKey = process.env["LINKEDIN_API_KEY"];
