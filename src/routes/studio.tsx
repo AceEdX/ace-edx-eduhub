@@ -216,8 +216,10 @@ function StudioPage() {
           <TabsList className="mb-6 flex-wrap">
             <TabsTrigger value="webinars">Webinars & masterclasses</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
+            <TabsTrigger value="content">Course content</TabsTrigger>
             <TabsTrigger value="media">Video library</TabsTrigger>
-            <TabsTrigger value="remix">Reels & posts</TabsTrigger>
+            <TabsTrigger value="remix">Reels & clips</TabsTrigger>
+            <TabsTrigger value="social">Social posts</TabsTrigger>
             <TabsTrigger value="earnings">Earnings</TabsTrigger>
           </TabsList>
           <TabsContent value="webinars">
@@ -226,11 +228,17 @@ function StudioPage() {
           <TabsContent value="courses">
             <StudioCourses principalId={principalId} />
           </TabsContent>
+          <TabsContent value="content">
+            <CourseContentEditor principalId={principalId} />
+          </TabsContent>
           <TabsContent value="media">
             <MediaLibraryAdmin ownerOnly />
           </TabsContent>
           <TabsContent value="remix">
             <ClipStudio />
+          </TabsContent>
+          <TabsContent value="social">
+            <SocialPostsPanel ownerOnly />
           </TabsContent>
           <TabsContent value="earnings">
             <StudioEarnings
