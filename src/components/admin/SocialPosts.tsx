@@ -248,8 +248,7 @@ export function SocialPostsPanel({ ownerOnly = false }: { ownerOnly?: boolean })
             <div key={row.id} className="flex flex-wrap items-start justify-between gap-3 p-4">
               <div className="min-w-0 flex-1">
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  {row.channel} · {row.status} ·{" "}
-                  {new Date(row.created_at).toLocaleDateString()}
+                  {row.channel} · {row.status} · {new Date(row.created_at).toLocaleDateString()}
                 </p>
                 <p className="mt-1 line-clamp-3 whitespace-pre-wrap text-sm">{row.caption}</p>
                 {row.error && <p className="mt-1 text-xs text-destructive">{row.error}</p>}

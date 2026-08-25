@@ -36,7 +36,6 @@ import { GrowthAdmin } from "@/components/admin/GrowthAdmin";
 import { CourseContentEditor } from "@/components/admin/CourseContent";
 import { SocialPostsPanel } from "@/components/admin/SocialPosts";
 
-
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
@@ -68,7 +67,6 @@ type CourseRow = {
   created_at: string;
   principal_id: string | null;
   revenue_share_pct: number | null;
-
 };
 
 function toLocalInput(value: string) {
@@ -93,7 +91,6 @@ type WebinarRow = {
   principal_id: string | null;
   revenue_share_pct: number | null;
 };
-
 
 function AlertDot({ count }: { count?: number }) {
   if (!count) return null;
@@ -219,7 +216,6 @@ function AdminPage() {
           <TabsContent value="settings">
             <SettingsAdmin />
           </TabsContent>
-
         </Tabs>
       </div>
     </PageShell>
@@ -235,7 +231,9 @@ function CoursesAdmin() {
     queryFn: async (): Promise<CourseRow[]> => {
       const { data, error } = await supabase
         .from("courses")
-        .select("id, slug, title, summary, topic, level, price_inr, is_free, published, format, duration_hours, created_at, principal_id, revenue_share_pct")
+        .select(
+          "id, slug, title, summary, topic, level, price_inr, is_free, published, format, duration_hours, created_at, principal_id, revenue_share_pct",
+        )
         .order("title");
       if (error) throw error;
       return (data ?? []) as CourseRow[];
@@ -397,7 +395,6 @@ function CourseEditor({ course, onSaved }: { course: CourseRow; onSaved: () => v
           <Save className="h-4 w-4" /> {saving ? "Saving…" : "Save"}
         </Button>
       </div>
-
     </div>
   );
 }
@@ -422,7 +419,9 @@ function WebinarsAdmin() {
 
   if (isLoading) return <Skeleton className="h-64 rounded-2xl" />;
   if (!data?.length)
-    return <EmptyState title="No webinars yet" description="Webinars you create will appear here." />;
+    return (
+      <EmptyState title="No webinars yet" description="Webinars you create will appear here." />
+    );
 
   return (
     <div className="space-y-4">
@@ -446,7 +445,11 @@ function WebinarEditor({ webinar, onSaved }: { webinar: WebinarRow; onSaved: () 
     meeting_url: null,
     recording_url: null,
   });
-  useEffect(() => setRow((r) => ({ ...webinar, meeting_url: r.meeting_url, recording_url: r.recording_url })), [webinar]);
+  useEffect(
+    () =>
+      setRow((r) => ({ ...webinar, meeting_url: r.meeting_url, recording_url: r.recording_url })),
+    [webinar],
+  );
 
   const links = useWebinarLinks(webinar.id);
   useEffect(() => {
@@ -603,7 +606,6 @@ function WebinarEditor({ webinar, onSaved }: { webinar: WebinarRow; onSaved: () 
     </div>
   );
 }
-
 
 /* ---------------------------------- Orders ---------------------------------- */
 

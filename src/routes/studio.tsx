@@ -29,7 +29,6 @@ import { AiDescriptionField } from "@/components/AiDescriptionField";
 import { CourseContentEditor } from "@/components/admin/CourseContent";
 import { SocialPostsPanel } from "@/components/admin/SocialPosts";
 
-
 export const Route = createFileRoute("/studio")({
   head: () => ({
     meta: [
@@ -196,7 +195,8 @@ function StudioPage() {
           <div className="rounded-2xl border border-border bg-card p-5">
             <p className="text-sm font-semibold">Need a hand going live?</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Message the PrincipalX team on WhatsApp and we will set up your first session with you.
+              Message the PrincipalX team on WhatsApp and we will set up your first session with
+              you.
             </p>
             <Button variant="outline" size="sm" className="mt-3" asChild>
               <a
@@ -246,7 +246,6 @@ function StudioPage() {
               defaultSharePct={principal.data!.revenue_share_pct}
             />
           </TabsContent>
-
         </Tabs>
       </div>
     </PageShell>
@@ -319,7 +318,6 @@ function StudioWebinars({ principalId }: { principalId: string }) {
     toast.success("Draft created — add the details and publish when ready");
     qc.invalidateQueries({ queryKey: ["studio-webinars", principalId] });
   }
-
 
   return (
     <div className="space-y-5">
@@ -394,7 +392,6 @@ function StudioWebinars({ principalId }: { principalId: string }) {
         </div>
       </div>
 
-
       {list.isLoading ? (
         <Skeleton className="h-56 rounded-2xl" />
       ) : !list.data?.length ? (
@@ -431,7 +428,6 @@ type StudioWebinar = {
   recording_url?: string | null;
   program_type: string;
   revenue_share_pct: number | null;
-
 };
 
 function StudioWebinarEditor({
@@ -586,8 +582,10 @@ function StudioWebinarEditor({
         {!row.is_free && (
           <div className="sm:col-span-3 rounded-xl border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
             Payments for this session are collected by AceEdX. Your share
-            {row.revenue_share_pct !== null ? ` is ${row.revenue_share_pct}%` : " follows your agreed percentage"} and
-            is released by the admin from the Earnings tab.
+            {row.revenue_share_pct !== null
+              ? ` is ${row.revenue_share_pct}%`
+              : " follows your agreed percentage"}{" "}
+            and is released by the admin from the Earnings tab.
           </div>
         )}
 
@@ -608,9 +606,7 @@ function StudioWebinarEditor({
         </div>
         <div className="sm:col-span-3 grid gap-4 sm:grid-cols-2">
           <div>
-            <Label className="text-xs">
-              Live link (YouTube Live or Zoom join URL)
-            </Label>
+            <Label className="text-xs">Live link (YouTube Live or Zoom join URL)</Label>
             <Input
               value={row.meeting_url ?? ""}
               placeholder="https://youtube.com/live/… or https://zoom.us/j/…"
@@ -737,7 +733,6 @@ function StudioCourses({ principalId }: { principalId: string }) {
     qc.invalidateQueries({ queryKey: ["studio-courses", principalId] });
   }
 
-
   async function patch(course: StudioCourse, values: Partial<StudioCourse>) {
     const { error } = await supabase.from("courses").update(values).eq("id", course.id);
     if (error) {
@@ -819,7 +814,6 @@ function StudioCourses({ principalId }: { principalId: string }) {
         </div>
       </div>
 
-
       {list.isLoading ? (
         <Skeleton className="h-56 rounded-2xl" />
       ) : !list.data?.length ? (
@@ -883,7 +877,6 @@ function StudioCourses({ principalId }: { principalId: string }) {
                   onSave={(v) => void patch(c, { summary: v })}
                 />
               </div>
-
             </div>
             <div className="mt-4">
               <Button variant="outline" size="sm" asChild>
@@ -921,7 +914,6 @@ function CourseSummaryField({
       }}
     />
   );
-
 }
 
 /* --------------------------------- Earnings -------------------------------- */
@@ -972,8 +964,8 @@ function StudioEarnings({
       </div>
 
       <div className="rounded-xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-        All payments are collected by AceEdX first. Your share is calculated per sale and released by
-        the admin. Percentages are set by the admin and can differ per session or course.
+        All payments are collected by AceEdX first. Your share is calculated per sale and released
+        by the admin. Percentages are set by the admin and can differ per session or course.
       </div>
 
       {shares.isLoading ? (

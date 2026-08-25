@@ -36,7 +36,10 @@ export type LessonRow = {
 
 /** Uploads a file into the private media bucket and returns a long-lived signed URL. */
 async function uploadToMedia(file: File, folder: "lessons" | "uploads") {
-  const safe = file.name.toLowerCase().replace(/[^a-z0-9.]+/g, "-").slice(-60);
+  const safe = file.name
+    .toLowerCase()
+    .replace(/[^a-z0-9.]+/g, "-")
+    .slice(-60);
   const path = `${folder}/${Date.now()}-${safe}`;
   const { error } = await supabase.storage
     .from("media")
@@ -165,13 +168,7 @@ export function CourseContentEditor({ principalId }: { principalId?: string }) {
   );
 }
 
-export function LessonEditor({
-  lesson,
-  onChanged,
-}: {
-  lesson: LessonRow;
-  onChanged: () => void;
-}) {
+export function LessonEditor({ lesson, onChanged }: { lesson: LessonRow; onChanged: () => void }) {
   const [row, setRow] = useState(lesson);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -341,12 +338,13 @@ export function LessonEditor({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button variant="brand" size="sm" onClick={() => void save()} disabled={saving || uploading}>
-          {uploading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Save className="h-4 w-4" />
-          )}{" "}
+        <Button
+          variant="brand"
+          size="sm"
+          onClick={() => void save()}
+          disabled={saving || uploading}
+        >
+          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}{" "}
           {uploading ? "Uploading…" : saving ? "Saving…" : "Save lesson"}
         </Button>
         {(row.video_url || row.document_url) && (

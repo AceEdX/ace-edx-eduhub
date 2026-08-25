@@ -73,7 +73,9 @@ export const publishLinkedInPost = createServerFn({ method: "POST" })
           .update({ status: "failed", error: body.slice(0, 500) })
           .eq("id", data.publicationId);
       }
-      throw new Error(`LinkedIn could not publish the post [${postRes.status}]: ${body.slice(0, 300)}`);
+      throw new Error(
+        `LinkedIn could not publish the post [${postRes.status}]: ${body.slice(0, 300)}`,
+      );
     }
 
     const postId = postRes.headers.get("x-restli-id") ?? "";
