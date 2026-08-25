@@ -286,6 +286,19 @@ function StudioWebinars({ principalId }: { principalId: string }) {
     },
   });
 
+  const stats = useQuery({
+    queryKey: ["studio-session-stats", principalId],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("principal_session_stats", {
+        _principal_id: principalId,
+      });
+      if (error) throw error;
+      return Object.fromEntries(
+        (data ?? []).map((r) => [r.webinar_id, { registered: r.registered, attended: r.attended }]),
+      ) as Record<string, { registered: number; attended: number }>;
+    },
+  });
+
   async function create() {
     if (title.trim().length < 6) {
       toast.error("Give your session a clear title");
@@ -404,6 +417,7 @@ function StudioWebinars({ principalId }: { principalId: string }) {
           <StudioWebinarEditor
             key={w.id}
             webinar={w}
+            stats={stats.data?.[w.id] ?? null}
             onChanged={() => qc.invalidateQueries({ queryKey: ["studio-webinars", principalId] })}
           />
         ))
@@ -432,9 +446,11 @@ type StudioWebinar = {
 
 function StudioWebinarEditor({
   webinar,
+  stats,
   onChanged,
 }: {
   webinar: StudioWebinar;
+  stats: { registered: number; attended: number } | null;
   onChanged: () => void;
 }) {
   const [row, setRow] = useState<StudioWebinar>({
@@ -502,6 +518,7 @@ function StudioWebinarEditor({
           />
           <p className="mt-1 text-xs text-muted-foreground">
             {row.program_type} · {new Date(row.starts_at).toLocaleString()}
+            {stats ? ` · ${stats.registered} registered · ${stats.attended} attended` : ""}
           </p>
         </div>
         <div className="flex items-center gap-3">
