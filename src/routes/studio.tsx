@@ -26,7 +26,8 @@ import { useMembership, whatsappConfirmationUrl } from "@/lib/membership";
 import { ClipStudio } from "@/components/admin/ClipStudio";
 import { MediaLibraryAdmin } from "@/components/admin/MediaAdmin";
 import { AiDescriptionField } from "@/components/AiDescriptionField";
-
+import { CourseContentEditor } from "@/components/admin/CourseContent";
+import { SocialPostsPanel } from "@/components/admin/SocialPosts";
 
 export const Route = createFileRoute("/studio")({
   head: () => ({
@@ -194,7 +195,8 @@ function StudioPage() {
           <div className="rounded-2xl border border-border bg-card p-5">
             <p className="text-sm font-semibold">Need a hand going live?</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Message the PrincipalX team on WhatsApp and we will set up your first session with you.
+              Message the PrincipalX team on WhatsApp and we will set up your first session with
+              you.
             </p>
             <Button variant="outline" size="sm" className="mt-3" asChild>
               <a
@@ -214,8 +216,10 @@ function StudioPage() {
           <TabsList className="mb-6 flex-wrap">
             <TabsTrigger value="webinars">Webinars & masterclasses</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
+            <TabsTrigger value="content">Course content</TabsTrigger>
             <TabsTrigger value="media">Video library</TabsTrigger>
-            <TabsTrigger value="remix">Reels & posts</TabsTrigger>
+            <TabsTrigger value="remix">Reels & clips</TabsTrigger>
+            <TabsTrigger value="social">Social posts</TabsTrigger>
             <TabsTrigger value="earnings">Earnings</TabsTrigger>
           </TabsList>
           <TabsContent value="webinars">
@@ -224,11 +228,17 @@ function StudioPage() {
           <TabsContent value="courses">
             <StudioCourses principalId={principalId} />
           </TabsContent>
+          <TabsContent value="content">
+            <CourseContentEditor principalId={principalId} />
+          </TabsContent>
           <TabsContent value="media">
             <MediaLibraryAdmin ownerOnly />
           </TabsContent>
           <TabsContent value="remix">
             <ClipStudio />
+          </TabsContent>
+          <TabsContent value="social">
+            <SocialPostsPanel ownerOnly />
           </TabsContent>
           <TabsContent value="earnings">
             <StudioEarnings
@@ -236,7 +246,6 @@ function StudioPage() {
               defaultSharePct={principal.data!.revenue_share_pct}
             />
           </TabsContent>
-
         </Tabs>
       </div>
     </PageShell>
@@ -277,6 +286,19 @@ function StudioWebinars({ principalId }: { principalId: string }) {
     },
   });
 
+  const stats = useQuery({
+    queryKey: ["studio-session-stats", principalId],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("principal_session_stats", {
+        _principal_id: principalId,
+      });
+      if (error) throw error;
+      return Object.fromEntries(
+        (data ?? []).map((r) => [r.webinar_id, { registered: r.registered, attended: r.attended }]),
+      ) as Record<string, { registered: number; attended: number }>;
+    },
+  });
+
   async function create() {
     if (title.trim().length < 6) {
       toast.error("Give your session a clear title");
@@ -309,7 +331,6 @@ function StudioWebinars({ principalId }: { principalId: string }) {
     toast.success("Draft created — add the details and publish when ready");
     qc.invalidateQueries({ queryKey: ["studio-webinars", principalId] });
   }
-
 
   return (
     <div className="space-y-5">
@@ -384,7 +405,6 @@ function StudioWebinars({ principalId }: { principalId: string }) {
         </div>
       </div>
 
-
       {list.isLoading ? (
         <Skeleton className="h-56 rounded-2xl" />
       ) : !list.data?.length ? (
@@ -397,6 +417,7 @@ function StudioWebinars({ principalId }: { principalId: string }) {
           <StudioWebinarEditor
             key={w.id}
             webinar={w}
+            stats={stats.data?.[w.id] ?? null}
             onChanged={() => qc.invalidateQueries({ queryKey: ["studio-webinars", principalId] })}
           />
         ))
@@ -421,14 +442,15 @@ type StudioWebinar = {
   recording_url?: string | null;
   program_type: string;
   revenue_share_pct: number | null;
-
 };
 
 function StudioWebinarEditor({
   webinar,
+  stats,
   onChanged,
 }: {
   webinar: StudioWebinar;
+  stats: { registered: number; attended: number } | null;
   onChanged: () => void;
 }) {
   const [row, setRow] = useState<StudioWebinar>({
@@ -496,6 +518,7 @@ function StudioWebinarEditor({
           />
           <p className="mt-1 text-xs text-muted-foreground">
             {row.program_type} · {new Date(row.starts_at).toLocaleString()}
+            {stats ? ` · ${stats.registered} registered · ${stats.attended} attended` : ""}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -576,8 +599,10 @@ function StudioWebinarEditor({
         {!row.is_free && (
           <div className="sm:col-span-3 rounded-xl border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
             Payments for this session are collected by AceEdX. Your share
-            {row.revenue_share_pct !== null ? ` is ${row.revenue_share_pct}%` : " follows your agreed percentage"} and
-            is released by the admin from the Earnings tab.
+            {row.revenue_share_pct !== null
+              ? ` is ${row.revenue_share_pct}%`
+              : " follows your agreed percentage"}{" "}
+            and is released by the admin from the Earnings tab.
           </div>
         )}
 
@@ -598,9 +623,7 @@ function StudioWebinarEditor({
         </div>
         <div className="sm:col-span-3 grid gap-4 sm:grid-cols-2">
           <div>
-            <Label className="text-xs">
-              Live link (YouTube Live or Zoom join URL)
-            </Label>
+            <Label className="text-xs">Live link (YouTube Live or Zoom join URL)</Label>
             <Input
               value={row.meeting_url ?? ""}
               placeholder="https://youtube.com/live/… or https://zoom.us/j/…"
@@ -727,7 +750,6 @@ function StudioCourses({ principalId }: { principalId: string }) {
     qc.invalidateQueries({ queryKey: ["studio-courses", principalId] });
   }
 
-
   async function patch(course: StudioCourse, values: Partial<StudioCourse>) {
     const { error } = await supabase.from("courses").update(values).eq("id", course.id);
     if (error) {
@@ -809,7 +831,6 @@ function StudioCourses({ principalId }: { principalId: string }) {
         </div>
       </div>
 
-
       {list.isLoading ? (
         <Skeleton className="h-56 rounded-2xl" />
       ) : !list.data?.length ? (
@@ -873,7 +894,6 @@ function StudioCourses({ principalId }: { principalId: string }) {
                   onSave={(v) => void patch(c, { summary: v })}
                 />
               </div>
-
             </div>
             <div className="mt-4">
               <Button variant="outline" size="sm" asChild>
@@ -911,7 +931,6 @@ function CourseSummaryField({
       }}
     />
   );
-
 }
 
 /* --------------------------------- Earnings -------------------------------- */
@@ -962,8 +981,8 @@ function StudioEarnings({
       </div>
 
       <div className="rounded-xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-        All payments are collected by AceEdX first. Your share is calculated per sale and released by
-        the admin. Percentages are set by the admin and can differ per session or course.
+        All payments are collected by AceEdX first. Your share is calculated per sale and released
+        by the admin. Percentages are set by the admin and can differ per session or course.
       </div>
 
       {shares.isLoading ? (

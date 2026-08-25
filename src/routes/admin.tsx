@@ -1,13 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Save, Trash2 } from "lucide-react";
+import { Save, Trash2 } from "lucide-react";
 import { PageHeading, PageShell, EmptyState } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { AiDescriptionField } from "@/components/AiDescriptionField";
 
 import { Switch } from "@/components/ui/switch";
@@ -34,7 +33,8 @@ import { AiStudioAdmin } from "@/components/admin/AiStudioAdmin";
 import { MediaAdmin } from "@/components/admin/MediaAdmin";
 import { MonetizationAdmin } from "@/components/admin/MonetizationAdmin";
 import { GrowthAdmin } from "@/components/admin/GrowthAdmin";
-
+import { CourseContentEditor } from "@/components/admin/CourseContent";
+import { SocialPostsPanel } from "@/components/admin/SocialPosts";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -67,7 +67,6 @@ type CourseRow = {
   created_at: string;
   principal_id: string | null;
   revenue_share_pct: number | null;
-
 };
 
 function toLocalInput(value: string) {
@@ -91,21 +90,6 @@ type WebinarRow = {
   recording_url: string | null;
   principal_id: string | null;
   revenue_share_pct: number | null;
-};
-
-
-type LessonRow = {
-  id: string;
-  course_id: string;
-  module_title: string;
-  module_order: number;
-  title: string;
-  lesson_order: number;
-  kind: string;
-  duration_min: number;
-  content: string | null;
-  video_url: string | null;
-  document_url: string | null;
 };
 
 function AlertDot({ count }: { count?: number }) {
@@ -181,6 +165,7 @@ function AdminPage() {
             <TabsTrigger value="library">Library</TabsTrigger>
             <TabsTrigger value="ai">AI Studio</TabsTrigger>
             <TabsTrigger value="media">Media</TabsTrigger>
+            <TabsTrigger value="social">Social</TabsTrigger>
             <TabsTrigger value="monetization">Monetization</TabsTrigger>
             <TabsTrigger value="growth">
               Growth
@@ -196,7 +181,7 @@ function AdminPage() {
             <WebinarsAdmin />
           </TabsContent>
           <TabsContent value="content">
-            <ContentAdmin />
+            <CourseContentEditor />
           </TabsContent>
           <TabsContent value="verifications">
             <VerificationQueueAdmin />
@@ -216,6 +201,9 @@ function AdminPage() {
           <TabsContent value="media">
             <MediaAdmin />
           </TabsContent>
+          <TabsContent value="social">
+            <SocialPostsPanel />
+          </TabsContent>
           <TabsContent value="monetization">
             <MonetizationAdmin />
           </TabsContent>
@@ -228,7 +216,6 @@ function AdminPage() {
           <TabsContent value="settings">
             <SettingsAdmin />
           </TabsContent>
-
         </Tabs>
       </div>
     </PageShell>
@@ -244,7 +231,9 @@ function CoursesAdmin() {
     queryFn: async (): Promise<CourseRow[]> => {
       const { data, error } = await supabase
         .from("courses")
-        .select("id, slug, title, summary, topic, level, price_inr, is_free, published, format, duration_hours, created_at, principal_id, revenue_share_pct")
+        .select(
+          "id, slug, title, summary, topic, level, price_inr, is_free, published, format, duration_hours, created_at, principal_id, revenue_share_pct",
+        )
         .order("title");
       if (error) throw error;
       return (data ?? []) as CourseRow[];
@@ -406,7 +395,6 @@ function CourseEditor({ course, onSaved }: { course: CourseRow; onSaved: () => v
           <Save className="h-4 w-4" /> {saving ? "Saving…" : "Save"}
         </Button>
       </div>
-
     </div>
   );
 }
@@ -431,7 +419,9 @@ function WebinarsAdmin() {
 
   if (isLoading) return <Skeleton className="h-64 rounded-2xl" />;
   if (!data?.length)
-    return <EmptyState title="No webinars yet" description="Webinars you create will appear here." />;
+    return (
+      <EmptyState title="No webinars yet" description="Webinars you create will appear here." />
+    );
 
   return (
     <div className="space-y-4">
@@ -455,7 +445,11 @@ function WebinarEditor({ webinar, onSaved }: { webinar: WebinarRow; onSaved: () 
     meeting_url: null,
     recording_url: null,
   });
-  useEffect(() => setRow((r) => ({ ...webinar, meeting_url: r.meeting_url, recording_url: r.recording_url })), [webinar]);
+  useEffect(
+    () =>
+      setRow((r) => ({ ...webinar, meeting_url: r.meeting_url, recording_url: r.recording_url })),
+    [webinar],
+  );
 
   const links = useWebinarLinks(webinar.id);
   useEffect(() => {
@@ -608,254 +602,6 @@ function WebinarEditor({ webinar, onSaved }: { webinar: WebinarRow; onSaved: () 
             />
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------ Course content ------------------------------ */
-
-function ContentAdmin() {
-  const [courseId, setCourseId] = useState<string>("");
-  const qc = useQueryClient();
-
-  const courses = useQuery({
-    queryKey: ["admin-courses-basic"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("courses")
-        .select("id, title, format")
-        .order("title");
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-
-  const lessons = useQuery({
-    queryKey: ["admin-lessons", courseId],
-    enabled: Boolean(courseId),
-    queryFn: async (): Promise<LessonRow[]> => {
-      const { data, error } = await supabase
-        .from("lessons")
-        .select("*")
-        .eq("course_id", courseId)
-        .order("module_order")
-        .order("lesson_order");
-      if (error) throw error;
-      return (data ?? []) as LessonRow[];
-    },
-  });
-
-  const list = lessons.data ?? [];
-  const nextOrder = useMemo(
-    () => (list.length ? Math.max(...list.map((l) => l.lesson_order)) + 1 : 1),
-    [list],
-  );
-
-  async function addLesson() {
-    if (!courseId) return;
-    const { error } = await supabase.from("lessons").insert({
-      course_id: courseId,
-      module_title: list.at(-1)?.module_title ?? "Module 1",
-      module_order: list.at(-1)?.module_order ?? 1,
-      title: "New lesson",
-      lesson_order: nextOrder,
-      kind: "video",
-      duration_min: 10,
-    });
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success("Lesson added");
-    qc.invalidateQueries({ queryKey: ["admin-lessons", courseId] });
-  }
-
-  return (
-    <div className="space-y-5">
-      <div className="card-surface p-5">
-        <Label className="text-xs">Choose a course</Label>
-        <Select value={courseId} onValueChange={setCourseId}>
-          <SelectTrigger className="mt-1 max-w-xl">
-            <SelectValue placeholder="Select a course to edit its modules" />
-          </SelectTrigger>
-          <SelectContent>
-            {(courses.data ?? []).map((c) => (
-              <SelectItem key={c.id} value={c.id}>
-                {c.title}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {!courseId ? (
-        <EmptyState
-          title="Pick a course"
-          description="Select a course above to add videos, reading material and modules."
-        />
-      ) : lessons.isLoading ? (
-        <Skeleton className="h-64 rounded-2xl" />
-      ) : (
-        <>
-          <div className="flex justify-end">
-            <Button variant="brand" size="sm" onClick={addLesson}>
-              <Plus className="h-4 w-4" /> Add lesson
-            </Button>
-          </div>
-          {list.length === 0 ? (
-            <EmptyState
-              title="No lessons yet"
-              description="Add your first lesson and attach a video or document to it."
-            />
-          ) : (
-            <div className="space-y-4">
-              {list.map((lesson) => (
-                <LessonEditor
-                  key={lesson.id}
-                  lesson={lesson}
-                  onChanged={() => qc.invalidateQueries({ queryKey: ["admin-lessons", courseId] })}
-                />
-              ))}
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  );
-}
-
-function LessonEditor({ lesson, onChanged }: { lesson: LessonRow; onChanged: () => void }) {
-  const [row, setRow] = useState(lesson);
-  const [saving, setSaving] = useState(false);
-  useEffect(() => setRow(lesson), [lesson]);
-
-  async function save() {
-    setSaving(true);
-    const { error } = await supabase
-      .from("lessons")
-      .update({
-        module_title: row.module_title,
-        module_order: row.module_order,
-        title: row.title,
-        lesson_order: row.lesson_order,
-        kind: row.kind,
-        duration_min: row.duration_min,
-        content: row.content,
-        video_url: row.video_url,
-        document_url: row.document_url,
-      })
-      .eq("id", lesson.id);
-    setSaving(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success("Lesson saved");
-    onChanged();
-  }
-
-  async function remove() {
-    const { error } = await supabase.from("lessons").delete().eq("id", lesson.id);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success("Lesson deleted");
-    onChanged();
-  }
-
-  return (
-    <div className="card-surface space-y-4 p-5">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <Label className="text-xs">Module title</Label>
-          <Input
-            value={row.module_title}
-            onChange={(e) => setRow({ ...row, module_title: e.target.value })}
-          />
-        </div>
-        <div>
-          <Label className="text-xs">Lesson title</Label>
-          <Input value={row.title} onChange={(e) => setRow({ ...row, title: e.target.value })} />
-        </div>
-        <div className="grid grid-cols-3 gap-3">
-          <div>
-            <Label className="text-xs">Module #</Label>
-            <Input
-              type="number"
-              value={row.module_order}
-              onChange={(e) => setRow({ ...row, module_order: Number(e.target.value) })}
-            />
-          </div>
-          <div>
-            <Label className="text-xs">Lesson #</Label>
-            <Input
-              type="number"
-              value={row.lesson_order}
-              onChange={(e) => setRow({ ...row, lesson_order: Number(e.target.value) })}
-            />
-          </div>
-          <div>
-            <Label className="text-xs">Minutes</Label>
-            <Input
-              type="number"
-              value={row.duration_min}
-              onChange={(e) => setRow({ ...row, duration_min: Number(e.target.value) })}
-            />
-          </div>
-        </div>
-        <div>
-          <Label className="text-xs">Lesson type</Label>
-          <Select value={row.kind} onValueChange={(v) => setRow({ ...row, kind: v })}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="video">Video</SelectItem>
-              <SelectItem value="document">Document / reading</SelectItem>
-              <SelectItem value="quiz">Quiz</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {row.kind === "video" ? (
-        <div>
-          <Label className="text-xs">Video URL (YouTube, Vimeo or direct MP4)</Label>
-          <Input
-            value={row.video_url ?? ""}
-            placeholder="https://www.youtube.com/watch?v=…"
-            onChange={(e) => setRow({ ...row, video_url: e.target.value })}
-          />
-        </div>
-      ) : (
-        <div>
-          <Label className="text-xs">Document URL (PDF or slides — optional)</Label>
-          <Input
-            value={row.document_url ?? ""}
-            placeholder="https://…/handbook.pdf"
-            onChange={(e) => setRow({ ...row, document_url: e.target.value })}
-          />
-        </div>
-      )}
-
-      <div>
-        <Label className="text-xs">Lesson notes / reading content</Label>
-        <Textarea
-          rows={4}
-          value={row.content ?? ""}
-          onChange={(e) => setRow({ ...row, content: e.target.value })}
-        />
-      </div>
-
-      <div className="flex gap-2">
-        <Button variant="brand" size="sm" onClick={save} disabled={saving}>
-          <Save className="h-4 w-4" /> {saving ? "Saving…" : "Save lesson"}
-        </Button>
-        <Button variant="outline" size="sm" onClick={remove}>
-          <Trash2 className="h-4 w-4" /> Delete
-        </Button>
       </div>
     </div>
   );
