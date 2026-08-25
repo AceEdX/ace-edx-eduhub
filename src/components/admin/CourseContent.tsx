@@ -361,10 +361,13 @@ export function LessonEditor({
 
       {preview && (
         <LessonMedia
-          kind={row.kind}
-          videoUrl={row.video_url}
-          documentUrl={row.document_url}
-          title={row.title}
+          lesson={{
+            title: row.title,
+            kind: row.kind,
+            duration_min: row.duration_min,
+            video_url: row.video_url,
+            document_url: row.document_url,
+          }}
         />
       )}
     </div>
