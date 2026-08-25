@@ -26,6 +26,8 @@ import { useMembership, whatsappConfirmationUrl } from "@/lib/membership";
 import { ClipStudio } from "@/components/admin/ClipStudio";
 import { MediaLibraryAdmin } from "@/components/admin/MediaAdmin";
 import { AiDescriptionField } from "@/components/AiDescriptionField";
+import { CourseContentEditor } from "@/components/admin/CourseContent";
+import { SocialPostsPanel } from "@/components/admin/SocialPosts";
 
 
 export const Route = createFileRoute("/studio")({
