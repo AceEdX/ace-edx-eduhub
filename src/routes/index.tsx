@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, CheckCircle2, MessageCircle, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, MessageCircle, PlayCircle, Sparkles } from "lucide-react";
 import heroImage from "@/assets/hero-leaders.jpg";
 import { PageShell } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/button";
@@ -181,9 +181,15 @@ function HomePage() {
                 <Link to="/courses">Explore learning</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
+                <Link to="/how-it-works">
+                  <PlayCircle className="h-4 w-4" /> Watch demo
+                </Link>
+              </Button>
+              <Button size="lg" variant="ghost" asChild>
                 <Link to="/community">Join the community</Link>
               </Button>
             </div>
+
             <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
               {["Verifiable certificates", "Live expert webinars", "Peer community"].map((i) => (
                 <li key={i} className="inline-flex items-center gap-2">
