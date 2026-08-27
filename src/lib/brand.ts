@@ -29,7 +29,9 @@ export const NAV_LINKS = [
   { to: "/resource-principals", label: "Resource Principals" },
   { to: "/resources", label: "Resources" },
   { to: "/assistant", label: "AI Assistant" },
+  { to: "/how-it-works", label: "How it works" },
   { to: "/pricing", label: "Pricing" },
+
 ] as const;
 
 

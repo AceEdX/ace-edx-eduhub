@@ -18,6 +18,7 @@ import { Route as CertificatesRouteImport } from './routes/certificates'
 import { Route as CookiePolicyRouteImport } from './routes/cookie-policy'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as LearningHubRouteImport } from './routes/learning-hub'
 import { Route as MyLearningRouteImport } from './routes/my-learning'
 import { Route as PricingRouteImport } from './routes/pricing'
@@ -87,6 +88,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const DisclaimerRoute = DisclaimerRouteImport.update({
   id: '/disclaimer',
   path: '/disclaimer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearningHubRoute = LearningHubRouteImport.update({
@@ -220,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/cookie-policy': typeof CookiePolicyRoute
   '/dashboard': typeof DashboardRoute
   '/disclaimer': typeof DisclaimerRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/learning-hub': typeof LearningHubRoute
   '/my-learning': typeof MyLearningRoute
   '/pricing': typeof PricingRoute
@@ -255,6 +262,7 @@ export interface FileRoutesByTo {
   '/cookie-policy': typeof CookiePolicyRoute
   '/dashboard': typeof DashboardRoute
   '/disclaimer': typeof DisclaimerRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/learning-hub': typeof LearningHubRoute
   '/my-learning': typeof MyLearningRoute
   '/pricing': typeof PricingRoute
@@ -291,6 +299,7 @@ export interface FileRoutesById {
   '/cookie-policy': typeof CookiePolicyRoute
   '/dashboard': typeof DashboardRoute
   '/disclaimer': typeof DisclaimerRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/learning-hub': typeof LearningHubRoute
   '/my-learning': typeof MyLearningRoute
   '/pricing': typeof PricingRoute
@@ -328,6 +337,7 @@ export interface FileRouteTypes {
     | '/cookie-policy'
     | '/dashboard'
     | '/disclaimer'
+    | '/how-it-works'
     | '/learning-hub'
     | '/my-learning'
     | '/pricing'
@@ -363,6 +373,7 @@ export interface FileRouteTypes {
     | '/cookie-policy'
     | '/dashboard'
     | '/disclaimer'
+    | '/how-it-works'
     | '/learning-hub'
     | '/my-learning'
     | '/pricing'
@@ -398,6 +409,7 @@ export interface FileRouteTypes {
     | '/cookie-policy'
     | '/dashboard'
     | '/disclaimer'
+    | '/how-it-works'
     | '/learning-hub'
     | '/my-learning'
     | '/pricing'
@@ -434,6 +446,7 @@ export interface RootRouteChildren {
   CookiePolicyRoute: typeof CookiePolicyRoute
   DashboardRoute: typeof DashboardRoute
   DisclaimerRoute: typeof DisclaimerRoute
+  HowItWorksRoute: typeof HowItWorksRoute
   LearningHubRoute: typeof LearningHubRoute
   MyLearningRoute: typeof MyLearningRoute
   PricingRoute: typeof PricingRoute
@@ -523,6 +536,13 @@ declare module '@tanstack/react-router' {
       path: '/disclaimer'
       fullPath: '/disclaimer'
       preLoaderRoute: typeof DisclaimerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learning-hub': {
@@ -706,6 +726,7 @@ const rootRouteChildren: RootRouteChildren = {
   CookiePolicyRoute: CookiePolicyRoute,
   DashboardRoute: DashboardRoute,
   DisclaimerRoute: DisclaimerRoute,
+  HowItWorksRoute: HowItWorksRoute,
   LearningHubRoute: LearningHubRoute,
   MyLearningRoute: MyLearningRoute,
   PricingRoute: PricingRoute,
