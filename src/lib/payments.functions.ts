@@ -342,6 +342,26 @@ export const verifyPayment = createServerFn({ method: "POST" })
       link,
     });
 
+    // Confirmation email with the access link (managed sending).
+    const recipientEmail = (context.claims as { email?: string } | undefined)?.email;
+    if (recipientEmail) {
+      try {
+        const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+        await sendTemplateEmail("payment-confirmation", recipientEmail, {
+          idempotencyKey: `payment-confirmation-${order.id}`,
+          templateData: {
+            itemTitle: order.item_title,
+            amountInr: order.amount_inr,
+            paymentId: data.razorpayPaymentId,
+            accessUrl: `https://eduhub.aceedx.com${link}`,
+            itemType: order.item_type,
+          },
+        });
+      } catch (error) {
+        console.error("[email] payment confirmation failed", error);
+      }
+    }
+
     return {
       ok: true,
       itemType: order.item_type,
