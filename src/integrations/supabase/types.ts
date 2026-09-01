@@ -1653,31 +1653,306 @@ export type Database = {
         }
         Relationships: []
       }
-      webinar_registrations: {
+      webinar_chat: {
         Row: {
-          attendance_minutes: number
-          attended: boolean
+          author_name: string
+          body: string
           created_at: string
           id: string
-          joined_at: string | null
+          is_host: boolean
           user_id: string
           webinar_id: string
         }
         Insert: {
-          attendance_minutes?: number
-          attended?: boolean
+          author_name: string
+          body: string
           created_at?: string
           id?: string
-          joined_at?: string | null
+          is_host?: boolean
           user_id: string
           webinar_id: string
         }
         Update: {
-          attendance_minutes?: number
-          attended?: boolean
+          author_name?: string
+          body?: string
           created_at?: string
           id?: string
+          is_host?: boolean
+          user_id?: string
+          webinar_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webinar_chat_webinar_id_fkey"
+            columns: ["webinar_id"]
+            isOneToOne: false
+            referencedRelation: "webinars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webinar_email_jobs: {
+        Row: {
+          attempts: number
+          created_at: string
+          error: string | null
+          id: string
+          send_after: string
+          sent_at: string | null
+          status: string
+          template: string
+          user_id: string
+          webinar_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          send_after: string
+          sent_at?: string | null
+          status?: string
+          template: string
+          user_id: string
+          webinar_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          send_after?: string
+          sent_at?: string | null
+          status?: string
+          template?: string
+          user_id?: string
+          webinar_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webinar_email_jobs_webinar_id_fkey"
+            columns: ["webinar_id"]
+            isOneToOne: false
+            referencedRelation: "webinars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webinar_handouts: {
+        Row: {
+          created_at: string
+          id: string
+          title: string
+          url: string
+          webinar_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title: string
+          url: string
+          webinar_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string
+          url?: string
+          webinar_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webinar_handouts_webinar_id_fkey"
+            columns: ["webinar_id"]
+            isOneToOne: false
+            referencedRelation: "webinars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webinar_poll_votes: {
+        Row: {
+          created_at: string
+          id: string
+          option_index: number
+          poll_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          option_index: number
+          poll_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          option_index?: number
+          poll_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webinar_poll_votes_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "webinar_polls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webinar_polls: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          options: string[]
+          question: string
+          webinar_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          options?: string[]
+          question: string
+          webinar_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          options?: string[]
+          question?: string
+          webinar_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webinar_polls_webinar_id_fkey"
+            columns: ["webinar_id"]
+            isOneToOne: false
+            referencedRelation: "webinars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webinar_question_votes: {
+        Row: {
+          created_at: string
+          id: string
+          question_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          question_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          question_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webinar_question_votes_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "webinar_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webinar_questions: {
+        Row: {
+          answer: string | null
+          answered: boolean
+          author_name: string
+          body: string
+          created_at: string
+          dismissed: boolean
+          id: string
+          upvotes: number
+          user_id: string
+          webinar_id: string
+        }
+        Insert: {
+          answer?: string | null
+          answered?: boolean
+          author_name: string
+          body: string
+          created_at?: string
+          dismissed?: boolean
+          id?: string
+          upvotes?: number
+          user_id: string
+          webinar_id: string
+        }
+        Update: {
+          answer?: string | null
+          answered?: boolean
+          author_name?: string
+          body?: string
+          created_at?: string
+          dismissed?: boolean
+          id?: string
+          upvotes?: number
+          user_id?: string
+          webinar_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webinar_questions_webinar_id_fkey"
+            columns: ["webinar_id"]
+            isOneToOne: false
+            referencedRelation: "webinars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webinar_registrations: {
+        Row: {
+          answers: Json
+          approved: boolean
+          attendance_minutes: number
+          attendance_seconds: number
+          attended: boolean
+          created_at: string
+          cta_clicks: number
+          id: string
+          joined_at: string | null
+          last_seen_at: string | null
+          user_id: string
+          webinar_id: string
+        }
+        Insert: {
+          answers?: Json
+          approved?: boolean
+          attendance_minutes?: number
+          attendance_seconds?: number
+          attended?: boolean
+          created_at?: string
+          cta_clicks?: number
+          id?: string
           joined_at?: string | null
+          last_seen_at?: string | null
+          user_id: string
+          webinar_id: string
+        }
+        Update: {
+          answers?: Json
+          approved?: boolean
+          attendance_minutes?: number
+          attendance_seconds?: number
+          attended?: boolean
+          created_at?: string
+          cta_clicks?: number
+          id?: string
+          joined_at?: string | null
+          last_seen_at?: string | null
           user_id?: string
           webinar_id?: string
         }
@@ -1693,8 +1968,14 @@ export type Database = {
       }
       webinars: {
         Row: {
+          agenda: string | null
+          approval_status: string
+          attendance_threshold_pct: number
           certificate: boolean
           created_at: string
+          cta_active: boolean
+          cta_label: string | null
+          cta_url: string | null
           description: string | null
           duration_min: number
           expert_id: string | null
@@ -1703,24 +1984,38 @@ export type Database = {
           id: string
           image_url: string | null
           is_free: boolean
+          live_ended_at: string | null
+          live_started_at: string | null
           meeting_url: string | null
+          pinned_message: string | null
           price_inr: number
           principal_id: string | null
           program_type: string
           published: boolean
           recording_url: string | null
           registered_count: number
+          registration_questions: Json
           revenue_share_pct: number | null
+          seat_cap: number | null
+          session_type: string
           slug: string
           starts_at: string
           status: string
           stream_provider: string
+          timezone: string
           title: string
           topic: string
+          waiting_room_min: number
         }
         Insert: {
+          agenda?: string | null
+          approval_status?: string
+          attendance_threshold_pct?: number
           certificate?: boolean
           created_at?: string
+          cta_active?: boolean
+          cta_label?: string | null
+          cta_url?: string | null
           description?: string | null
           duration_min?: number
           expert_id?: string | null
@@ -1729,24 +2024,38 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_free?: boolean
+          live_ended_at?: string | null
+          live_started_at?: string | null
           meeting_url?: string | null
+          pinned_message?: string | null
           price_inr?: number
           principal_id?: string | null
           program_type?: string
           published?: boolean
           recording_url?: string | null
           registered_count?: number
+          registration_questions?: Json
           revenue_share_pct?: number | null
+          seat_cap?: number | null
+          session_type?: string
           slug: string
           starts_at: string
           status?: string
           stream_provider?: string
+          timezone?: string
           title: string
           topic?: string
+          waiting_room_min?: number
         }
         Update: {
+          agenda?: string | null
+          approval_status?: string
+          attendance_threshold_pct?: number
           certificate?: boolean
           created_at?: string
+          cta_active?: boolean
+          cta_label?: string | null
+          cta_url?: string | null
           description?: string | null
           duration_min?: number
           expert_id?: string | null
@@ -1755,20 +2064,28 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_free?: boolean
+          live_ended_at?: string | null
+          live_started_at?: string | null
           meeting_url?: string | null
+          pinned_message?: string | null
           price_inr?: number
           principal_id?: string | null
           program_type?: string
           published?: boolean
           recording_url?: string | null
           registered_count?: number
+          registration_questions?: Json
           revenue_share_pct?: number | null
+          seat_cap?: number | null
+          session_type?: string
           slug?: string
           starts_at?: string
           status?: string
           stream_provider?: string
+          timezone?: string
           title?: string
           topic?: string
+          waiting_room_min?: number
         }
         Relationships: [
           {
@@ -1792,6 +2109,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_manage_webinar: {
+        Args: { _user_id: string; _webinar_id: string }
+        Returns: boolean
+      }
       course_outline: {
         Args: { _course_id: string }
         Returns: {
@@ -1816,6 +2137,10 @@ export type Database = {
         Returns: boolean
       }
       is_resource_principal: { Args: { _user_id: string }; Returns: boolean }
+      is_webinar_registrant: {
+        Args: { _user_id: string; _webinar_id: string }
+        Returns: boolean
+      }
       issue_certificate: {
         Args: { _course_id?: string; _kind: string; _webinar_id?: string }
         Returns: string
@@ -1832,6 +2157,14 @@ export type Database = {
         Args: { _minutes: number; _webinar_id: string }
         Returns: boolean
       }
+      record_webinar_cta_click: {
+        Args: { _webinar_id: string }
+        Returns: undefined
+      }
+      register_for_webinar: {
+        Args: { _answers?: Json; _webinar_id: string }
+        Returns: boolean
+      }
       sync_course_progress: { Args: { _course_id: string }; Returns: number }
       verify_certificate: {
         Args: { _certificate_id: string }
@@ -1845,6 +2178,41 @@ export type Database = {
           revoked: boolean
           speaker: string
           title: string
+        }[]
+      }
+      webinar_analytics: {
+        Args: { _webinar_id: string }
+        Returns: {
+          attended: number
+          avg_watch_min: number
+          chat_messages: number
+          cta_clicks: number
+          gross_inr: number
+          live_now: number
+          payout_inr: number
+          questions: number
+          registered: number
+          show_up_pct: number
+        }[]
+      }
+      webinar_attendees: {
+        Args: { _webinar_id: string }
+        Returns: {
+          answers: Json
+          attendance_minutes: number
+          attended: boolean
+          city: string
+          full_name: string
+          joined_at: string
+          registered_at: string
+          school_name: string
+        }[]
+      }
+      webinar_heartbeat: {
+        Args: { _webinar_id: string }
+        Returns: {
+          is_attended: boolean
+          seconds_watched: number
         }[]
       }
       webinar_links: {
