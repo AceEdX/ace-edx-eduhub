@@ -229,9 +229,8 @@ export const verifyPayment = createServerFn({ method: "POST" })
         .upsert({ user_id: userId, course_id: order.item_id }, { onConflict: "user_id,course_id", ignoreDuplicates: true });
     }
     if (order.item_type === "webinar" && order.item_id) {
-      await supabase
-        .from("webinar_registrations")
-        .upsert({ user_id: userId, webinar_id: order.item_id }, { onConflict: "user_id,webinar_id", ignoreDuplicates: true });
+      // Registers the buyer, enforces the seat cap and schedules the reminder emails.
+      await supabase.rpc("register_for_webinar", { _webinar_id: order.item_id });
     }
 
     // Revenue share: income lands with AceEdX first, then the admin releases the payout.

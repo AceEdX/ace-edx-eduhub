@@ -15,6 +15,7 @@ export type AdminAlerts = {
   principals: number;
   moderation: number;
   growth: number;
+  webinars: number;
 };
 
 /** Counts of items waiting on an admin decision, used for the green dots. */
@@ -24,18 +25,20 @@ export function useAdminAlerts(enabled: boolean) {
     enabled,
     refetchInterval: 60_000,
     queryFn: async () => {
-      const [verifications, principals, reports, speakers, sponsorships] = await Promise.all([
+      const [verifications, principals, reports, speakers, sponsorships, webinars] = await Promise.all([
         countRows("school_verifications", "status", ["pending"]),
         countRows("resource_principal_applications", "status", ["under_review", "pending"]),
         countRows("content_reports", "status", ["open", "pending"]),
         countRows("speaker_requests", "status", ["new", "pending"]),
         countRows("sponsorships", "status", ["new", "pending"]),
+        countRows("webinars", "approval_status", ["pending"]),
       ]);
       return {
         verifications,
         principals,
         moderation: reports,
         growth: speakers + sponsorships,
+        webinars,
       };
     },
   });
