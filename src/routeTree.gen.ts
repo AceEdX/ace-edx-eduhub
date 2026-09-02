@@ -43,6 +43,7 @@ import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
 import { Route as VerifyCertificateIdRouteImport } from './routes/verify.$certificateId'
 import { Route as WebinarsIndexRouteImport } from './routes/webinars.index'
 import { Route as WebinarsSlugRouteImport } from './routes/webinars.$slug'
+import { Route as ApiPublicWebinarRemindersRouteImport } from './routes/api/public/webinar-reminders'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -218,6 +219,12 @@ const WebinarsSlugRoute = WebinarsSlugRouteImport.update({
   path: '/webinars/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicWebinarRemindersRoute =
+  ApiPublicWebinarRemindersRouteImport.update({
+    id: '/api/public/webinar-reminders',
+    path: '/api/public/webinar-reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   id: '/lovable/email/auth/preview',
   path: '/lovable/email/auth/preview',
@@ -270,6 +277,7 @@ export interface FileRoutesByFullPath {
   '/resource-principals/': typeof ResourcePrincipalsIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/webinars/': typeof WebinarsIndexRoute
+  '/api/public/webinar-reminders': typeof ApiPublicWebinarRemindersRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -309,6 +317,7 @@ export interface FileRoutesByTo {
   '/resource-principals': typeof ResourcePrincipalsIndexRoute
   '/resources': typeof ResourcesIndexRoute
   '/webinars': typeof WebinarsIndexRoute
+  '/api/public/webinar-reminders': typeof ApiPublicWebinarRemindersRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -349,6 +358,7 @@ export interface FileRoutesById {
   '/resource-principals/': typeof ResourcePrincipalsIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/webinars/': typeof WebinarsIndexRoute
+  '/api/public/webinar-reminders': typeof ApiPublicWebinarRemindersRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -390,6 +400,7 @@ export interface FileRouteTypes {
     | '/resource-principals/'
     | '/resources/'
     | '/webinars/'
+    | '/api/public/webinar-reminders'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -429,6 +440,7 @@ export interface FileRouteTypes {
     | '/resource-principals'
     | '/resources'
     | '/webinars'
+    | '/api/public/webinar-reminders'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -468,6 +480,7 @@ export interface FileRouteTypes {
     | '/resource-principals/'
     | '/resources/'
     | '/webinars/'
+    | '/api/public/webinar-reminders'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -508,6 +521,7 @@ export interface RootRouteChildren {
   ResourcePrincipalsIndexRoute: typeof ResourcePrincipalsIndexRoute
   ResourcesIndexRoute: typeof ResourcesIndexRoute
   WebinarsIndexRoute: typeof WebinarsIndexRoute
+  ApiPublicWebinarRemindersRoute: typeof ApiPublicWebinarRemindersRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -753,6 +767,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WebinarsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/webinar-reminders': {
+      id: '/api/public/webinar-reminders'
+      path: '/api/public/webinar-reminders'
+      fullPath: '/api/public/webinar-reminders'
+      preLoaderRoute: typeof ApiPublicWebinarRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/auth/preview': {
       id: '/lovable/email/auth/preview'
       path: '/lovable/email/auth/preview'
@@ -812,6 +833,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResourcePrincipalsIndexRoute: ResourcePrincipalsIndexRoute,
   ResourcesIndexRoute: ResourcesIndexRoute,
   WebinarsIndexRoute: WebinarsIndexRoute,
+  ApiPublicWebinarRemindersRoute: ApiPublicWebinarRemindersRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
