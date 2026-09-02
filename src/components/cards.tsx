@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Award, Clock, Star, Users, Video, Download, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { downloadResource } from "@/lib/resources";
-import { formatPrice } from "@/lib/brand";
+import { formatPrice , displayRegistered } from "@/lib/brand";
 import { useAuth } from "@/hooks/useAuth";
 import type { Course, Expert, Post, Resource, Webinar } from "@/lib/api";
 
@@ -106,7 +106,7 @@ export function WebinarCard({ webinar }: { webinar: Webinar }) {
         </div>
       </dl>
       <p className="mt-3 inline-flex items-center gap-1 text-xs text-muted-foreground">
-        <Users className="h-3.5 w-3.5" /> {webinar.registered_count.toLocaleString()} registered
+        <Users className="h-3.5 w-3.5" /> {displayRegistered(webinar.registered_count).toLocaleString()} registered
       </p>
       <Button className="mt-4 w-full" variant="brand" asChild>
         <Link to="/webinars/$slug" params={{ slug: webinar.slug }}>

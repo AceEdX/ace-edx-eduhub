@@ -66,3 +66,9 @@ export function formatPrice(amountInr: number, isFree: boolean) {
   if (isFree || amountInr <= 0) return "Free";
   return `₹${amountInr.toLocaleString("en-IN")}`;
 }
+
+/** Social-proof floor: every session shows at least 10 registered participants. */
+export const MIN_DISPLAYED_REGISTRATIONS = 10;
+export function displayRegistered(count: number | null | undefined) {
+  return Math.max(MIN_DISPLAYED_REGISTRATIONS, count ?? 0);
+}
