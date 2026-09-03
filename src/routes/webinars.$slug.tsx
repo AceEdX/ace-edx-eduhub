@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CalendarPlus, CheckCircle2, Clock, Users, Video } from "lucide-react";
+import { CalendarPlus, CheckCircle2, Clock, MessageCircle, Radio, Share2, Users, Video } from "lucide-react";
 import { PageShell, EmptyState } from "@/components/layout/PageShell";
 import { Pill } from "@/components/cards";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import { LessonMedia } from "@/components/LessonMedia";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useWebinarLinks } from "@/lib/webinar-links";
-import { formatPrice } from "@/lib/brand";
+import { displayRegistered, formatPrice } from "@/lib/brand";
 import { payAndUnlock } from "@/lib/razorpay";
 import type { Webinar } from "@/lib/api";
 
@@ -59,7 +59,7 @@ function WebinarDetail() {
       const { data, error } = await supabase
         .from("webinars")
         .select(
-          "id, slug, title, description, topic, starts_at, duration_min, price_inr, is_free, status, certificate, image_url, registered_count, expert_id, published, program_type, principal_id, stream_provider, has_recording, has_meeting_link, experts(*)",
+          "id, slug, title, description, topic, starts_at, duration_min, price_inr, is_free, status, certificate, image_url, registered_count, expert_id, published, program_type, principal_id, stream_provider, has_recording, has_meeting_link, agenda, seat_cap, session_type, live_started_at, live_ended_at, resource_principals(display_name, slug), experts(*)",
         )
         .eq("published", true)
         .eq("slug", slug)
@@ -89,23 +89,47 @@ function WebinarDetail() {
   const recordingUrl = links.data?.recording_url ?? null;
 
   const countdown = useCountdown(webinar.data?.starts_at);
+  const [watching, setWatching] = useState(false);
+  const [watchedSec, setWatchedSec] = useState(0);
+  const [issuing, setIssuing] = useState(false);
 
   async function confirmRegistration(w: Webinar) {
-    const { error } = await supabase
-      .from("webinar_registrations")
-      .upsert({ user_id: user!.id, webinar_id: w.id }, { onConflict: "user_id,webinar_id", ignoreDuplicates: true });
+    // Server-side: seat cap, payment check and the automated email schedule.
+    const { error } = await supabase.rpc("register_for_webinar", { _webinar_id: w.id });
     if (error) {
       toast.error(error.message);
       return;
     }
-    await supabase.from("notifications").insert({
-      user_id: user!.id,
-      title: "Webinar registration confirmed",
-      body: `You are registered for ${w.title}. We'll remind you 24 hours and 1 hour before.`,
-      link: `/webinars/${w.slug}`,
-    });
     await registration.refetch();
-    toast.success("You're registered — confirmation sent to your notifications");
+    await webinar.refetch();
+    const recorded = w.status === "recorded" || Boolean(w.has_recording);
+    if (recorded) {
+      // Recorded sessions start playing immediately after registration/payment.
+      setWatching(true);
+      setTimeout(() => document.getElementById("watch")?.scrollIntoView({ behavior: "smooth", block: "start" }), 300);
+      toast.success("You're in — the recording is ready below");
+    } else {
+      toast.success("You're registered — your join link is on its way by email", {
+        action: { label: "Get it on WhatsApp", onClick: () => window.open(whatsappLinkUrl(w), "_blank", "noopener") },
+      });
+    }
+  }
+
+  function whatsappLinkUrl(w: Webinar) {
+    const page = `https://eduhub.aceedx.com/webinars/${w.slug}`;
+    return `https://wa.me/919373387800?text=${encodeURIComponent(
+      `Hello AceEdX, I have registered for "${w.title}" (${new Date(w.starts_at).toLocaleString()}). Please send me the join link on WhatsApp. Session page: ${page}`,
+    )}`;
+  }
+
+  async function sharePage(w: Webinar) {
+    const url = `https://eduhub.aceedx.com/webinars/${w.slug}`;
+    const text = `${w.title} — register on AceEdX PrincipalX`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try { await navigator.share({ title: w.title, text, url }); return; } catch { /* fallthrough */ }
+    }
+    await navigator.clipboard.writeText(url);
+    toast.success("Registration link copied");
   }
 
   async function register() {
@@ -129,9 +153,6 @@ function WebinarDetail() {
     await confirmRegistration(w);
   }
 
-  const [watching, setWatching] = useState(false);
-  const [watchedSec, setWatchedSec] = useState(0);
-  const [issuing, setIssuing] = useState(false);
 
   useEffect(() => {
     const mins = registration.data?.attendance_minutes ?? 0;
@@ -257,7 +278,7 @@ function WebinarDetail() {
         <div className="container-page grid gap-10 lg:grid-cols-[1.6fr_1fr]">
           <div>
             <div className="flex flex-wrap gap-2">
-              <Pill tone="accent">{w.status === "recorded" ? "Recorded" : "Upcoming"}</Pill>
+              <Pill tone="accent">{w.status === "live" ? "Live now" : w.status === "recorded" ? "Recorded" : "Upcoming"}</Pill>
               <Pill tone="success">{formatPrice(w.price_inr, w.is_free)}</Pill>
             </div>
             <h1 className="mt-4 text-3xl font-semibold md:text-4xl">{w.title}</h1>
@@ -270,7 +291,7 @@ function WebinarDetail() {
                 <Clock className="h-4 w-4" /> {w.duration_min} minutes
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <Users className="h-4 w-4" /> {w.registered_count.toLocaleString()} registered
+                <Users className="h-4 w-4" /> {displayRegistered(w.registered_count).toLocaleString()} registered{w.seat_cap ? ` · ${Math.max(0, w.seat_cap - w.registered_count)} seats left` : ""}
               </span>
             </div>
             {countdown && (
@@ -325,14 +346,20 @@ function WebinarDetail() {
                   </>
                 ) : (
                   <>
-                    <Button
-                      variant="brand"
-                      className="mt-4 w-full"
-                      disabled={!meetingUrl}
-                      onClick={startLiveSession}
-                    >
-                      <Video className="h-4 w-4" />
-                      {meetingUrl ? "Join live session" : "Joining link coming soon"}
+                    <Button variant="brand" className="mt-4 w-full" asChild>
+                      <Link to="/live/$slug" params={{ slug: w.slug }}>
+                        <Radio className="h-4 w-4" /> {w.status === "live" ? "Join live now" : "Enter the live room"}
+                      </Link>
+                    </Button>
+                    {meetingUrl && (
+                      <Button variant="outline" className="mt-2 w-full" onClick={startLiveSession}>
+                        <Video className="h-4 w-4" /> Open in {w.stream_provider === "zoom" ? "Zoom" : "streaming app"}
+                      </Button>
+                    )}
+                    <Button variant="outline" className="mt-2 w-full" asChild>
+                      <a href={whatsappLinkUrl(w)} target="_blank" rel="noopener noreferrer">
+                        <MessageCircle className="h-4 w-4" /> Get join link on WhatsApp
+                      </a>
                     </Button>
                     <Button
                       variant="outline"
@@ -357,6 +384,9 @@ function WebinarDetail() {
                     <CalendarPlus className="h-4 w-4" /> Add to Google Calendar
                   </a>
                 </Button>
+                <Button variant="ghost" className="mt-2 w-full" onClick={() => void sharePage(w)}>
+                  <Share2 className="h-4 w-4" /> Share this session
+                </Button>
                 {certificateEarned && (
                   <Button variant="success" className="mt-2 w-full" asChild>
                     <Link to="/certificates">View your certificate</Link>
@@ -371,8 +401,11 @@ function WebinarDetail() {
                 <Button variant="brand" size="lg" className="mt-5 w-full" onClick={register}>
                   Register for this webinar
                 </Button>
+                <Button variant="ghost" className="mt-2 w-full" onClick={() => void sharePage(w)}>
+                  <Share2 className="h-4 w-4" /> Share this session
+                </Button>
                 <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
-                  <li>Live Q&amp;A with the speaker</li>
+                  <li>Live room with chat, Q&amp;A and polls</li>
                   <li>Recording access afterwards</li>
                   {w.certificate && <li>Participation certificate</li>}
                 </ul>
@@ -407,9 +440,15 @@ function WebinarDetail() {
 
 
       <div className="container-page py-14">
+        {w.agenda && (
+          <div className="card-surface mb-6 max-w-2xl p-6">
+            <h2 className="font-display text-lg font-semibold">Agenda</h2>
+            <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{w.agenda}</p>
+          </div>
+        )}
         <div className="card-surface max-w-2xl p-6">
           <h2 className="font-display text-lg font-semibold">Your speaker</h2>
-          <p className="mt-3 text-sm font-semibold">{w.experts?.name ?? "AceEdX Faculty"}</p>
+          <p className="mt-3 text-sm font-semibold">{w.experts?.name ?? w.resource_principals?.display_name ?? "AceEdX Faculty"}</p>
           <p className="text-xs text-muted-foreground">
             {w.experts?.title} · {w.experts?.organisation}
           </p>
