@@ -36,6 +36,7 @@ import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
 import { Route as ExpertsIndexRouteImport } from './routes/experts.index'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
 import { Route as LearningPathsIndexRouteImport } from './routes/learning-paths.index'
+import { Route as LiveSlugRouteImport } from './routes/live.$slug'
 import { Route as MediaIndexRouteImport } from './routes/media.index'
 import { Route as ResourcePrincipalsIndexRouteImport } from './routes/resource-principals.index'
 import { Route as ResourcePrincipalsSlugRouteImport } from './routes/resource-principals.$slug'
@@ -184,6 +185,11 @@ const LearningPathsIndexRoute = LearningPathsIndexRouteImport.update({
   path: '/learning-paths/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LiveSlugRoute = LiveSlugRouteImport.update({
+  id: '/live/$slug',
+  path: '/live/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MediaIndexRoute = MediaIndexRouteImport.update({
   id: '/media/',
   path: '/media/',
@@ -266,6 +272,7 @@ export interface FileRoutesByFullPath {
   '/verification': typeof VerificationRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/live/$slug': typeof LiveSlugRoute
   '/resource-principals/$slug': typeof ResourcePrincipalsSlugRoute
   '/verify/$certificateId': typeof VerifyCertificateIdRoute
   '/webinars/$slug': typeof WebinarsSlugRoute
@@ -306,6 +313,7 @@ export interface FileRoutesByTo {
   '/verification': typeof VerificationRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/live/$slug': typeof LiveSlugRoute
   '/resource-principals/$slug': typeof ResourcePrincipalsSlugRoute
   '/verify/$certificateId': typeof VerifyCertificateIdRoute
   '/webinars/$slug': typeof WebinarsSlugRoute
@@ -347,6 +355,7 @@ export interface FileRoutesById {
   '/verification': typeof VerificationRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/live/$slug': typeof LiveSlugRoute
   '/resource-principals/$slug': typeof ResourcePrincipalsSlugRoute
   '/verify/$certificateId': typeof VerifyCertificateIdRoute
   '/webinars/$slug': typeof WebinarsSlugRoute
@@ -389,6 +398,7 @@ export interface FileRouteTypes {
     | '/verification'
     | '/courses/$slug'
     | '/learn/$slug'
+    | '/live/$slug'
     | '/resource-principals/$slug'
     | '/verify/$certificateId'
     | '/webinars/$slug'
@@ -429,6 +439,7 @@ export interface FileRouteTypes {
     | '/verification'
     | '/courses/$slug'
     | '/learn/$slug'
+    | '/live/$slug'
     | '/resource-principals/$slug'
     | '/verify/$certificateId'
     | '/webinars/$slug'
@@ -469,6 +480,7 @@ export interface FileRouteTypes {
     | '/verification'
     | '/courses/$slug'
     | '/learn/$slug'
+    | '/live/$slug'
     | '/resource-principals/$slug'
     | '/verify/$certificateId'
     | '/webinars/$slug'
@@ -510,6 +522,7 @@ export interface RootRouteChildren {
   VerificationRoute: typeof VerificationRoute
   CoursesSlugRoute: typeof CoursesSlugRoute
   LearnSlugRoute: typeof LearnSlugRoute
+  LiveSlugRoute: typeof LiveSlugRoute
   ResourcePrincipalsSlugRoute: typeof ResourcePrincipalsSlugRoute
   VerifyCertificateIdRoute: typeof VerifyCertificateIdRoute
   WebinarsSlugRoute: typeof WebinarsSlugRoute
@@ -718,6 +731,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearningPathsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/live/$slug': {
+      id: '/live/$slug'
+      path: '/live/$slug'
+      fullPath: '/live/$slug'
+      preLoaderRoute: typeof LiveSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/media/': {
       id: '/media/'
       path: '/media'
@@ -822,6 +842,7 @@ const rootRouteChildren: RootRouteChildren = {
   VerificationRoute: VerificationRoute,
   CoursesSlugRoute: CoursesSlugRoute,
   LearnSlugRoute: LearnSlugRoute,
+  LiveSlugRoute: LiveSlugRoute,
   ResourcePrincipalsSlugRoute: ResourcePrincipalsSlugRoute,
   VerifyCertificateIdRoute: VerifyCertificateIdRoute,
   WebinarsSlugRoute: WebinarsSlugRoute,

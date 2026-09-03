@@ -228,7 +228,7 @@ function LiveRoom() {
       .from("webinars")
       .update(live ? { status: "live", published: true, live_started_at: new Date().toISOString(), live_ended_at: null } : { status: w!.has_recording || links.data?.recording_url ? "recorded" : "upcoming", live_ended_at: new Date().toISOString() })
       .eq("id", w!.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(live ? "You are live — registrants are being notified" : "Session ended");
     qc.invalidateQueries({ queryKey: ["live-room", slug] });
   }
@@ -480,9 +480,9 @@ function PollsPanel({ webinarId, userId, isHost }: { webinarId: string; userId: 
 
   async function launch() {
     const opts = options.split("\n").map((s) => s.trim()).filter(Boolean);
-    if (!question.trim() || opts.length < 2) return toast.error("Add a question and at least two options");
+    if (!question.trim() || opts.length < 2) { toast.error("Add a question and at least two options"); return; }
     const { error } = await supabase.from("webinar_polls").insert({ webinar_id: webinarId, question: question.trim(), options: opts });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setQuestion("");
     refresh();
   }
@@ -552,9 +552,9 @@ function HandoutsPanel({ webinarId, isHost }: { webinarId: string; isHost: boole
           <Input className="mt-2" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
           <Input className="mt-2" placeholder="https://… (PDF, slides, resource link)" value={url} onChange={(e) => setUrl(e.target.value)} />
           <Button size="sm" variant="brand" className="mt-2" onClick={async () => {
-            if (!title.trim() || !/^https?:\/\//.test(url)) return toast.error("Add a title and a valid link");
+            if (!title.trim() || !/^https?:\/\//.test(url)) { toast.error("Add a title and a valid link"); return; }
             const { error } = await supabase.from("webinar_handouts").insert({ webinar_id: webinarId, title: title.trim(), url });
-            if (error) return toast.error(error.message);
+            if (error) { toast.error(error.message); return; }
             setTitle(""); setUrl(""); refresh();
           }}>Add</Button>
         </div>
@@ -581,7 +581,7 @@ function HostControls({ room, onChanged }: { room: Room; onChanged: () => void }
   const [ctaUrl, setCtaUrl] = useState(room.cta_url ?? "");
   async function save(values: Partial<Room>) {
     const { error } = await supabase.from("webinars").update(values).eq("id", room.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Updated for everyone in the room");
     onChanged();
   }
