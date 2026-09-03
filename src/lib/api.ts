@@ -67,6 +67,12 @@ export type Webinar = {
   registered_count: number;
   expert_id: string | null;
   has_meeting_link?: boolean | null;
+  agenda?: string | null;
+  seat_cap?: number | null;
+  session_type?: string;
+  live_started_at?: string | null;
+  live_ended_at?: string | null;
+  resource_principals?: { display_name: string; slug: string } | null;
   has_recording?: boolean | null;
   image_url?: string | null;
   experts?: Expert | null;
