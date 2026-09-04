@@ -67,6 +67,7 @@ type CourseRow = {
   created_at: string;
   principal_id: string | null;
   revenue_share_pct: number | null;
+  approval_status: string;
 };
 
 function toLocalInput(value: string) {
@@ -148,7 +149,10 @@ function AdminPage() {
         <Tabs defaultValue="courses">
           <TabsList className="mb-6 flex-wrap">
             <TabsTrigger value="courses">Courses</TabsTrigger>
-            <TabsTrigger value="webinars">Webinars</TabsTrigger>
+            <TabsTrigger value="webinars">
+              Webinars
+              <AlertDot count={alerts.data?.webinars} />
+            </TabsTrigger>
             <TabsTrigger value="content">Course content</TabsTrigger>
             <TabsTrigger value="verifications">
               Verifications
@@ -409,8 +413,9 @@ function WebinarsAdmin() {
       const { data, error } = await supabase
         .from("webinars")
         .select(
-          "id, slug, title, description, starts_at, duration_min, price_inr, is_free, published, status, principal_id, revenue_share_pct",
+          "id, slug, title, description, starts_at, duration_min, price_inr, is_free, published, status, principal_id, revenue_share_pct, approval_status",
         )
+        .order("approval_status", { ascending: false })
         .order("starts_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as WebinarRow[];
@@ -477,8 +482,8 @@ function WebinarEditor({ webinar, onSaved }: { webinar: WebinarRow; onSaved: () 
         meeting_url: next.meeting_url,
         recording_url: next.recording_url,
         revenue_share_pct: next.revenue_share_pct,
+        approval_status: next.approval_status,
       })
-
       .eq("id", webinar.id);
     if (error) {
       toast.error(error.message);
@@ -495,7 +500,21 @@ function WebinarEditor({ webinar, onSaved }: { webinar: WebinarRow; onSaved: () 
           <h3 className="font-display text-lg font-semibold">{row.title}</h3>
           <p className="text-xs text-muted-foreground">
             {new Date(row.starts_at).toLocaleString()} · {row.duration_min} min
+            {row.principal_id ? " · Resource Principal session" : ""}
           </p>
+          {row.principal_id && (
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span className={`text-xs font-semibold ${row.approval_status === "approved" ? "text-success" : row.approval_status === "rejected" ? "text-destructive" : "text-accent"}`}>
+                {row.approval_status === "approved" ? "Approved" : row.approval_status === "rejected" ? "Rejected" : "Awaiting approval"}
+              </span>
+              {row.approval_status !== "approved" && (
+                <Button size="sm" variant="success" onClick={() => patch({ approval_status: "approved", published: true })}>Approve & publish</Button>
+              )}
+              {row.approval_status !== "rejected" && (
+                <Button size="sm" variant="ghost" onClick={() => patch({ approval_status: "rejected", published: false })}>Reject</Button>
+              )}
+            </div>
+          )}
         </div>
         <label className="flex items-center gap-2 text-sm">
           <Switch
