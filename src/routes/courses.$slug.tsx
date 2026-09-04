@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Award, Clock, Layers, Star, Users } from "lucide-react";
+import { Award, Clock, Layers, Share2, Star, Users } from "lucide-react";
 import { PageShell, EmptyState } from "@/components/layout/PageShell";
 import { Pill } from "@/components/cards";
 import { Button } from "@/components/ui/button";
@@ -62,6 +62,17 @@ function CourseDetail() {
   const lessons = useQuery(lessonsQuery(course.data?.id));
 
   const modules = groupModules(lessons.data ?? []);
+
+  async function shareCourse() {
+    const c = course.data;
+    if (!c) return;
+    const url = `https://eduhub.aceedx.com/courses/${c.slug}`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try { await navigator.share({ title: c.title, text: `${c.title} — enrol on AceEdX PrincipalX`, url }); return; } catch { /* fall through */ }
+    }
+    await navigator.clipboard.writeText(url);
+    toast.success("Course link copied — share it anywhere");
+  }
 
   async function enrol() {
     if (!user) {
@@ -164,6 +175,9 @@ function CourseDetail() {
             )}
             <Button variant="brand" size="lg" className="mt-5 w-full" onClick={enrol}>
               {c.is_free ? "Enrol now" : "Buy course"}
+            </Button>
+            <Button variant="ghost" className="mt-2 w-full" onClick={() => void shareCourse()}>
+              <Share2 className="h-4 w-4" /> Share this course
             </Button>
             <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">

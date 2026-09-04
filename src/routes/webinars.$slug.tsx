@@ -17,9 +17,9 @@ import { payAndUnlock } from "@/lib/razorpay";
 import type { Webinar } from "@/lib/api";
 
 export const Route = createFileRoute("/webinars/$slug")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
-      { title: "Webinar — AceEdX" },
+      { title: `${params.slug.replace(/-/g, " ").replace(/\s[a-z0-9]{4}$/, "")} — AceEdX webinar` },
       {
         name: "description",
         content:
@@ -27,6 +27,8 @@ export const Route = createFileRoute("/webinars/$slug")({
       },
       { property: "og:title", content: "AceEdX webinar for school leaders" },
       { property: "og:description", content: "Register free or paid and earn a certificate." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: WebinarDetail,
