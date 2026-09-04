@@ -124,7 +124,7 @@ async function drain(request: Request) {
       )}`;
 
       const result = await sendTemplateEmail(job.template, email, {
-        idempotencyKey: `${job.template}-${job.webinar_id}-${job.user_id}`,
+        idempotencyKey: `${job.template}-${job.webinar_id}-${job.user_id}-${job.attempts}`,
         templateData: {
           kind,
           name: profile?.full_name?.split(" ")[0] || "there",
@@ -167,7 +167,12 @@ async function drain(request: Request) {
         .update({ status: retryable ? "pending" : "failed", attempts: job.attempts + 1, error: message })
         .eq("id", job.id);
       failed++;
-      if (retryable) break;
+      if (retryable) {
+        // Release the rest of the claimed batch so the next run picks it up.
+        const rest = jobs.slice(jobs.indexOf(job) + 1).map((j) => j.id);
+        if (rest.length) await supabaseAdmin.from("webinar_email_jobs").update({ status: "pending" }).in("id", rest);
+        break;
+      }
     }
   }
 
