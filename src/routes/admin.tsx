@@ -67,7 +67,6 @@ type CourseRow = {
   created_at: string;
   principal_id: string | null;
   revenue_share_pct: number | null;
-  approval_status: string;
 };
 
 function toLocalInput(value: string) {
@@ -91,6 +90,7 @@ type WebinarRow = {
   recording_url: string | null;
   principal_id: string | null;
   revenue_share_pct: number | null;
+  approval_status: string;
 };
 
 function AlertDot({ count }: { count?: number }) {
@@ -418,7 +418,7 @@ function WebinarsAdmin() {
         .order("approval_status", { ascending: false })
         .order("starts_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as WebinarRow[];
+      return (data ?? []) as unknown as WebinarRow[];
     },
   });
 
