@@ -277,7 +277,7 @@ function StudioWebinars({ principalId }: { principalId: string }) {
       const { data, error } = await supabase
         .from("webinars")
         .select(
-          "id, slug, title, description, starts_at, duration_min, price_inr, is_free, published, status, stream_provider, program_type, revenue_share_pct",
+          "id, slug, title, description, starts_at, duration_min, price_inr, is_free, published, status, stream_provider, program_type, revenue_share_pct, session_type, seat_cap, agenda, attendance_threshold_pct, waiting_room_min, approval_status, certificate",
         )
         .eq("principal_id", principalId)
         .order("starts_at", { ascending: false });
@@ -442,6 +442,13 @@ type StudioWebinar = {
   recording_url?: string | null;
   program_type: string;
   revenue_share_pct: number | null;
+  session_type: string;
+  seat_cap: number | null;
+  agenda: string | null;
+  attendance_threshold_pct: number;
+  waiting_room_min: number;
+  approval_status: string;
+  certificate: boolean;
 };
 
 function StudioWebinarEditor({
@@ -486,6 +493,12 @@ function StudioWebinarEditor({
         stream_provider: next.stream_provider,
         meeting_url: next.meeting_url,
         recording_url: next.recording_url,
+        session_type: next.session_type,
+        seat_cap: next.seat_cap,
+        agenda: next.agenda,
+        attendance_threshold_pct: next.attendance_threshold_pct,
+        waiting_room_min: next.waiting_room_min,
+        certificate: next.certificate,
       })
       .eq("id", webinar.id);
     if (error) {
@@ -519,6 +532,10 @@ function StudioWebinarEditor({
           <p className="mt-1 text-xs text-muted-foreground">
             {row.program_type} · {new Date(row.starts_at).toLocaleString()}
             {stats ? ` · ${stats.registered} registered · ${stats.attended} attended` : ""}
+            {" · "}
+            <span className={row.approval_status === "approved" ? "text-success" : row.approval_status === "rejected" ? "text-destructive" : "text-accent"}>
+              {row.approval_status === "approved" ? "Approved by admin" : row.approval_status === "rejected" ? "Not approved" : "Awaiting admin approval"}
+            </span>
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -607,6 +624,40 @@ function StudioWebinarEditor({
         )}
 
         <div>
+          <Label className="text-xs">Session type</Label>
+          <Select value={row.session_type} onValueChange={(v) => patch({ session_type: v })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="live">Live</SelectItem>
+              <SelectItem value="recorded">Recorded (watch any time)</SelectItem>
+              <SelectItem value="evergreen">Evergreen replay</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label className="text-xs">Seat cap (blank = unlimited)</Label>
+          <Input type="number" min={1} value={row.seat_cap ?? ""} onChange={(e) => setRow({ ...row, seat_cap: e.target.value ? Number(e.target.value) : null })} onBlur={() => patch({ seat_cap: row.seat_cap })} />
+        </div>
+        <div>
+          <Label className="text-xs">Certificate</Label>
+          <div className="flex h-10 items-center gap-2">
+            <Switch checked={row.certificate} onCheckedChange={(v) => patch({ certificate: v })} />
+            <span className="text-sm text-muted-foreground">{row.certificate ? `Issued at ${row.attendance_threshold_pct}% attendance` : "Off"}</span>
+          </div>
+        </div>
+        <div>
+          <Label className="text-xs">Attendance threshold (%)</Label>
+          <Input type="number" min={10} max={100} value={row.attendance_threshold_pct} onChange={(e) => setRow({ ...row, attendance_threshold_pct: Number(e.target.value) })} onBlur={() => patch({ attendance_threshold_pct: row.attendance_threshold_pct })} />
+        </div>
+        <div>
+          <Label className="text-xs">Waiting room opens (min before)</Label>
+          <Input type="number" min={0} max={120} value={row.waiting_room_min} onChange={(e) => setRow({ ...row, waiting_room_min: Number(e.target.value) })} onBlur={() => patch({ waiting_room_min: row.waiting_room_min })} />
+        </div>
+        <div className="sm:col-span-3">
+          <Label className="text-xs">Agenda (shown on the registration page)</Label>
+          <Textarea rows={3} value={row.agenda ?? ""} placeholder={"10:00 Welcome and context\n10:10 Three retention levers\n10:40 Live Q&A"} onChange={(e) => setRow({ ...row, agenda: e.target.value })} onBlur={() => patch({ agenda: row.agenda })} />
+        </div>
+        <div>
           <Label className="text-xs">Streaming platform</Label>
           <Select value={row.stream_provider} onValueChange={(v) => patch({ stream_provider: v })}>
             <SelectTrigger>
@@ -670,16 +721,93 @@ function StudioWebinarEditor({
             Schedule on Zoom
           </a>
         </Button>
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/webinars/$slug" params={{ slug: row.slug }}>
-            <Video className="h-4 w-4" /> View page
+        <Button variant="success" size="sm" asChild>
+          <Link to="/live/$slug" params={{ slug: row.slug }}>
+            <Radio className="h-4 w-4" /> Host console / live room
           </Link>
         </Button>
+        <Button variant="ghost" size="sm" asChild>
+          <Link to="/webinars/$slug" params={{ slug: row.slug }}>
+            <Video className="h-4 w-4" /> Registration page
+          </Link>
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={async () => {
+            await navigator.clipboard.writeText(`https://eduhub.aceedx.com/webinars/${row.slug}`);
+            toast.success("Registration link copied — share it on WhatsApp, LinkedIn or email");
+          }}
+        >
+          Copy share link
+        </Button>
       </div>
+      <SessionAnalytics webinarId={row.id} title={row.title} />
       {!row.meeting_url && (
         <p className="mt-2 text-xs text-muted-foreground">
           Paste your Zoom, YouTube Live or other join link above to enable the go live button.
         </p>
+      )}
+    </div>
+  );
+}
+
+function SessionAnalytics({ webinarId, title }: { webinarId: string; title: string }) {
+  const [open, setOpen] = useState(false);
+  const a = useQuery({
+    queryKey: ["webinar-analytics", webinarId],
+    enabled: open,
+    queryFn: async () => (await supabase.rpc("webinar_analytics", { _webinar_id: webinarId })).data?.[0] ?? null,
+  });
+  async function exportCsv() {
+    const { data, error } = await supabase.rpc("webinar_attendees", { _webinar_id: webinarId });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    const rows = [["Name", "School", "City", "Attended", "Minutes", "Joined at", "Registered at"]].concat(
+      (data ?? []).map((r) => [r.full_name, r.school_name ?? "", r.city ?? "", r.attended ? "yes" : "no", String(r.attendance_minutes), r.joined_at ?? "", r.registered_at]),
+    );
+    const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const el = document.createElement("a");
+    el.href = url;
+    el.download = `${title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-attendees.csv`;
+    el.click();
+    URL.revokeObjectURL(url);
+  }
+  const d = a.data;
+  return (
+    <div className="mt-4 rounded-xl border border-border p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <button className="text-xs font-semibold" onClick={() => setOpen((o) => !o)}>
+          {open ? "Hide" : "Show"} session analytics
+        </button>
+        <Button size="sm" variant="outline" onClick={() => void exportCsv()}>
+          Export attendees CSV
+        </Button>
+      </div>
+      {open && d && (
+        <div className="mt-3 grid grid-cols-2 gap-3 text-center sm:grid-cols-5">
+          {[
+            ["Registered", d.registered],
+            ["Attended", d.attended],
+            ["Show-up %", d.show_up_pct],
+            ["Avg watch min", d.avg_watch_min],
+            ["Live now", d.live_now],
+            ["Questions", d.questions],
+            ["Chat msgs", d.chat_messages],
+            ["Offer clicks", d.cta_clicks],
+            ["Gross ₹", d.gross_inr],
+            ["Your share ₹", d.payout_inr],
+          ].map(([l, v]) => (
+            <div key={l as string}>
+              <p className="font-display text-lg font-semibold">{v as number}</p>
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{l}</p>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
