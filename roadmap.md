@@ -13,3 +13,5 @@
 - [ ] Paid recorded webinar → straight to the recording
 - [ ] Upcoming/live → link by email + WhatsApp
 - [ ] Every webinar has its own shareable page/link (share button)
+
+- [ ] Course page: share button + rich OG metadata so each course/webinar page works as a shareable ad/registration page

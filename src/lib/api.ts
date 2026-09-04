@@ -70,6 +70,7 @@ export type Webinar = {
   agenda?: string | null;
   seat_cap?: number | null;
   session_type?: string;
+  stream_provider?: string;
   live_started_at?: string | null;
   live_ended_at?: string | null;
   resource_principals?: { display_name: string; slug: string } | null;
