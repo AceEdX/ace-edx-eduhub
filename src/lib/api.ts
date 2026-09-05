@@ -138,10 +138,11 @@ export const coursesQuery = {
 export const courseQuery = (slug: string) => ({
   queryKey: ["course", slug],
   queryFn: async (): Promise<Course | null> => {
+    // Access rules decide visibility: published courses for everyone, plus
+    // lifetime access for enrolled learners even if the course is hidden later.
     const { data, error } = await supabase
       .from("courses")
       .select(COURSE_SELECT)
-      .eq("published", true)
       .eq("slug", slug)
       .maybeSingle();
     if (error) throw error;

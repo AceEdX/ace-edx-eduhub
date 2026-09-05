@@ -15,7 +15,10 @@ import { INTEREST_AREAS, PROFESSIONAL_ROLES, brand } from "@/lib/brand";
 import { SCHOOL_BOARDS } from "@/lib/principals";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: z.object({ mode: z.enum(["signin", "signup"]).optional() }),
+  validateSearch: z.object({
+    mode: z.enum(["signin", "signup"]).optional(),
+    redirect: z.string().optional(),
+  }),
   head: () => ({
     meta: [
       { title: "Join the Principal Network — AceEdX PrincipalX" },
@@ -104,9 +107,15 @@ function AuthPage() {
   const [showSigninPassword, setShowSigninPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
 
+  // Only same-origin paths are honoured so the redirect cannot send people off-site.
+  const safeRedirect =
+    search.redirect && search.redirect.startsWith("/") && !search.redirect.startsWith("//")
+      ? search.redirect
+      : null;
+
   useEffect(() => {
-    if (!loading && user) navigate({ to: "/dashboard", replace: true });
-  }, [loading, user, navigate]);
+    if (!loading && user) navigate({ to: safeRedirect ?? "/dashboard", replace: true });
+  }, [loading, user, navigate, safeRedirect]);
 
   function set<K extends keyof Form>(key: K, value: Form[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -199,7 +208,7 @@ function AuthPage() {
       }
       if (data.session) {
         toast.success("Account created — your school verification is under review");
-        navigate({ to: "/verification" });
+        navigate({ to: safeRedirect ?? "/verification" });
       } else {
         toast.success("Check your email to confirm your account");
         setMode("signin");
@@ -221,7 +230,7 @@ function AuthPage() {
       });
       if (error) throw error;
       toast.success("Welcome back");
-      navigate({ to: "/dashboard" });
+      navigate({ to: safeRedirect ?? "/dashboard" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Sign in failed");
     } finally {
