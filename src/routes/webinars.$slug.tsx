@@ -63,7 +63,8 @@ function WebinarDetail() {
         .select(
           "id, slug, title, description, topic, starts_at, duration_min, price_inr, is_free, status, certificate, image_url, registered_count, expert_id, published, program_type, principal_id, stream_provider, has_recording, has_meeting_link, agenda, seat_cap, session_type, live_started_at, live_ended_at, resource_principals(display_name, slug), experts(*)",
         )
-        .eq("published", true)
+        // Visibility is enforced by access rules: public sessions for everyone,
+        // plus lifetime access for anyone already registered even if it is hidden later.
         .eq("slug", slug)
         .maybeSingle();
       if (error) throw error;
@@ -136,7 +137,7 @@ function WebinarDetail() {
 
   async function register() {
     if (!user) {
-      navigate({ to: "/auth", search: { mode: "signup" } });
+      navigate({ to: "/auth", search: { mode: "signup", redirect: `/webinars/${slug}` } });
       return;
     }
     const w = webinar.data;

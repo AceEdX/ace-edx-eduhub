@@ -190,7 +190,7 @@ function LiveRoom() {
           <EmptyState
             title="Sign in to enter the live room"
             description={`"${w.title}" is open to registered participants. Sign in and register from the session page.`}
-            action={<Button variant="brand" onClick={() => navigate({ to: "/auth", search: { mode: "signin" } })}>Sign in</Button>}
+            action={<Button variant="brand" onClick={() => navigate({ to: "/auth", search: { mode: "signin", redirect: `/live/${slug}` } })}>Sign in</Button>}
           />
         </div>
       </PageShell>

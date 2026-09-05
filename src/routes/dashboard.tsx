@@ -69,10 +69,15 @@ function DashboardPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("webinar_registrations")
-        .select("*, webinars(*)")
-        .eq("user_id", user!.id);
+        .select(
+          "id, attended, webinars(id, slug, title, starts_at, duration_min, status, has_recording, session_type)",
+        )
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as unknown as Array<{ id: string; webinars: Webinar }>;
+      return ((data ?? []) as unknown as Array<{ id: string; attended: boolean; webinars: Webinar | null }>).filter(
+        (r) => Boolean(r.webinars),
+      ) as Array<{ id: string; attended: boolean; webinars: Webinar }>;
     },
   });
 
@@ -171,6 +176,9 @@ function DashboardPage() {
         <aside className="space-y-6">
           <div className="card-surface p-5">
             <h2 className="font-display text-base font-semibold">Your webinars</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Lifetime access — every session you registered for stays here to rewatch.
+            </p>
             {(registrations.data ?? []).length === 0 ? (
               <p className="mt-2 text-sm text-muted-foreground">
                 No registrations yet.{" "}
@@ -180,20 +188,42 @@ function DashboardPage() {
               </p>
             ) : (
               <ul className="mt-3 space-y-3">
-                {(registrations.data ?? []).map((r) => (
-                  <li key={r.id} className="text-sm">
-                    <Link
-                      to="/webinars/$slug"
-                      params={{ slug: r.webinars.slug }}
-                      className="font-medium hover:text-accent"
-                    >
-                      {r.webinars.title}
-                    </Link>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(r.webinars.starts_at).toLocaleString()}
-                    </p>
-                  </li>
-                ))}
+                {(registrations.data ?? []).map((r) => {
+                  const w = r.webinars;
+                  const ended = Date.now() > new Date(w.starts_at).getTime() + w.duration_min * 60000;
+                  const recorded = w.status === "recorded" || Boolean(w.has_recording);
+                  const label = recorded
+                    ? "Watch recording"
+                    : w.status === "live"
+                      ? "Join live now"
+                      : ended
+                        ? "Open session"
+                        : "Enter live room";
+                  return (
+                    <li key={r.id} className="flex items-start justify-between gap-3 text-sm">
+                      <div className="min-w-0">
+                        <Link
+                          to="/webinars/$slug"
+                          params={{ slug: w.slug }}
+                          className="font-medium hover:text-accent"
+                        >
+                          {w.title}
+                        </Link>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(w.starts_at).toLocaleString()}
+                          {r.attended ? " · Attended" : ""}
+                        </p>
+                      </div>
+                      <Button variant={recorded || w.status === "live" ? "brand" : "outline"} size="sm" asChild>
+                        {recorded || ended ? (
+                          <Link to="/webinars/$slug" params={{ slug: w.slug }}>{label}</Link>
+                        ) : (
+                          <Link to="/live/$slug" params={{ slug: w.slug }}>{label}</Link>
+                        )}
+                      </Button>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>
