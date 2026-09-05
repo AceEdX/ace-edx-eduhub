@@ -76,7 +76,7 @@ function CourseDetail() {
 
   async function enrol() {
     if (!user) {
-      navigate({ to: "/auth", search: { mode: "signup" } });
+      navigate({ to: "/auth", search: { mode: "signup", redirect: `/courses/${slug}` } });
       return;
     }
     const data = course.data;
