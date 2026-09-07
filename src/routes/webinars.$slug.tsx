@@ -162,6 +162,15 @@ function WebinarDetail() {
     if (mins > 0) setWatchedSec((s) => Math.max(s, mins * 60));
   }, [registration.data]);
 
+  // Registered attendees of a recorded session start watching straight away so
+  // their certificate is issued automatically once they finish it.
+  useEffect(() => {
+    const w = webinar.data;
+    if (!w || !registration.data || registration.data.attended) return;
+    const recorded = w.status === "recorded" || Boolean(w.has_recording);
+    if (recorded && recordingUrl) setWatching(true);
+  }, [webinar.data, registration.data, recordingUrl]);
+
   useEffect(() => {
     if (!watching) return;
     const id = setInterval(() => setWatchedSec((s) => s + 5), 5000);
