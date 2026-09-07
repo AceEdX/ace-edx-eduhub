@@ -35,7 +35,9 @@ function WebinarsPage() {
   const [term, setTerm] = useState("");
 
   const filtered = (data ?? []).filter((w) => {
-    const matchesTab = tab === "All" || (tab === "Upcoming" ? w.status === "upcoming" : w.status === "recorded");
+    const matchesTab =
+      tab === "All" ||
+      (tab === "Upcoming" ? w.status === "upcoming" || w.status === "live" : w.status === "recorded");
     const matchesPrice = price === "All" || (price === "Free" ? w.is_free : !w.is_free);
     const q = term.trim().toLowerCase();
     const matchesTerm =
