@@ -284,30 +284,70 @@ function WebinarDetail() {
     .toISOString()
     .replace(/[-:]|\.\d{3}/g, "")}&details=${encodeURIComponent(w.description ?? "")}`;
 
+  const speakerName = w.experts?.name ?? w.resource_principals?.display_name ?? "AceEdX Faculty";
+  const highlights = [
+    { icon: Radio, title: "Live interactive room", text: "Chat, Q&A and polls with the speaker and fellow school leaders." },
+    { icon: Video, title: "Lifetime recording", text: "Rewatch the full session any time from your dashboard." },
+    { icon: Award, title: "Verifiable certificate", text: "A shareable credential with a unique ID, issued automatically." },
+    { icon: Users, title: "Peer network", text: "Join principals and owners solving the same challenges." },
+  ];
+
   return (
     <PageShell>
-      <section className="border-b border-border bg-primary py-14 text-primary-foreground">
-        <div className="container-page grid gap-10 lg:grid-cols-[1.6fr_1fr]">
+      <section className="relative overflow-hidden border-b border-border bg-primary py-16 text-primary-foreground">
+        {w.image_url && (
+          <img
+            src={w.image_url}
+            alt=""
+            aria-hidden
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-15"
+          />
+        )}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent/25 blur-3xl"
+        />
+        <div className="container-page relative grid gap-10 lg:grid-cols-[1.6fr_1fr]">
           <div>
-            <div className="flex flex-wrap gap-2">
-              <Pill tone="accent">{w.status === "live" ? "Live now" : w.status === "recorded" ? "Recorded" : "Upcoming"}</Pill>
+            <div className="flex flex-wrap items-center gap-2">
+              <Pill tone="accent">
+                {w.status === "live" ? "Live now" : w.status === "recorded" ? "Watch on demand" : "Upcoming session"}
+              </Pill>
               <Pill tone="success">{formatPrice(w.price_inr, w.is_free)}</Pill>
+              {w.certificate && <Pill>Certificate included</Pill>}
+              <Pill>{w.topic}</Pill>
             </div>
-            <h1 className="mt-4 text-3xl font-semibold md:text-4xl">{w.title}</h1>
-            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-primary-foreground/80">
-              {w.description}
-            </p>
+            <h1 className="mt-5 font-display text-3xl font-semibold leading-tight md:text-5xl">{w.title}</h1>
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-primary-foreground/85">{w.description}</p>
+
+            <div className="mt-7 flex flex-wrap items-center gap-3 rounded-2xl bg-primary-foreground/10 px-5 py-4 text-sm">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent/25 font-semibold">
+                {speakerName.charAt(0)}
+              </span>
+              <span>
+                <span className="block font-semibold">{speakerName}</span>
+                <span className="block text-xs text-primary-foreground/70">
+                  {w.experts?.title ?? "Resource Principal"}
+                  {w.experts?.organisation ? ` · ${w.experts.organisation}` : ""}
+                </span>
+              </span>
+            </div>
+
             <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-primary-foreground/80">
-              <span>{date.toLocaleString()}</span>
+              <span className="inline-flex items-center gap-1.5">
+                <CalendarPlus className="h-4 w-4" /> {date.toLocaleString()}
+              </span>
               <span className="inline-flex items-center gap-1.5">
                 <Clock className="h-4 w-4" /> {w.duration_min} minutes
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <Users className="h-4 w-4" /> {displayRegistered(w.registered_count).toLocaleString()} registered{w.seat_cap ? ` · ${Math.max(0, w.seat_cap - w.registered_count)} seats left` : ""}
+                <Users className="h-4 w-4" /> {displayRegistered(w.registered_count).toLocaleString()} registered
+                {w.seat_cap ? ` · ${Math.max(0, w.seat_cap - w.registered_count)} seats left` : ""}
               </span>
             </div>
+
             {countdown && (
-              <div className="mt-6 flex gap-3">
+              <div className="mt-7 flex gap-3">
                 {[
                   ["Days", countdown.days],
                   ["Hours", countdown.hours],
@@ -316,9 +356,9 @@ function WebinarDetail() {
                 ].map(([label, value]) => (
                   <div
                     key={label as string}
-                    className="rounded-xl bg-primary-foreground/10 px-4 py-3 text-center"
+                    className="min-w-16 rounded-xl bg-primary-foreground/10 px-4 py-3 text-center ring-1 ring-primary-foreground/15"
                   >
-                    <p className="font-display text-xl font-semibold">{value as number}</p>
+                    <p className="font-display text-2xl font-semibold">{value as number}</p>
                     <p className="text-[10px] uppercase tracking-wide opacity-70">{label}</p>
                   </div>
                 ))}
@@ -326,7 +366,7 @@ function WebinarDetail() {
             )}
           </div>
 
-          <aside className="card-surface h-fit p-6 text-foreground">
+          <aside className="card-surface h-fit p-6 text-foreground shadow-xl lg:sticky lg:top-24">
             {isRegistered ? (
               <>
                 <p className="inline-flex items-center gap-2 text-sm font-semibold text-success">
@@ -352,8 +392,8 @@ function WebinarDetail() {
                     <Progress value={watchPct} className="mt-4" />
                     <p className="mt-2 text-xs text-muted-foreground">
                       {certificateEarned
-                        ? "Watched — your participation certificate has been issued."
-                        : `${watchPct}% watched · certificate unlocks at 80% of the session.`}
+                        ? "Watched — your certificate is ready in My certificates."
+                        : `${watchPct}% watched · certificate is issued automatically at 80%.`}
                     </p>
                   </>
                 ) : (
@@ -407,20 +447,32 @@ function WebinarDetail() {
               </>
             ) : (
               <>
-                <p className="font-display text-3xl font-semibold">
-                  {formatPrice(w.price_inr, w.is_free)}
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  {w.is_free ? "Free seat" : "Your investment"}
                 </p>
+                <p className="font-display text-4xl font-semibold">{formatPrice(w.price_inr, w.is_free)}</p>
                 <Button variant="brand" size="lg" className="mt-5 w-full" onClick={register}>
-                  Register for this webinar
+                  {isRecorded ? "Get instant access" : "Reserve my seat"}
                 </Button>
                 <Button variant="ghost" className="mt-2 w-full" onClick={() => void sharePage(w)}>
                   <Share2 className="h-4 w-4" /> Share this session
                 </Button>
-                <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
-                  <li>Live room with chat, Q&amp;A and polls</li>
-                  <li>Recording access afterwards</li>
-                  {w.certificate && <li>Participation certificate</li>}
+                <ul className="mt-5 space-y-2.5 text-sm text-muted-foreground">
+                  <li className="flex gap-2">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" /> Live room with chat, Q&amp;A and polls
+                  </li>
+                  <li className="flex gap-2">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" /> Lifetime access to the recording
+                  </li>
+                  {w.certificate && (
+                    <li className="flex gap-2">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" /> Verifiable participation certificate
+                    </li>
+                  )}
                 </ul>
+                <p className="mt-5 inline-flex items-center gap-2 border-t border-border pt-4 text-xs text-muted-foreground">
+                  <ShieldCheck className="h-4 w-4 text-primary" /> Secure payment · instant confirmation by email
+                </p>
               </>
             )}
           </aside>
@@ -442,29 +494,74 @@ function WebinarDetail() {
             <Progress value={watchPct} />
             <p className="mt-2 text-xs text-muted-foreground">
               {certificateEarned
-                ? "Certificate issued — find it in your credentials wallet."
+                ? "Certificate issued — find it in My certificates."
                 : `Keep the recording playing on this page. ${watchPct}% of the required watch time completed — your certificate is issued automatically at 80%.`}
             </p>
           </div>
         </div>
       )}
 
+      <section className="border-b border-border bg-muted/40 py-12">
+        <div className="container-page grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {highlights.map((h) => (
+            <div key={h.title} className="card-surface h-full p-5">
+              <h.icon className="h-5 w-5 text-primary" />
+              <h3 className="mt-3 font-display text-base font-semibold">{h.title}</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{h.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-
-      <div className="container-page py-14">
-        {w.agenda && (
-          <div className="card-surface mb-6 max-w-2xl p-6">
-            <h2 className="font-display text-lg font-semibold">Agenda</h2>
-            <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{w.agenda}</p>
+      <div className="container-page grid gap-8 py-14 lg:grid-cols-[1.6fr_1fr]">
+        <div className="space-y-6">
+          {w.agenda && (
+            <div className="card-surface p-6">
+              <h2 className="font-display text-lg font-semibold">What we will cover</h2>
+              <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{w.agenda}</p>
+            </div>
+          )}
+          <div className="card-surface p-6">
+            <h2 className="font-display text-lg font-semibold">Who this is for</h2>
+            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+              <li>School owners and trustees planning growth</li>
+              <li>Principals and vice principals leading academic teams</li>
+              <li>Coordinators and senior educators driving school improvement</li>
+            </ul>
           </div>
-        )}
-        <div className="card-surface max-w-2xl p-6">
-          <h2 className="font-display text-lg font-semibold">Your speaker</h2>
-          <p className="mt-3 text-sm font-semibold">{w.experts?.name ?? w.resource_principals?.display_name ?? "AceEdX Faculty"}</p>
-          <p className="text-xs text-muted-foreground">
-            {w.experts?.title} · {w.experts?.organisation}
-          </p>
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{w.experts?.bio}</p>
+        </div>
+
+        <div className="space-y-6">
+          <div className="card-surface p-6">
+            <h2 className="font-display text-lg font-semibold">Your speaker</h2>
+            <div className="mt-4 flex items-center gap-3">
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft font-display text-lg font-semibold text-primary">
+                {speakerName.charAt(0)}
+              </span>
+              <span>
+                <span className="block text-sm font-semibold">{speakerName}</span>
+                <span className="block text-xs text-muted-foreground">
+                  {w.experts?.title ?? "Resource Principal"}
+                  {w.experts?.organisation ? ` · ${w.experts.organisation}` : ""}
+                </span>
+              </span>
+            </div>
+            {w.experts?.bio && (
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{w.experts.bio}</p>
+            )}
+          </div>
+
+          <div className="rounded-2xl bg-primary p-6 text-primary-foreground">
+            <Award className="h-6 w-6 text-accent" />
+            <h2 className="mt-3 font-display text-lg font-semibold">Certificate on completion</h2>
+            <p className="mt-2 text-sm leading-relaxed text-primary-foreground/80">
+              Attend at least 80% of the session — live or recorded — and your certificate appears automatically in My
+              certificates with a public verification link.
+            </p>
+            <Button variant="outline" className="mt-4 w-full bg-transparent" asChild>
+              <Link to="/certificates">Go to My certificates</Link>
+            </Button>
+          </div>
         </div>
       </div>
     </PageShell>
