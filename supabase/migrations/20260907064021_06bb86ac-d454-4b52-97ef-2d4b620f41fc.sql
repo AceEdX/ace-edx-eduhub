@@ -1,0 +1,1 @@
+GRANT SELECT (agenda, seat_cap, session_type, timezone, waiting_room_min, attendance_threshold_pct, approval_status, registration_questions, cta_label, cta_url, cta_active, pinned_message, live_started_at, live_ended_at) ON public.webinars TO anon, authenticated;
