@@ -1042,6 +1042,7 @@ export type Database = {
           updated_at: string
           verification_status: string
           visibility: string
+          whatsapp_number: string | null
           years_in_education: number | null
         }
         Insert: {
@@ -1066,6 +1067,7 @@ export type Database = {
           updated_at?: string
           verification_status?: string
           visibility?: string
+          whatsapp_number?: string | null
           years_in_education?: number | null
         }
         Update: {
@@ -1090,6 +1092,7 @@ export type Database = {
           updated_at?: string
           verification_status?: string
           visibility?: string
+          whatsapp_number?: string | null
           years_in_education?: number | null
         }
         Relationships: []
@@ -2103,6 +2106,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      whatsapp_messages: {
+        Row: {
+          body: string | null
+          created_at: string
+          error: string | null
+          id: string
+          kind: string
+          provider_message_id: string | null
+          status: string
+          to_number: string
+          user_id: string | null
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          kind?: string
+          provider_message_id?: string | null
+          status?: string
+          to_number: string
+          user_id?: string | null
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          kind?: string
+          provider_message_id?: string | null
+          status?: string
+          to_number?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {
