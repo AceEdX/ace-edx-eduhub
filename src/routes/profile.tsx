@@ -34,6 +34,7 @@ type ProfileForm = {
   school_name: string;
   city: string;
   country: string;
+  whatsapp_number: string;
   years_in_education: number | null;
   bio: string;
   interests: string[];
@@ -45,6 +46,7 @@ const EMPTY: ProfileForm = {
   school_name: "",
   city: "",
   country: "",
+  whatsapp_number: "",
   years_in_education: null,
   bio: "",
   interests: [],
@@ -82,6 +84,7 @@ function ProfilePage() {
       school_name: profile.data.school_name ?? "",
       city: profile.data.city ?? "",
       country: profile.data.country ?? "",
+      whatsapp_number: (profile.data as { whatsapp_number?: string | null }).whatsapp_number ?? "",
       years_in_education: profile.data.years_in_education ?? null,
       bio: profile.data.bio ?? "",
       interests: profile.data.interests ?? [],
@@ -175,6 +178,19 @@ function ProfilePage() {
                 value={form.country}
                 onChange={(e) => setForm({ ...form, country: e.target.value })}
               />
+            </div>
+            <div>
+              <Label className="text-xs">WhatsApp number</Label>
+              <Input
+                type="tel"
+                inputMode="tel"
+                placeholder="e.g. 9373387800"
+                value={form.whatsapp_number}
+                onChange={(e) => setForm({ ...form, whatsapp_number: e.target.value })}
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                We send payment confirmations and webinar join links here.
+              </p>
             </div>
           </div>
 
