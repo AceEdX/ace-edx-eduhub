@@ -141,6 +141,25 @@ async function drain(request: Request) {
         },
       });
 
+      // WhatsApp copy of the same notice, when the member saved a number.
+      try {
+        const { sendWhatsAppText, getUserWhatsAppNumber } = await import("@/lib/whatsapp.server");
+        const to = await getUserWhatsAppNumber(job.user_id);
+        if (to) {
+          const lines =
+            kind === "live-now"
+              ? `We are live now: ${w.title}\n\nJoin here: ${joinUrl}`
+              : kind === "followup"
+                ? `Thank you for joining ${w.title}.\n\nReplay and resources: ${w.recording_url ? joinUrl : pageUrl}`
+                : kind === "registration"
+                  ? `You are registered for ${w.title}.\n\nWhen: ${startsAtText}\nJoin link: ${joinUrl}`
+                  : `Reminder: ${w.title}\n\nWhen: ${startsAtText}\nJoin link: ${joinUrl}`;
+          await sendWhatsAppText({ to, body: lines, userId: job.user_id, kind: job.template });
+        }
+      } catch (e) {
+        console.error("[whatsapp] webinar notice failed", e);
+      }
+
       // Mirror the email as an in-app notification so it is never missed.
       await supabaseAdmin.from("notifications").insert({
         user_id: job.user_id,
