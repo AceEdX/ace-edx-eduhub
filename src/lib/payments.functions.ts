@@ -341,6 +341,15 @@ export const verifyPayment = createServerFn({ method: "POST" })
       link,
     });
 
+    // WhatsApp confirmation (sent automatically when the member saved a number).
+    try {
+      const { sendWhatsAppText, getUserWhatsAppNumber } = await import("@/lib/whatsapp.server");
+      const to = await getUserWhatsAppNumber(userId);
+      if (to) await sendWhatsAppText({ to, body: message, userId, kind: "payment-confirmation" });
+    } catch (error) {
+      console.error("[whatsapp] payment confirmation failed", error);
+    }
+
     // Confirmation email with the access link (managed sending).
     const recipientEmail = (context.claims as { email?: string } | undefined)?.email;
     if (recipientEmail) {
