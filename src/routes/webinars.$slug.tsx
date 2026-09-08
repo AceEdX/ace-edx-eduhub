@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CalendarPlus, CheckCircle2, Clock, MessageCircle, Radio, Share2, Users, Video } from "lucide-react";
+import { Award, CalendarPlus, CheckCircle2, Clock, MessageCircle, Radio, Share2, ShieldCheck, Users, Video } from "lucide-react";
 import { PageShell, EmptyState } from "@/components/layout/PageShell";
 import { Pill } from "@/components/cards";
 import { Button } from "@/components/ui/button";
