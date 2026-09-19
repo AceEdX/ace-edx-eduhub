@@ -711,6 +711,7 @@ export type Database = {
           id: string
           lesson_id: string
           user_id: string
+          watched_seconds: number
         }
         Insert: {
           completed_at?: string
@@ -718,6 +719,7 @@ export type Database = {
           id?: string
           lesson_id: string
           user_id: string
+          watched_seconds?: number
         }
         Update: {
           completed_at?: string
@@ -725,6 +727,7 @@ export type Database = {
           id?: string
           lesson_id?: string
           user_id?: string
+          watched_seconds?: number
         }
         Relationships: [
           {
@@ -2151,6 +2154,14 @@ export type Database = {
       can_manage_webinar: {
         Args: { _user_id: string; _webinar_id: string }
         Returns: boolean
+      }
+      course_lesson_heartbeat: {
+        Args: { _course_id: string; _lesson_id: string }
+        Returns: {
+          certificate_ready: boolean
+          course_progress: number
+          lesson_complete: boolean
+        }[]
       }
       course_outline: {
         Args: { _course_id: string }
