@@ -42,7 +42,12 @@ export async function payAndUnlock(opts: {
       },
     });
 
-    const rzp = new window.Razorpay!({
+    const Razorpay = window.Razorpay;
+    if (!Razorpay) {
+      toast.error("Could not open the secure checkout. Please try again.");
+      return;
+    }
+    const rzp = new Razorpay({
       key: order.keyId,
       amount: order.amount,
       currency: order.currency,
@@ -64,10 +69,9 @@ export async function payAndUnlock(opts: {
               razorpaySignature: response.razorpay_signature,
             },
           });
-          window.open(result.whatsappUrl, "_blank", "noopener");
           toast.success(`Payment confirmed — ${result.title}`, {
             description:
-              "Your access link is in your notifications. Tap to get the confirmation on WhatsApp.",
+              "Your access is ready. We have also sent the link by email and WhatsApp.",
             duration: 12000,
             action: {
               label: "WhatsApp confirmation",
@@ -75,9 +79,7 @@ export async function payAndUnlock(opts: {
             },
           });
           await opts.onSuccess();
-          if (opts.itemType === "subscription") {
-            window.location.assign(result.link);
-          }
+          window.location.assign(result.link);
         } catch (error) {
           toast.error(error instanceof Error ? error.message : "Payment verification failed");
         }

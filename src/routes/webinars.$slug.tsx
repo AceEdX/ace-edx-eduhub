@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Award, CalendarPlus, CheckCircle2, Clock, MessageCircle, Radio, Share2, ShieldCheck, Users, Video } from "lucide-react";
 import { PageShell, EmptyState } from "@/components/layout/PageShell";
@@ -54,6 +54,7 @@ function WebinarDetail() {
   const { slug } = Route.useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const webinar = useQuery({
     queryKey: ["webinar", slug],
@@ -172,10 +173,28 @@ function WebinarDetail() {
   }, [webinar.data, registration.data, recordingUrl]);
 
   useEffect(() => {
-    if (!watching) return;
-    const id = setInterval(() => setWatchedSec((s) => s + 5), 5000);
-    return () => clearInterval(id);
-  }, [watching]);
+    const w = webinar.data;
+    if (!watching || !user || !w) return;
+    let running = false;
+    const heartbeat = async () => {
+      if (running || document.visibilityState !== "visible") return;
+      running = true;
+      const { data, error } = await supabase.rpc("webinar_heartbeat", { _webinar_id: w.id });
+      running = false;
+      if (error) return;
+      const result = Array.isArray(data) ? data[0] : data;
+      if (result) setWatchedSec(result.seconds_watched ?? 0);
+      if (result?.is_attended) {
+        setWatching(false);
+        await registration.refetch();
+        await queryClient.invalidateQueries({ queryKey: ["certificates"] });
+        toast.success("Session complete — your certificate is ready");
+      }
+    };
+    void heartbeat();
+    const id = window.setInterval(() => void heartbeat(), 15000);
+    return () => window.clearInterval(id);
+  }, [watching, user, webinar.data, registration, queryClient]);
 
   async function saveAttendance(minutes: number, _attended: boolean) {
     const w = webinar.data;
@@ -489,6 +508,7 @@ function WebinarDetail() {
               duration_min: w.duration_min,
               video_url: recordingUrl,
             }}
+            onPlaybackChange={setWatching}
           />
           <div className="mt-4 max-w-xl">
             <Progress value={watchPct} />

@@ -12,3 +12,10 @@
 - [x] Paid recorded webinar → straight to the recording
 - [x] Upcoming/live → link by email (auto) + WhatsApp button
 - [x] Every webinar/course has its own shareable page with share button + social metadata
+
+## Instant purchase access and certificates
+- [x] Paid course and webinar access is created before payment completion returns
+- [x] Direct access link is delivered by email, WhatsApp and in-app notification
+- [x] Successful payment redirects immediately to the purchased content
+- [x] Video playback progress is persisted and certificates issue automatically at 80%
+- [x] Purchased learning remains available in My Learning and the dashboard

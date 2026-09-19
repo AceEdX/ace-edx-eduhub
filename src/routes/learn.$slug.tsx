@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CheckCircle2, ChevronLeft, ChevronRight, Circle } from "lucide-react";
 import { PageShell, EmptyState } from "@/components/layout/PageShell";
@@ -34,10 +34,12 @@ function LearnPage() {
   const { slug } = Route.useParams();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const course = useQuery(courseQuery(slug));
   const lessons = useQuery(lessonsQuery(course.data?.id));
   const [activeId, setActiveId] = useState<string | null>(null);
   const [completed, setCompleted] = useState<Set<string>>(new Set());
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth", search: { mode: "signin" } });
@@ -72,6 +74,7 @@ function LearnPage() {
   const [dwellSec, setDwellSec] = useState(0);
   useEffect(() => {
     setDwellSec(0);
+    setIsPlaying(false);
   }, [active?.id]);
   useEffect(() => {
     const id = setInterval(() => setDwellSec((s) => s + 1), 1000);
@@ -81,6 +84,38 @@ function LearnPage() {
   const isDone = active ? completed.has(active.id) : false;
   const engaged = isDone || dwellSec >= requiredSec;
   const remainingSec = Math.max(0, requiredSec - dwellSec);
+
+  useEffect(() => {
+    if (!isPlaying || !user || !active || !course.data || active.kind !== "video") return;
+    let running = false;
+    const heartbeat = async () => {
+      if (running || document.visibilityState !== "visible") return;
+      running = true;
+      const { data, error } = await supabase.rpc("course_lesson_heartbeat", {
+        _course_id: course.data.id,
+        _lesson_id: active.id,
+      });
+      running = false;
+      if (error) return;
+      const result = Array.isArray(data) ? data[0] : data;
+      if (result?.lesson_complete) {
+        setCompleted((current) => new Set(current).add(active.id));
+      }
+      if (result?.certificate_ready && course.data.certificate) {
+        const { error: certificateError } = await supabase.rpc("issue_certificate", {
+          _kind: "course",
+          _course_id: course.data.id,
+        });
+        if (!certificateError) {
+          await queryClient.invalidateQueries({ queryKey: ["certificates"] });
+          toast.success("Course complete — your certificate is ready");
+          setIsPlaying(false);
+        }
+      }
+    };
+    const id = window.setInterval(() => void heartbeat(), 15000);
+    return () => window.clearInterval(id);
+  }, [isPlaying, user, active, course.data, queryClient]);
 
 
   async function toggleComplete() {
@@ -178,7 +213,7 @@ function LearnPage() {
             ← {course.data.title}
           </Link>
 
-          <LessonMedia lesson={active} />
+          <LessonMedia lesson={active} onPlaybackChange={setIsPlaying} />
 
           <h1 className="mt-6 font-display text-2xl font-semibold">{active.title}</h1>
           <p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
