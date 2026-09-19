@@ -54,7 +54,13 @@ export function isDirectVideoUrl(url: string): boolean {
 }
 
 
-export function LessonMedia({ lesson }: { lesson: MediaLesson }) {
+export function LessonMedia({
+  lesson,
+  onPlaybackChange,
+}: {
+  lesson: MediaLesson;
+  onPlaybackChange?: (playing: boolean) => void;
+}) {
   const isDirectVideo = Boolean(lesson.video_url && isDirectVideoUrl(lesson.video_url));
   const embed = lesson.video_url ? toEmbedUrl(lesson.video_url) : null;
 
@@ -62,7 +68,14 @@ export function LessonMedia({ lesson }: { lesson: MediaLesson }) {
     return (
       <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-primary">
         {isDirectVideo ? (
-          <video className="aspect-video w-full" controls src={lesson.video_url} />
+          <video
+            className="aspect-video w-full"
+            controls
+            src={lesson.video_url}
+            onPlay={() => onPlaybackChange?.(true)}
+            onPause={() => onPlaybackChange?.(false)}
+            onEnded={() => onPlaybackChange?.(false)}
+          />
         ) : (
           <iframe
             className="aspect-video w-full"
@@ -70,6 +83,7 @@ export function LessonMedia({ lesson }: { lesson: MediaLesson }) {
             title={lesson.title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
             allowFullScreen
+            onLoad={() => onPlaybackChange?.(true)}
           />
         )}
       </div>
